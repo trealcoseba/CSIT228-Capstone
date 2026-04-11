@@ -1,4 +1,4 @@
-# Project LIGTAS-Bgy
+# Project LIGTAS-Brgy
 Local Integrated Guard & Task-Alert System for Barangays
 
 ## Group Members
@@ -11,11 +11,11 @@ Local Integrated Guard & Task-Alert System for Barangays
 
 
 ## Project Description
-Project **LIGTAS-Bgy** is a Java-based desktop disaster management command center designed to assist Barangay officials in preparing for and responding to emergencies.
+Project **LIGTAS-Brgy** is a Java-based desktop disaster management command center designed to assist Barangay officials in preparing for and responding to emergencies.
 
 At the barangay level, disaster response is often reactive due to fragmented records, lack of equipment tracking, and slow reporting systems. Important data such as vulnerable residents (elderly, PWDs, children) are frequently stored in physical logbooks that may be lost or damaged during disasters.
 
-LIGTAS-Bgy addresses this problem by providing a **centralized, offline-capable system** that allows officials to manage resident risk data, track emergency resources, monitor evacuation centers, and generate standardized disaster reports for submission to city authorities.
+LIGTAS-Brgy addresses this problem by providing a **centralized, offline-capable system** that allows officials to manage resident risk data, track emergency resources, monitor evacuation centers, and generate standardized disaster reports for submission to city authorities.
 
 The system aims to improve **disaster preparedness, response coordination, and data reliability**, especially in situations where internet connectivity is unavailable.
 
