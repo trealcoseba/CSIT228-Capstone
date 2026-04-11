@@ -1,6 +1,217 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-
-<HBox  prefHeight="570.0" prefWidth="863.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" />
+<Pane prefHeight="570.0" prefWidth="1079.0" style="-fx-background-color: #FFFF;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <HBox layoutX="-6.0" prefHeight="87.0" prefWidth="1085.0" style="-fx-background-color: #FFFF;">
+         <effect>
+            <DropShadow height="41.0" offsetX="2.0" radius="20.0" spread="0.15" width="41.0" />
+         </effect>
+         <children>
+            <ImageView fx:id="sidebar" fitHeight="38.0" fitWidth="32.0">
+               <image>
+                  <Image url="@../images/sidebar.png" />
+               </image>
+               <HBox.margin>
+                  <Insets left="30.0" top="23.0" />
+               </HBox.margin>
+            </ImageView>
+            <ImageView fitHeight="83.0" fitWidth="151.0">
+               <image>
+                  <Image url="@../images/logo.png" />
+               </image>
+               <HBox.margin>
+                  <Insets left="-20.0" top="2.0" />
+               </HBox.margin>
+            </ImageView>
+            <Label prefHeight="86.0" prefWidth="233.0" text="LIGTAS-Brgy">
+               <font>
+                  <Font name="Cambria Bold" size="30.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="-25.0" />
+               </HBox.margin>
+            </Label>
+            <VBox prefHeight="87.0" prefWidth="539.0">
+               <children>
+                  <Label prefHeight="55.0" prefWidth="252.0" text="Vulnerability registry">
+                     <font>
+                        <Font name="Eras Demi ITC" size="20.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets top="3.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label prefHeight="34.0" prefWidth="499.0" text="Barangay resident records — risk &amp; priority tracking" textFill="#797979">
+                     <font>
+                        <Font name="Eras Demi ITC" size="18.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets top="-18.0" />
+                     </VBox.margin>
+                  </Label>
+               </children>
+               <HBox.margin>
+                  <Insets left="10.0" />
+               </HBox.margin>
+            </VBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="87.0" prefWidth="281.0">
+               <children>
+                  <Button mnemonicParsing="false" prefHeight="45.0" prefWidth="167.0" text="+ Add resident">
+                     <HBox.margin>
+                        <Insets right="24.0" />
+                     </HBox.margin>
+                     <font>
+                        <Font name="Cambria Bold" size="18.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="3.0" layoutY="97.0" prefHeight="110.0" prefWidth="1079.0">
+         <children>
+            <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="82.0" prefWidth="191.0" style="-fx-background-color: #FFFF;">
+               <effect>
+                  <DropShadow blurType="GAUSSIAN" offsetX="2.0" offsetY="3.0" />
+               </effect>
+               <HBox.margin>
+                  <Insets top="12.0" />
+               </HBox.margin>
+               <children>
+                  <Label prefHeight="18.0" prefWidth="151.0" text="TOTAL HOUSEHOLDS">
+                     <font>
+                        <Font name="Eras Demi ITC" size="14.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="8.0" top="8.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="totalHouseholdLabel" prefHeight="18.0" prefWidth="20.0" text="0" textFill="#37c435">
+                     <font>
+                        <Font name="Eras Demi ITC" size="30.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="13.0" top="7.0" />
+                     </VBox.margin>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="82.0" prefWidth="191.0" style="-fx-background-color: #FFFF;">
+               <HBox.margin>
+                  <Insets left="60.0" top="12.0" />
+               </HBox.margin>
+               <effect>
+                  <DropShadow blurType="GAUSSIAN" offsetX="2.0" offsetY="3.0" />
+               </effect>
+               <children>
+                  <Label prefHeight="18.0" prefWidth="151.0" text="HIGH RISK">
+                     <font>
+                        <Font name="Eras Demi ITC" size="14.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="8.0" top="8.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="highRiskLabel" prefHeight="18.0" prefWidth="20.0" text="0" textFill="#ff3636">
+                     <font>
+                        <Font name="Eras Demi ITC" size="30.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="13.0" top="7.0" />
+                     </VBox.margin>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="82.0" prefWidth="191.0" style="-fx-background-color: #FFFF;">
+               <HBox.margin>
+                  <Insets left="60.0" top="12.0" />
+               </HBox.margin>
+               <effect>
+                  <DropShadow blurType="GAUSSIAN" offsetX="2.0" offsetY="3.0" />
+               </effect>
+               <children>
+                  <Label prefHeight="18.0" prefWidth="151.0" text="AT RISK">
+                     <font>
+                        <Font name="Eras Demi ITC" size="14.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="8.0" top="8.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="atRiskLabel" prefHeight="18.0" prefWidth="20.0" text="0" textFill="#ffab23">
+                     <font>
+                        <Font name="Eras Demi ITC" size="30.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="13.0" top="7.0" />
+                     </VBox.margin>
+                  </Label>
+               </children>
+            </VBox>
+            <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="82.0" prefWidth="191.0" style="-fx-background-color: #FFFF;">
+               <HBox.margin>
+                  <Insets left="60.0" top="12.0" />
+               </HBox.margin>
+               <effect>
+                  <DropShadow offsetX="2.0" offsetY="3.0" />
+               </effect>
+               <children>
+                  <Label prefHeight="18.0" prefWidth="151.0" text="PRIORITY EVAC.">
+                     <font>
+                        <Font name="Eras Demi ITC" size="14.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="8.0" top="8.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="priorityEvacLabel" prefHeight="18.0" prefWidth="20.0" text="0">
+                     <font>
+                        <Font name="Eras Demi ITC" size="30.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="13.0" top="7.0" />
+                     </VBox.margin>
+                  </Label>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <VBox alignment="TOP_CENTER" layoutX="8.0" layoutY="215.0" prefHeight="351.0" prefWidth="1062.0">
+         <children>
+            <TextField fx:id="searchBarTextField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="32.0" prefWidth="1035.0" promptText="Search name, purok, or contact...">
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </TextField>
+            <ComboBox fx:id="allPurokComboBox" prefHeight="32.0" prefWidth="1035.0" promptText="All puroks">
+               <VBox.margin>
+                  <Insets top="15.0" />
+               </VBox.margin>
+            </ComboBox>
+            <ComboBox fx:id="allRiskLevelsComboBox" prefHeight="32.0" prefWidth="1035.0" promptText="All risk levels">
+               <VBox.margin>
+                  <Insets top="15.0" />
+               </VBox.margin>
+            </ComboBox>
+            <ComboBox fx:id="allTypesComboBox" prefHeight="32.0" prefWidth="1035.0" promptText="All types">
+               <VBox.margin>
+                  <Insets top="15.0" />
+               </VBox.margin>
+            </ComboBox>
+         </children>
+      </VBox>
+   </children>
+</Pane>
