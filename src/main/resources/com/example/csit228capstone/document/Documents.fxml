@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane prefHeight="800.0" prefWidth="1000.0" fitToWidth="true" styleClass="dashboard-scroll" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.documents.DocumentsController">
+    <VBox spacing="16">
+        <padding><Insets topRightBottomLeft="16" /></padding>
+
+        <!-- Header with Title and Actions -->
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <Label styleClass="page-title" text="Document Management" />
+            <Region HBox.hgrow="ALWAYS" />
+            <TextField prefWidth="200" promptText="🔍 Search documents..." styleClass="search-field" />
+            <Button onAction="#uploadDocument" styleClass="quick-action-btn, qa-warning" text="📤 Upload Document" />
+        </HBox>
+
+        <!-- Stats Row -->
+        <HBox spacing="16">
+            <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="kpi-label" text="Total Documents" />
+                <Label fx:id="lblTotal" styleClass="kpi-value" text="0" />
+            </VBox>
+            <VBox styleClass="kpi-card, kpi-info" HBox.hgrow="ALWAYS">
+                <Label styleClass="kpi-label" text="Pending Approval" />
+                <Label fx:id="lblPending" styleClass="kpi-value" text="0" />
+            </VBox>
+            <VBox styleClass="kpi-card, kpi-warning" HBox.hgrow="ALWAYS">
+                <Label styleClass="kpi-label" text="Expiring Soon" />
+                <Label fx:id="lblExpiring" styleClass="kpi-value" text="0" />
+            </VBox>
+            <VBox styleClass="kpi-card, kpi-danger" HBox.hgrow="ALWAYS">
+                <Label styleClass="kpi-label" text="Rejected" />
+                <Label fx:id="lblRejected" styleClass="kpi-value" text="0" />
+            </VBox>
+        </HBox>
+
+        <!-- Filters -->
+        <HBox spacing="12">
+            <Label styleClass="filter-label" text="Filter:" />
+            <ComboBox fx:id="filterType" prefWidth="140" promptText="Document Type" />
+            <ComboBox fx:id="filterStatus" prefWidth="120" promptText="Status" />
+            <ComboBox fx:id="filterResident" prefWidth="140" promptText="Resident" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button onAction="#generateReport" styleClass="quick-action-btn" text="Generate Report" />
+        </HBox>
+
+        <!-- Documents Table -->
+        <VBox spacing="12" styleClass="panel-card" VBox.vgrow="ALWAYS">
+            <Label styleClass="panel-title" text="Document List" />
+            <TableView fx:id="documentsTable" prefHeight="350" styleClass="incident-table" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colId" prefWidth="50" text="ID" />
+                    <TableColumn fx:id="colResident" prefWidth="150" text="Resident" />
+                    <TableColumn fx:id="colType" prefWidth="120" text="Type" />
+                    <TableColumn fx:id="colRefNumber" prefWidth="100" text="Reference #" />
+                    <TableColumn fx:id="colStatus" prefWidth="100" text="Status" />
+                    <TableColumn fx:id="colSubmitted" prefWidth="100" text="Submitted" />
+                    <TableColumn fx:id="colExpiry" prefWidth="100" text="Expiry" />
+                    <TableColumn fx:id="colActions" prefWidth="80" text="Actions" />
+                </columns>
+            </TableView>
+        </VBox>
+    </VBox>
+</ScrollPane>

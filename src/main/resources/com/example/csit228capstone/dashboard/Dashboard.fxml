@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" prefHeight="800.0" prefWidth="1000.0" styleClass="dashboard-scroll" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.dashboard.DashboardController">
+
+    <VBox alignment="TOP_CENTER" spacing="24">
+        <padding><Insets topRightBottomLeft="16" /></padding>
+
+        <!-- KPI Cards Row -->
+        <HBox fx:id="kpiRow" spacing="16">
+            <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="kpi-label" text="Total Residents" />
+                <Label fx:id="lblTotalResidents" styleClass="kpi-value" text="0" />
+                <Label styleClass="kpi-sub" text="Registered in system" />
+            </VBox>
+            <VBox styleClass="kpi-card, kpi-danger" HBox.hgrow="ALWAYS">
+                <Label styleClass="kpi-label" text="Active Incidents" />
+                <Label fx:id="lblActiveIncidents" styleClass="kpi-value" text="0" />
+                <Label styleClass="kpi-sub" text="Require attention" />
+            </VBox>
+            <VBox styleClass="kpi-card, kpi-warning" HBox.hgrow="ALWAYS">
+                <Label styleClass="kpi-label" text="Pending Documents" />
+                <Label fx:id="lblPendingDocs" styleClass="kpi-value" text="0" />
+                <Label styleClass="kpi-sub" text="Awaiting processing" />
+            </VBox>
+            <VBox styleClass="kpi-card, kpi-info" HBox.hgrow="ALWAYS">
+                <Label styleClass="kpi-label" text="Evacuees" />
+                <Label fx:id="lblEvacuees" styleClass="kpi-value" text="0" />
+                <Label styleClass="kpi-sub" text="Currently sheltered" />
+            </VBox>
+        </HBox>
+
+        <!-- Middle Row: Incident Monitor + Quick Actions -->
+        <HBox spacing="16">
+            <!-- Live Incident Monitor -->
+            <VBox styleClass="panel-card" HBox.hgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label styleClass="panel-title" text="Live Incident Monitor" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Hyperlink onAction="#viewAllIncidents" styleClass="panel-link" text="View all →" />
+                </HBox>
+                <TableView fx:id="incidentTable" prefHeight="250" styleClass="incident-table" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colSeverity" prefWidth="30" text="" />
+                        <TableColumn fx:id="colType" prefWidth="140" text="Incident" />
+                        <TableColumn fx:id="colLocation" prefWidth="130" text="Location" />
+                        <TableColumn fx:id="colTime" prefWidth="80" text="Time" />
+                        <TableColumn fx:id="colStatus" prefWidth="100" text="Status" />
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- Quick Actions -->
+            <VBox prefWidth="200" spacing="12" styleClass="panel-card">
+                <Label styleClass="panel-title" text="Quick Actions" />
+                <Button maxWidth="Infinity" onAction="#reportIncident" styleClass="quick-action-btn, qa-danger" text="Report Incident" />
+                <Button maxWidth="Infinity" onAction="#evacuationOrder" styleClass="quick-action-btn, qa-warning" text="Evacuation Order" />
+                <Button maxWidth="Infinity" onAction="#addResident" styleClass="quick-action-btn" text="Add Resident" />
+            </VBox>
+        </HBox>
+
+        <!-- Bottom Row: Resources + Vulnerable + Weather -->
+        <HBox spacing="16">
+            <!-- Resource Status -->
+            <VBox spacing="12" styleClass="panel-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="panel-title" text="Resource Status" />
+                <VBox spacing="8">
+                    <HBox alignment="CENTER_LEFT"><Label styleClass="resource-label" text="Relief Goods" /><Region HBox.hgrow="ALWAYS" /><Label fx:id="lblRelief" styleClass="resource-pct" text="68%" /></HBox>
+                    <ProgressBar fx:id="pbRelief" maxWidth="Infinity" progress="0.68" styleClass="progress-green" />
+                    <HBox alignment="CENTER_LEFT"><Label styleClass="resource-label" text="Med Supplies" /><Region HBox.hgrow="ALWAYS" /><Label fx:id="lblMed" styleClass="resource-pct" text="45%" /></HBox>
+                    <ProgressBar fx:id="pbMed" maxWidth="Infinity" progress="0.45" styleClass="progress-amber" />
+                    <HBox alignment="CENTER_LEFT"><Label styleClass="resource-label" text="Emergency Fund" /><Region HBox.hgrow="ALWAYS" /><Label fx:id="lblFund" styleClass="resource-pct" text="22%" /></HBox>
+                    <ProgressBar fx:id="pbFund" maxWidth="Infinity" progress="0.22" styleClass="progress-red" />
+                    <HBox alignment="CENTER_LEFT"><Label styleClass="resource-label" text="Evac Center Cap." /><Region HBox.hgrow="ALWAYS" /><Label fx:id="lblEvac" styleClass="resource-pct" text="80%" /></HBox>
+                    <ProgressBar fx:id="pbEvac" maxWidth="Infinity" progress="0.80" styleClass="progress-blue" />
+                </VBox>
+            </VBox>
+
+            <!-- Vulnerable Residents -->
+            <VBox spacing="12" styleClass="panel-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="panel-title" text="Vulnerable Residents" />
+                <HBox alignment="CENTER_LEFT" spacing="16">
+                    <VBox alignment="CENTER_LEFT" prefHeight="59.0" prefWidth="149.0" spacing="4">
+                        <Label fx:id="lblSenior" styleClass="vuln-count" text="312" textFill="#bf5d5d" />
+                        <Label styleClass="vuln-label" text="Senior Citizens" />
+                  <HBox.margin>
+                     <Insets />
+                  </HBox.margin>
+                    </VBox>
+                    <VBox alignment="CENTER_LEFT" spacing="4">
+                        <Label fx:id="lblPwd" styleClass="vuln-count" text="87" />
+                        <Label styleClass="vuln-label" text="PWD" />
+                    </VBox>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+               <padding>
+                  <Insets left="15.0" />
+               </padding>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" spacing="16">
+                    <VBox alignment="CENTER_LEFT" prefHeight="52.0" prefWidth="149.0" spacing="4">
+                        <Label fx:id="lblPregnant" prefHeight="34.0" prefWidth="80.0" styleClass="vuln-count" text="24" />
+                        <Label styleClass="vuln-label" text="Pregnant" />
+                    </VBox>
+                    <VBox alignment="CENTER_LEFT" spacing="4">
+                        <Label fx:id="lblChildren" styleClass="vuln-count" text="441" />
+                        <Label styleClass="vuln-label" text="Children (0-5)" />
+                    </VBox>
+               <padding>
+                  <Insets left="15.0" top="15.0" />
+               </padding>
+                </HBox>
+            </VBox>
+
+            <!-- Weather Widget -->
+            <VBox prefWidth="220" spacing="4" styleClass="panel-card, weather-card">
+                <Label styleClass="weather-temp" text="29°C" />
+                <HBox spacing="16">
+                    <VBox><Label styleClass="weather-stat" text="78%" /><Label styleClass="weather-stat-label" text="Humidity" /></VBox>
+                    <VBox><Label styleClass="weather-stat" text="18 kph" /><Label styleClass="weather-stat-label" text="Wind" /></VBox>
+                </HBox>
+                <Label styleClass="weather-desc" text="Partly cloudy · Bacolod City" />
+            </VBox>
+        </HBox>
+    </VBox>
+</ScrollPane>

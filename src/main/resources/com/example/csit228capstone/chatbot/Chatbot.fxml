@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" prefHeight="800.0" prefWidth="1000.0" styleClass="dashboard-scroll" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.chatbot.ChatbotController">
+
+    <stylesheets>
+        <URL value="@../../../../css/application.css" />
+    </stylesheets>
+
+    <content>
+        <VBox fillWidth="true" spacing="16">
+            <padding>
+                <Insets bottom="16" left="16" right="16" top="16" />
+            </padding>
+
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <Label styleClass="page-title" text="AI Chatbot &amp; Logs" />
+                <Region HBox.hgrow="ALWAYS" />
+                <TextField prefWidth="200" promptText="🔍 Search conversations..." styleClass="search-field" />
+                <Button onAction="#clearLogs" styleClass="quick-action-btn" text="Clear Logs" />
+            </HBox>
+
+            <!-- Stats -->
+            <HBox spacing="16">
+                <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                    <Label styleClass="kpi-label" text="Total Conversations" />
+                    <Label fx:id="lblTotalConv" styleClass="kpi-value" text="0" />
+                </VBox>
+
+                <VBox styleClass="kpi-card, kpi-info" HBox.hgrow="ALWAYS">
+                    <Label styleClass="kpi-label" text="Avg. Resolution" />
+                    <Label fx:id="lblResolution" styleClass="kpi-value" text="0%" />
+                </VBox>
+
+                <VBox styleClass="kpi-card, kpi-warning" HBox.hgrow="ALWAYS">
+                    <Label styleClass="kpi-label" text="Escalated to Human" />
+                    <Label fx:id="lblEscalated" styleClass="kpi-value" text="0" />
+                </VBox>
+
+                <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                    <Label styleClass="kpi-label" text="User Satisfaction" />
+                    <Label fx:id="lblSatisfaction" styleClass="kpi-value" text="0/5" />
+                </VBox>
+            </HBox>
+
+            <!-- Main Content -->
+            <HBox spacing="16">
+                <VBox spacing="8" styleClass="panel-card" HBox.hgrow="ALWAYS">
+                    <Label styleClass="panel-title" text="Live Chatbot Window" />
+                    <VBox fx:id="chatWindow" styleClass="chat-area" VBox.vgrow="ALWAYS">
+                        <TextArea fx:id="chatDisplay" editable="false" styleClass="text-area-chat" wrapText="true" VBox.vgrow="ALWAYS" />
+                    </VBox>
+                    <HBox spacing="8">
+                        <TextField fx:id="messageInput" promptText="Type a message..." styleClass="chat-input" HBox.hgrow="ALWAYS" />
+                        <Button maxHeight="-Infinity" minWidth="-Infinity" onAction="#sendMessage" prefWidth="80" styleClass="quick-action-btn, qa-warning" text="Send">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin></Button>
+                    </HBox>
+                </VBox>
+
+                <VBox prefWidth="300" spacing="12" styleClass="panel-card">
+                    <Label styleClass="panel-title" text="Chatbot Settings" />
+                    <VBox spacing="8">
+                        <Label styleClass="resource-label" text="Chatbot Status:" />
+                        <HBox alignment="CENTER_LEFT" spacing="8">
+                            <Label fx:id="statusIndicator" styleClass="status-dot-active" text="●" />
+                            <Label styleClass="kpi-label" text="Active" />
+                        </HBox>
+                        <Label styleClass="resource-label" text="Response Mode:" />
+                        <ComboBox fx:id="responseMode" prefWidth="250">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="Smart" />
+                                    <String fx:value="FAQ Only" />
+                                    <String fx:value="Learning" />
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+                        <Separator />
+                        <Button maxWidth="Infinity" onAction="#loadTopic1" styleClass="quick-action-btn" text="Emergency Procedures" />
+                        <Button maxWidth="Infinity" onAction="#loadTopic2" styleClass="quick-action-btn" text="Evacuation Info" />
+                    </VBox>
+                </VBox>
+            </HBox>
+        </VBox>
+    </content>
+</ScrollPane>

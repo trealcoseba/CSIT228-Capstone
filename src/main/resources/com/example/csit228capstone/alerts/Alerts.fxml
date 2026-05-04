@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<ScrollPane fitToWidth="true" styleClass="dashboard-scroll" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.alerts.AlertsController">
+
+    <content>
+        <VBox fillWidth="true" spacing="16">
+
+            <padding>
+                <Insets bottom="16" left="16" right="16" top="16" />
+            </padding>
+
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <children>
+                    <Label styleClass="page-title" text="Alerts &amp; Broadcast" />
+                    <Region HBox.hgrow="ALWAYS" />
+
+                    <Button onAction="#sendAlert" styleClass="quick-action-btn, qa-danger" text="Send Alert">
+                        <font>
+                            <Font name="System Bold" size="13.0" />
+                        </font>
+                    </Button>
+
+                    <Button onAction="#sendBroadcast" styleClass="quick-action-btn, qa-warning" text="Send Broadcast" />
+                </children>
+            </HBox>
+
+            <!-- Stats -->
+            <HBox spacing="16">
+                <children>
+
+                    <VBox prefHeight="96.0" prefWidth="200.0" styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label styleClass="kpi-label" text="Alerts This Month" />
+                        <Label fx:id="lblAlertsMonth" styleClass="kpi-value" text="0" />
+                    </VBox>
+
+                    <VBox styleClass="kpi-card, kpi-danger" HBox.hgrow="ALWAYS">
+                        <Label styleClass="kpi-label" text="Unread Alerts" />
+                        <Label fx:id="lblUnread" styleClass="kpi-value" text="0" />
+                    </VBox>
+
+                    <VBox styleClass="kpi-card, kpi-info" HBox.hgrow="ALWAYS">
+                        <Label styleClass="kpi-label" text="Broadcasts" />
+                        <Label fx:id="lblBroadcasts" styleClass="kpi-value" text="0" />
+                    </VBox>
+
+                    <VBox styleClass="kpi-card, kpi-warning" HBox.hgrow="ALWAYS">
+                        <Label styleClass="kpi-label" text="Scheduled" />
+                        <Label fx:id="lblScheduled" styleClass="kpi-value" text="0" />
+                    </VBox>
+
+                </children>
+            </HBox>
+
+            <!-- Main Content -->
+            <HBox spacing="16" VBox.vgrow="ALWAYS">
+                <children>
+
+                    <!-- FORM -->
+                    <VBox prefWidth="350" spacing="12" styleClass="panel-card">
+                        <children>
+
+                            <Label styleClass="panel-title" text="Create New Alert" />
+
+                            <VBox spacing="8">
+                                <children>
+
+                                    <Label styleClass="resource-label" text="Alert Type:" />
+                                    <ComboBox fx:id="alertType" prefHeight="31.0" prefWidth="309.0" promptText="Select type...">
+                                        <items>
+                                            <FXCollections fx:factory="observableArrayList">
+                                                <String fx:value="Emergency Alert" />
+                                                <String fx:value="Warning" />
+                                                <String fx:value="Information" />
+                                                <String fx:value="Public Broadcast" />
+                                            </FXCollections>
+                                        </items>
+                                    </ComboBox>
+
+                                    <Label styleClass="resource-label" text="Priority:" />
+                                    <ComboBox fx:id="alertPriority" prefHeight="31.0" prefWidth="313.0" promptText="Select priority...">
+                                        <items>
+                                            <FXCollections fx:factory="observableArrayList">
+                                                <String fx:value="Critical" />
+                                                <String fx:value="High" />
+                                                <String fx:value="Medium" />
+                                                <String fx:value="Low" />
+                                            </FXCollections>
+                                        </items>
+                                    </ComboBox>
+
+                                    <Label styleClass="resource-label" text="Message:" />
+                                    <TextArea fx:id="alertMessage" prefRowCount="6" promptText="Enter your alert message..." wrapText="true" />
+
+                                    <Label styleClass="resource-label" text="Recipients:" />
+                                    <CheckBox fx:id="chkAll" text="Send to All Residents" />
+                                    <CheckBox fx:id="chkVulnerable" text="Vulnerable Groups Only" />
+                                    <CheckBox fx:id="chkOfficials" text="Officials Only" />
+
+                                    <!-- FIXED HBOX -->
+                                    <HBox spacing="8">
+                                        <padding>
+                                            <Insets bottom="0" left="0" right="0" top="10" />
+                                        </padding>
+
+                                        <children>
+                                            <Button maxWidth="Infinity" onAction="#sendNow" styleClass="quick-action-btn, qa-danger" text="Send Now" HBox.hgrow="ALWAYS" />
+
+                                            <Button maxWidth="Infinity" onAction="#scheduleAlert" styleClass="quick-action-btn, qa-warning" text="Schedule" HBox.hgrow="ALWAYS" />
+                                        </children>
+                                    </HBox>
+
+                                </children>
+                            </VBox>
+
+                        </children>
+                    </VBox>
+
+                    <!-- TABLE -->
+                    <VBox spacing="12" styleClass="panel-card" HBox.hgrow="ALWAYS">
+                        <children>
+
+                            <Label styleClass="panel-title" text="Recent Alerts &amp; Broadcasts" />
+
+                            <TableView fx:id="alertsTable" prefHeight="350" styleClass="incident-table" VBox.vgrow="ALWAYS">
+
+                                <columns>
+                                    <TableColumn fx:id="colType" text="Type" />
+                                    <TableColumn fx:id="colPriority" text="Priority" />
+                                    <TableColumn fx:id="colMessage" text="Message" />
+                                    <TableColumn fx:id="colSentBy" text="Sent By" />
+                                    <TableColumn fx:id="colSentDate" text="Date Sent" />
+                                    <TableColumn fx:id="colRecipients" text="Recipients" />
+                                </columns>
+
+                            </TableView>
+
+                        </children>
+                    </VBox>
+
+                </children>
+            </HBox>
+
+        </VBox>
+    </content>
+</ScrollPane>

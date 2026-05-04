@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="600.0" prefWidth="800.0" spacing="20" style="-fx-background-color: white;" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.resident.ResidentFormController">
+    <padding><Insets bottom="30" left="30" right="30" top="30" /></padding>
+
+    <Label fx:id="lblTitle" style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Resident Registration" />
+    <Separator />
+
+    <GridPane hgap="20" vgap="15">
+        <columnConstraints>
+            <ColumnConstraints minWidth="100" />
+            <ColumnConstraints hgrow="ALWAYS" />
+            <ColumnConstraints minWidth="100" />
+            <ColumnConstraints hgrow="ALWAYS" />
+        </columnConstraints>
+
+        <Label text="First Name:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <TextField fx:id="txtFirstName" promptText="Enter first name" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+        <Label text="Middle Name:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+        <TextField fx:id="txtMiddleName" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+        <Label text="Last Name:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <TextField fx:id="txtLastName" promptText="Enter last name" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <Label text="Suffix:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+        <TextField fx:id="txtSuffix" promptText="Jr., III, etc." GridPane.columnIndex="3" GridPane.rowIndex="1" />
+
+        <Label text="Birth Date:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <DatePicker fx:id="dpBirthDate" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+        <Label text="Sex:" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+        <ComboBox fx:id="cbSex" maxWidth="Infinity" promptText="Select" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+
+        <Label text="Civil Status:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <ComboBox fx:id="cbCivilStatus" maxWidth="Infinity" promptText="Select" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+        <Label text="Contact #:" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+        <TextField fx:id="txtPhone" promptText="09XXXXXXXXX" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+
+        <Label text="Photo URL:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+        <TextField fx:id="txtPhotoUrl" promptText="https://image-link.com" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="4" />
+
+        <!-- NEW ROW FOR VULNERABILITIES -->
+        <Label text="Vulnerabilities:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+        <HBox alignment="CENTER_LEFT" spacing="15" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="5">
+            <CheckBox fx:id="chkSenior" text="Senior Citizen" />
+            <CheckBox fx:id="chkPWD" text="PWD" />
+            <CheckBox fx:id="chkPregnant" text="Pregnant" />
+            <CheckBox fx:id="chkChild" text="Child (0-5)" />
+            <CheckBox fx:id="chkSoloParent" text="Solo Parent" />
+            <CheckBox fx:id="chkIndigenous" text="Indigenous" />
+        </HBox>
+
+        <CheckBox fx:id="chkIsHead" style="-fx-font-weight: bold;" text="Registered as Household Head" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+      <rowConstraints>
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+         <RowConstraints />
+      </rowConstraints>
+    </GridPane>
+
+    <Region VBox.vgrow="ALWAYS" />
+
+    <HBox alignment="CENTER_RIGHT" spacing="12">
+        <Button onAction="#handleCancel" prefHeight="38.0" prefWidth="125.0" style="-fx-background-color: #bdc3c7;" styleClass="secondary-btn" text="Cancel" />
+        <Button onAction="#handleSave" prefWidth="150" styleClass="quick-action-btn" text="Save Resident" />
+    </HBox>
+</VBox>

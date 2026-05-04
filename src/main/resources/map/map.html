@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="leaflet.css"/>
+    <script src="leaflet.js"></script>
+    <style>
+        * { margin: 0; padding: 0; }
+        html, body { width: 619px; height: 500px; overflow: hidden; }
+        #map { width: 619px; height: 500px; }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    let markerLayerGroup = null;
+    const deferred = [];
+
+    // Initialize immediately with hardcoded size — no waiting, no invalidation
+    const map = L.map('map', {
+        zoomControl: true,
+        preferCanvas: true,
+        fadeAnimation: false,
+        zoomAnimation: false,
+        markerZoomAnimation: false
+    }).setView([10.6765, 122.9509], 14);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    markerLayerGroup = L.layerGroup().addTo(map);
+
+    function forceSize(w, h) {
+        // Just do a clean redraw, size is already hardcoded
+        map.invalidateSize(true);
+        map.setView([10.6765, 122.9509], 14, { animate: false });
+    }
+
+    function fixMapSize() {
+        map.invalidateSize(true);
+        map.setView([10.6765, 122.9509], 14, { animate: false });
+    }
+
+    function clearMarkers() {
+        if (markerLayerGroup) markerLayerGroup.clearLayers();
+    }
+
+    function addCenterMarker(id, lat, lng, name, occupancy, capacity) {
+        const marker = L.marker([lat, lng]);
+        marker.bindPopup("<b>" + name + "</b><br>Occupancy: " + occupancy + "/" + capacity);
+        markerLayerGroup.addLayer(marker);
+    }
+
+    function forceSize(w, h) {
+        const el = document.getElementById('map');
+        alert('el size before: ' + el.offsetWidth + 'x' + el.offsetHeight
+            + ' | passed: ' + w + 'x' + h);
+        // ... rest of function
+    }
+</script>
+</body>
+</html>

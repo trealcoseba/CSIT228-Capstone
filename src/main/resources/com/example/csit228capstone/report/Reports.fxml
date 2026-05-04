@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" prefHeight="800.0" prefWidth="1000.0" styleClass="dashboard-scroll" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.reports.ReportsController">
+
+    <content>
+        <VBox fillWidth="true" spacing="16">
+            <padding>
+                <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+            </padding>
+
+            <!-- Header with Title and Actions -->
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <children>
+                    <Label styleClass="page-title" text="Reports &amp; Analytics" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button onAction="#downloadReports" styleClass="quick-action-btn" text="Download Reports" />
+                    <Button onAction="#generateReport" styleClass="quick-action-btn, qa-warning" text="Generate New Report" />
+                </children>
+            </HBox>
+
+            <!-- Report Type Selection -->
+            <VBox spacing="12" styleClass="panel-card">
+                <children>
+                    <Label styleClass="panel-title" text="Generate Report" />
+                    <HBox spacing="16">
+                        <children>
+                            <VBox HBox.hgrow="ALWAYS">
+                                <Label styleClass="resource-label" text="Report Type:" />
+                                <ComboBox fx:id="reportType" prefWidth="250" promptText="Select report type...">
+                                    <items>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <String fx:value="Incident Summary" />
+                                            <String fx:value="Residents Report" />
+                                            <String fx:value="Resource Inventory" />
+                                            <String fx:value="Evacuation Report" />
+                                            <String fx:value="Monthly Summary" />
+                                            <String fx:value="Custom Report" />
+                                        </FXCollections>
+                                    </items>
+                                </ComboBox>
+                            </VBox>
+                            <VBox HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label styleClass="resource-label" text="Date Range:" />
+                                    <HBox spacing="8">
+                                        <children>
+                                            <DatePicker fx:id="startDate" prefWidth="110" />
+                                            <DatePicker fx:id="endDate" prefWidth="110" style="-fx-background-color: white;" />
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </VBox>
+                            <VBox HBox.hgrow="ALWAYS">
+                                <Label styleClass="resource-label" text="Format:" />
+                                <ComboBox fx:id="reportFormat" prefWidth="250">
+                                    <items>
+                                        <FXCollections fx:factory="observableArrayList">
+                                            <String fx:value="PDF" />
+                                            <String fx:value="Excel" />
+                                            <String fx:value="CSV" />
+                                            <String fx:value="Print" />
+                                        </FXCollections>
+                                    </items>
+                                </ComboBox>
+                            </VBox>
+                            <VBox alignment="CENTER" spacing="8">
+                                <Button onAction="#generateReport" prefWidth="110" styleClass="quick-action-btn, qa-warning" text="Generate" />
+                            </VBox>
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
+
+            <!-- Statistics Overview -->
+            <HBox spacing="16">
+                <children>
+                    <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label styleClass="kpi-label" text="Total Incidents" />
+                        <Label fx:id="lblTotalIncidents" styleClass="kpi-value" text="0" />
+                        <Label styleClass="kpi-sub" text="This month" />
+                    </VBox>
+                    <VBox styleClass="kpi-card kpi-danger" HBox.hgrow="ALWAYS">
+                        <Label styleClass="kpi-label" text="Critical Incidents" />
+                        <Label fx:id="lblCritical" styleClass="kpi-value" text="0" />
+                        <Label styleClass="kpi-sub" text="Requiring attention" />
+                    </VBox>
+                    <VBox styleClass="kpi-card kpi-info" HBox.hgrow="ALWAYS">
+                        <Label styleClass="kpi-label" text="Avg. Response Time" />
+                        <Label fx:id="lblAvgResponse" styleClass="kpi-value" text="45 min" />
+                    </VBox>
+                    <VBox styleClass="kpi-card kpi-warning" HBox.hgrow="ALWAYS">
+                        <Label styleClass="kpi-label" text="Resolution Rate" />
+                        <Label fx:id="lblResolution" styleClass="kpi-value" text="92%" />
+                    </VBox>
+                </children>
+            </HBox>
+
+            <!-- Charts Area Placeholder -->
+            <VBox spacing="16" styleClass="panel-card" VBox.vgrow="ALWAYS">
+                <children>
+                    <Label styleClass="panel-title" text="Analytics &amp; Charts" />
+                    <HBox spacing="16">
+                        <children>
+                            <StackPane prefHeight="250" styleClass="panel-card" HBox.hgrow="ALWAYS">
+                                <Label styleClass="page-subtitle" text="Incidents by Type Chart" textAlignment="CENTER" wrapText="true" />
+                            </StackPane>
+                            <StackPane prefHeight="250" styleClass="panel-card" HBox.hgrow="ALWAYS">
+                                <Label styleClass="page-subtitle" text="Response Time Trend Chart" textAlignment="CENTER" wrapText="true" />
+                            </StackPane>
+                        </children>
+                    </HBox>
+                    <HBox spacing="16">
+                        <children>
+                            <StackPane prefHeight="200" styleClass="panel-card" HBox.hgrow="ALWAYS">
+                                <Label styleClass="page-subtitle" text="Resource Utilization Chart" />
+                            </StackPane>
+                            <StackPane prefHeight="200" styleClass="panel-card" HBox.hgrow="ALWAYS">
+                                <Label styleClass="page-subtitle" text="Vulnerable Groups Chart" />
+                            </StackPane>
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
+
+            <!-- Recent Reports Table -->
+            <VBox spacing="12" styleClass="panel-card">
+                <children>
+                    <Label styleClass="panel-title" text="Generated Reports" />
+                    <TableView fx:id="reportsTable" prefHeight="200" styleClass="incident-table">
+                        <columns>
+                            <TableColumn fx:id="colName" prefWidth="200" text="Report Name" />
+                            <TableColumn fx:id="colType" prefWidth="120" text="Type" />
+                            <TableColumn fx:id="colGenerated" prefWidth="120" text="Generated Date" />
+                            <TableColumn fx:id="colGeneratedBy" prefWidth="120" text="Generated By" />
+                            <TableColumn fx:id="colStatus" prefWidth="80" text="Status" />
+                            <TableColumn fx:id="colActions" prefWidth="100" text="Actions" />
+                        </columns>
+                    </TableView>
+                </children>
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>
