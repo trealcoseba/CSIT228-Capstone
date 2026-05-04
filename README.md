@@ -35,7 +35,7 @@ The system aims to improve **disaster preparedness, response coordination, and d
 - **Java** – Core programming language for system logic
 - **JavaFX** – GUI framework for building the desktop interface
 - **JDBC** – Database connectivity for managing system data
-- **SQLite / MySQL** – Database for storing resident, resource, and disaster data
+- **Supabase** – Database for storing resident, resource, and disaster data
 - **iText Library** – PDF report generation
 
 ## Evaluation Criteria Mapping (Initial)
