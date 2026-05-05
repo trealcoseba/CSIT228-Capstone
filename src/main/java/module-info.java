@@ -10,6 +10,9 @@ module ligtas.brgy {
     requires com.google.gson;
     requires layout;
     requires kernel;
+    requires webcam.capture;
+    requires java.desktop;
+    requires jdk.jsobject;
 
     opens com.example.csit228capstone.app to javafx.fxml;
     opens com.example.csit228capstone.model to javafx.base;
@@ -44,6 +47,8 @@ module ligtas.brgy {
     opens com.example.csit228capstone.controller.alerts to javafx.fxml;
     exports com.example.csit228capstone.controller.evacuation;
     opens com.example.csit228capstone.controller.evacuation to javafx.fxml;
+    exports com.example.csit228capstone.controller.map;
+    opens com.example.csit228capstone.controller.map to javafx.fxml;
     exports com.example.csit228capstone.model.incident;
     opens com.example.csit228capstone.model.incident to javafx.base;
     exports com.example.csit228capstone.model.chatbot;
@@ -54,6 +59,7 @@ module ligtas.brgy {
     opens com.example.csit228capstone.model.document to javafx.base;
     exports com.example.csit228capstone.model.alert;
     opens com.example.csit228capstone.model.alert to javafx.base;
+
 
 
 }

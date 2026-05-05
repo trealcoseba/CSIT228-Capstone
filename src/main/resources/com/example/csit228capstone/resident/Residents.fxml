@@ -4,11 +4,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<!-- Root is now a VBox, so the header stays put -->
 <VBox prefHeight="800.0" prefWidth="1000.0" spacing="16" styleClass="root-pane" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.resident.ResidentsController">
     <padding><Insets topRightBottomLeft="16" /></padding>
 
-    <!-- Header and KPIs remain visible at the top -->
     <HBox alignment="CENTER_LEFT" spacing="12">
         <Label styleClass="page-title" text="Residents Management" />
         <Region HBox.hgrow="ALWAYS" />
@@ -35,7 +33,6 @@
         </VBox>
     </HBox>
 
-    <!-- Filter Row -->
     <HBox spacing="12">
         <ComboBox fx:id="filterStatus" prefWidth="120" promptText="Status" />
         <ComboBox fx:id="filterCategory" prefWidth="120" promptText="Category" />
@@ -44,19 +41,17 @@
         <Button onAction="#exportData" styleClass="quick-action-btn" text="Export CSV" />
     </HBox>
 
-    <!-- The Table Container -->
     <VBox spacing="12" styleClass="panel-card" VBox.vgrow="ALWAYS">
         <Label styleClass="panel-title" text="Resident List" />
 
-        <!-- The TableView will handle its own scrolling -->
         <TableView fx:id="residentsTable" styleClass="incident-table" VBox.vgrow="ALWAYS">
             <columns>
-                <!-- Give these large prefWidths so they go off-screen -->
                 <TableColumn fx:id="colId" prefWidth="120.0" text="ID" />
                 <TableColumn fx:id="colName" prefWidth="250.0" text="Full Name" />
                 <TableColumn fx:id="colAge" prefWidth="80.0" text="Age" />
                 <TableColumn fx:id="colCategory" prefWidth="200.0" text="Category" />
                 <TableColumn fx:id="colStatus" prefWidth="120.0" text="Status" />
+                <TableColumn fx:id="colAddress" prefWidth="250.0" text="Address" />
                 <TableColumn fx:id="colPhoneNumber" prefWidth="180.0" text="Phone" />
                 <TableColumn fx:id="colRegisteredDate" prefWidth="150.0" text="Registered" />
                 <TableColumn fx:id="colActions" prefWidth="180.0" text="Actions" />

@@ -27,16 +27,20 @@ public class SupabaseConnectionManager {
         HikariConfig config = new HikariConfig();
 
         config.setDriverClassName("org.postgresql.Driver");
-        config.setJdbcUrl("jdbc:postgresql://" + host + ":" + port + "/" + dbName + "?sslmode=require");
+        config.setJdbcUrl(
+                "jdbc:postgresql://" + host + ":" + port + "/" + dbName +
+                        "?sslmode=require" +
+                        "&prepareThreshold=0"
+
+        );
         config.setUsername(user);
         config.setPassword(password);
+
         config.setMaximumPoolSize(10);
         config.setMinimumIdle(2);
         config.setConnectionTimeout(30_000);
         config.setIdleTimeout(600_000);
         config.setMaxLifetime(1_800_000);
-        config.addDataSourceProperty("cachePrepStmts", "true");
-        config.addDataSourceProperty("prepStmtCacheSize", "250");
 
         this.dataSource = new HikariDataSource(config);
     }

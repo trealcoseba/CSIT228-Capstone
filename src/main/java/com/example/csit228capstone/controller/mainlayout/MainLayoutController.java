@@ -4,8 +4,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import com.example.csit228capstone.service.IncidentService;
@@ -17,12 +19,14 @@ import java.util.List;
 public class MainLayoutController {
 
     @FXML private StackPane contentPane;
+    @FXML private BorderPane layoutPane;
     @FXML private Label lblActiveIncidents;
     @FXML private VBox sidebar;
 
     @FXML private Button btnDashboard, btnIncidents, btnResidents, btnDocuments;
     @FXML private Button btnEvacuation, btnResources, btnAlerts;
     @FXML private Button btnReports, btnChatbot, btnSettings;
+    @FXML private Button btnLogout;
 
     private List<Button> navButtons;
     private final IncidentService incidentService = new IncidentService();
@@ -92,5 +96,17 @@ public class MainLayoutController {
     @FXML
     void activateEmergency(ActionEvent e) {
         System.out.println("EMERGENCY MODE ACTIVATED");
+    }
+
+    public void handleLogout(ActionEvent actionEvent) throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/csit228capstone/login/Login.fxml"));
+        Parent root = loader.load();
+
+        layoutPane.setCenter(root);
+
+
+
+
+
     }
 }

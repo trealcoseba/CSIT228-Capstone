@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<ScrollPane fitToWidth="true" prefHeight="800.0" prefWidth="1000.0" styleClass="dashboard-scroll" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.dashboard.DashboardController">
+<ScrollPane fx:id="mainContent" fitToWidth="true" prefHeight="800.0" prefWidth="1000.0" styleClass="dashboard-scroll" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.dashboard.DashboardController">
 
     <VBox alignment="TOP_CENTER" spacing="24">
         <padding><Insets topRightBottomLeft="16" /></padding>

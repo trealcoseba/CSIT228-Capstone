@@ -4,7 +4,11 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import com.example.csit228capstone.model.incident.Incident;
@@ -12,16 +16,21 @@ import com.example.csit228capstone.model.vulnerability.VulnerabilityTag;
 import com.example.csit228capstone.repository.ResidentRepository;
 import com.example.csit228capstone.service.DocumentService;
 import com.example.csit228capstone.service.IncidentService;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class DashboardController {
 
+
     @FXML private Label lblTotalResidents, lblActiveIncidents, lblPendingDocs, lblEvacuees;
     @FXML private Label lblSenior, lblPwd, lblPregnant, lblChildren;
     @FXML private TableView<Incident> incidentTable;
     @FXML private TableColumn<Incident, String> colSeverity, colType, colLocation, colTime, colStatus;
+    @FXML private ScrollPane mainContent;
 
     private final IncidentService incidentService = new IncidentService();
     private final DocumentService documentService = new DocumentService();
@@ -88,8 +97,41 @@ public class DashboardController {
         }
     }
 
-    @FXML void viewAllIncidents(ActionEvent e) { /* Navigate to Incidents view */ }
-    @FXML void reportIncident(ActionEvent e)  { /* Open incident report dialog */ }
-    @FXML void evacuationOrder(ActionEvent e) { /* Open evacuation order dialog */ }
-    @FXML void addResident(ActionEvent e)     { /* Open add resident dialog */ }
+    @FXML void viewAllIncidents(ActionEvent e) {
+
+    }
+
+    @FXML void reportIncident(ActionEvent e)  {
+
+    }
+
+    @FXML void evacuationOrder(ActionEvent e) {
+
+    }
+
+    @FXML
+    void addResident(ActionEvent e) throws Exception {
+        try {
+            // 1. Load the FXML for the pop-up
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/csit228capstone/resident/ResidentForm.fxml"));
+            Parent root = loader.load();
+
+            // 2. Create a new Stage (Window)
+            Stage stage = new Stage();
+            stage.setTitle("Resident Registration");
+
+            // 3. Set the Scene with the loaded FXML
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+
+            // 4. Set Modality (Optional: Prevents clicking the dashboard until this is closed)
+            stage.initModality(Modality.APPLICATION_MODAL);
+
+            // 5. Show the window
+            stage.show();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
 }
