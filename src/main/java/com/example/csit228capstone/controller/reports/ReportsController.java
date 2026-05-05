@@ -11,5 +11,6 @@ public class ReportsController {
 
     //TO DO
     public void generateReport(ActionEvent actionEvent) {
+
     }
 }
