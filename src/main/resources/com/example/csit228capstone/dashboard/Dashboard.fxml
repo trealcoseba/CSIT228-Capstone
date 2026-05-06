@@ -50,6 +50,9 @@
                         <TableColumn fx:id="colTime" prefWidth="80" text="Time" />
                         <TableColumn fx:id="colStatus" prefWidth="100" text="Status" />
                     </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
                 </TableView>
             </VBox>
 

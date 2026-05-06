@@ -59,7 +59,7 @@ module ligtas.brgy {
     opens com.example.csit228capstone.model.document to javafx.base;
     exports com.example.csit228capstone.model.alert;
     opens com.example.csit228capstone.model.alert to javafx.base;
-
+    opens com.example.csit228capstone.model.report to javafx.base, javafx.fxml;
 
 
 }
