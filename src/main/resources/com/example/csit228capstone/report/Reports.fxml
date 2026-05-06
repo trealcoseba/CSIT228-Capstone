@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fitToWidth="true" prefHeight="800.0" prefWidth="1000.0" styleClass="dashboard-scroll" stylesheets="@../../../../css/application.css" vvalue="1.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.reports.ReportsController">
+<ScrollPane fitToWidth="true" prefHeight="800.0" prefWidth="1000.0" styleClass="dashboard-scroll" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.reports.ReportsController">
 
     <content>
         <VBox fillWidth="true" spacing="16">
