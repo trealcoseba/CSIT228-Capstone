@@ -25,6 +25,7 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -130,7 +131,9 @@ public class ResidentsController {
         filterStatus.setValue("All");
         filterCategory.setValue("All");
 
-        filterAscOrDesc.setItems(FXCollections.observableArrayList("Newest", "Oldest"));
+        filterAscOrDesc.setItems(FXCollections.observableArrayList(
+                "Newest", "Oldest", "Name A→Z", "Name Z→A", "Age ↑", "Age ↓"
+        ));
         filterAscOrDesc.setValue("Newest");
 
 
@@ -144,49 +147,44 @@ public class ResidentsController {
     }
 
     private void updateFilter() {
+        String search   = tfSearch.getText() == null ? "" : tfSearch.getText().toLowerCase().trim();
+        String status   = filterStatus.getValue() == null ? "All" : filterStatus.getValue();
+        String category = filterCategory.getValue() == null ? "All" : filterCategory.getValue();
+
         filteredData.setPredicate(resident -> {
+            // Search — matches name, address, phone, or ID
+            boolean matchesSearch = search.isEmpty()
+                    || resident.getFullName().toLowerCase().contains(search)
+                    || (resident.getAddress() != null && resident.getAddress().toLowerCase().contains(search))
+                    || (resident.getContactNumber() != null && resident.getContactNumber().toLowerCase().contains(search))
+                    || resident.getId().toString().toLowerCase().contains(search);
 
-            String search = tfSearch.getText() == null ? "" : tfSearch.getText().toLowerCase().trim();
-            boolean matchesSearch = search.isEmpty() || resident.getFullName().toLowerCase().contains(search);
+            // Status filter
+            boolean matchesStatus = status.equals("All")
+                    || resident.getCivilStatus().equalsIgnoreCase(status);
 
-            String status = filterStatus.getValue() == null ? "All" : filterStatus.getValue().toString();
-            boolean matchesStatus = status.equals("All") || resident.getCivilStatus().equalsIgnoreCase(status);
-
-            String category = filterCategory.getValue() == null ? "All" : filterCategory.getValue().toString();
-            boolean matchesCategory = true;
-            if (!category.equals("All")) {
-                if (category.equals("General")) {
-                    matchesCategory = resident.getVulnerabilities().isEmpty();
-                } else {
-                    matchesCategory = resident.getVulnerabilities().stream()
-                            .anyMatch(tag -> tag.getDisplayName().equalsIgnoreCase(category));
-                }
+            // Category filter
+            boolean matchesCategory;
+            if (category.equals("All")) {
+                matchesCategory = true;
+            } else if (category.equals("General")) {
+                matchesCategory = resident.getVulnerabilities().isEmpty();
+            } else {
+                matchesCategory = resident.getVulnerabilities().stream()
+                        .anyMatch(tag -> tag.getDisplayName().equalsIgnoreCase(category));
             }
 
             return matchesSearch && matchesStatus && matchesCategory;
         });
 
-        lblTotalResidents.setText(String.valueOf(filteredData.size()));
+        updateLabels();
     }
 
     public void loadData() {
         try {
             masterData.setAll(repository.findAll());
-            lblTotalResidents.setText(String.valueOf(masterData.size()));
-
-            long vulnerableCount = masterData.stream()
-                    .filter(r -> !r.getVulnerabilities().isEmpty())
-                    .count();
-            lblVulnerable.setText(String.valueOf(vulnerableCount));
-
-            java.time.LocalDate today = java.time.LocalDate.now();
-            long todayCount = masterData.stream()
-                    .filter(r -> r.getCreatedAt().toLocalDate().isEqual(today))
-                    .count();
-            lblRegisteredToday.setText(String.valueOf(todayCount));
-
+            updateLabels();
             updateSort();
-
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("Database Error", "Could not fetch data from server.");
@@ -237,8 +235,24 @@ public class ResidentsController {
             private final Button btnDelete = new Button("Delete");
             private final HBox container = new HBox(10, btnEdit, btnDelete);
             {
-                btnEdit.getStyleClass().add("btn-edit");
-                btnDelete.getStyleClass().add("btn-delete");
+                btnEdit.setStyle("""
+                            -fx-background-color: #fef08a;
+                            -fx-text-fill: #854d0e;
+                            -fx-font-size: 10px;
+                            -fx-padding: 3 8 3 8;
+                            -fx-background-radius: 4;
+                            -fx-cursor: hand;
+                            """);
+
+                btnDelete.setStyle("""
+                            -fx-background-color: #fecaca;
+                            -fx-text-fill: #991b1b;
+                            -fx-font-size: 10px;
+                            -fx-padding: 3 8 3 8;
+                            -fx-background-radius: 4;
+                            -fx-cursor: hand;
+                            """);
+
                 container.setStyle("-fx-alignment: CENTER;");
 
                 btnDelete.setOnAction(event -> handleDeleteResident(getTableView().getItems().get(getIndex())));
@@ -294,14 +308,19 @@ public class ResidentsController {
 
 
     private void updateSort() {
-        String sortOrder = filterAscOrDesc.getValue();
-        if (sortOrder == null) return;
+        String sort = filterAscOrDesc.getValue();
+        if (sort == null) return;
 
-        if (sortOrder.equals("Newest")) {
-            sortedData.setComparator((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt()));
-        } else {
-            sortedData.setComparator((r1, r2) -> r1.getCreatedAt().compareTo(r2.getCreatedAt()));
-        }
+        Comparator<Resident> comparator = switch (sort) {
+            case "Oldest"   -> Comparator.comparing(Resident::getCreatedAt);
+            case "Name A→Z" -> Comparator.comparing(Resident::getFullName, String.CASE_INSENSITIVE_ORDER);
+            case "Name Z→A" -> Comparator.comparing(Resident::getFullName, String.CASE_INSENSITIVE_ORDER).reversed();
+            case "Age ↑"    -> Comparator.comparingInt(Resident::getAge);
+            case "Age ↓"    -> Comparator.comparingInt(Resident::getAge).reversed();
+            default         -> Comparator.comparing(Resident::getCreatedAt).reversed(); // "Newest"
+        };
+
+        sortedData.setComparator(comparator);
     }
 
     private String escape(String data) {
@@ -343,5 +362,30 @@ public class ResidentsController {
         colPhoneNumber.setReorderable(false);
         colRegisteredDate.setReorderable(false);
         colActions.setReorderable(false);
+    }
+
+    private void updateLabels() {
+        // Total shown (respects current filter)
+        lblTotalResidents.setText(String.valueOf(filteredData.size()));
+
+        // These always reflect full dataset
+        java.time.LocalDate today = java.time.LocalDate.now();
+
+        long todayCount = masterData.stream()
+                .filter(r -> r.getCreatedAt().toLocalDate().isEqual(today))
+                .count();
+        lblRegisteredToday.setText(String.valueOf(todayCount));
+
+        long vulnerableCount = masterData.stream()
+                .filter(r -> !r.getVulnerabilities().isEmpty())
+                .count();
+        lblVulnerable.setText(String.valueOf(vulnerableCount));
+
+        // lblMissing — residents with no contact number and no address (unverified/incomplete)
+        long missingCount = masterData.stream()
+                .filter(r -> (r.getContactNumber() == null || r.getContactNumber().isBlank())
+                        && (r.getAddress() == null || r.getAddress().isBlank()))
+                .count();
+        lblMissing.setText(String.valueOf(missingCount));
     }
 }
