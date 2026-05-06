@@ -864,3 +864,11 @@
 .dialog-pane .button-bar .button:hover {
     -fx-background-color: -teal-light;
 }
+
+.table-row-cell:selected .button {
+    -fx-text-fill: white !important;
+}
+
+.table-cell:selected .button {
+    -fx-text-fill: white !important;
+}

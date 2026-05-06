@@ -56,15 +56,140 @@
         markerLayerGroup.clearLayers();
     }
 
-    function addCenterMarker(id, lat, lng, name, occupancy, capacity) {
-        const marker = L.marker([lat, lng]);
-        const status = (occupancy >= capacity) ? "<b style='color:red;'>FULL</b>" : "Available";
+    function addCenterMarker(id, lat, lng, name, occupancy, capacity, isActive, status) {
+        let color, borderColor;
+
+        // Status Logic: Red for Inactive, Yellow for Full, Green for Active
+        if (!isActive || status === 'Inactive') {
+            color = '#6b7280';       // Red
+            borderColor = '#4b5563';
+        } else if (status === 'Full') {
+            color = '#ef4444';       // Yellow/Amber
+            borderColor = '#dc2626';
+        } else {
+            color = '#22c55e';       // Green
+            borderColor = '#16a34a';
+        }
+
+        const percent = capacity > 0 ? Math.round((occupancy / capacity) * 100) : 0;
+
+        // Progress Bar Logic: Green < 90%, Yellow 90-100%, Red > 100%
+        let barColor = '#22c55e'; // Default Green
+        if (percent >= 90 && percent <= 100) {
+            barColor = '#f59e0b'; // Yellow
+        } else if (percent > 100) {
+            barColor = '#ef4444'; // Red
+        }
+
+        const statusLabel = !isActive ? 'Inactive'
+            : status === 'Full' ? 'Full'
+                : 'Available';
+
+        const icon = L.divIcon({
+            className: '',
+            html: `
+            <div style="
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            ">
+                <div style="
+                    background: ${color};
+                    border: 3px solid ${borderColor};
+                    border-radius: 50% 50% 50% 0;
+                    transform: rotate(-45deg);
+                    width: 28px;
+                    height: 28px;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                ">
+                    <div style="
+                        transform: rotate(45deg);
+                        color: white;
+                        font-size: 11px;
+                        font-weight: bold;
+                        line-height: 1;
+                    ">A</div>
+                </div>
+                <div style="
+                    width: 4px;
+                    height: 6px;
+                    background: ${borderColor};
+                    margin-top: -1px;
+                "></div>
+            </div>`,
+            iconSize: [28, 40],
+            iconAnchor: [14, 40],
+            popupAnchor: [0, -42]
+        });
+
+        const marker = L.marker([lat, lng], { icon });
 
         marker.bindPopup(`
-            <b>${name}</b><br>
-            Status: ${status}<br>
-            Occupancy: ${occupancy} / ${capacity}
-        `);
+        <div style="
+            font-family: sans-serif;
+            min-width: 180px;
+            padding: 4px;
+        ">
+            <div style="
+                font-size: 14px;
+                font-weight: 700;
+                color: #111827;
+                margin-bottom: 6px;
+            ">${name}</div>
+
+            <div style="
+                display: inline-block;
+                padding: 2px 10px;
+                border-radius: 12px;
+                font-size: 11px;
+                font-weight: 600;
+                background: ${color}22;
+                color: ${color};
+                border: 1px solid ${color};
+                margin-bottom: 8px;
+            ">${statusLabel}</div>
+
+            <div style="margin-bottom: 4px;">
+                <div style="
+                    display: flex;
+                    justify-content: space-between;
+                    font-size: 11px;
+                    color: #6b7280;
+                    margin-bottom: 2px;
+                ">
+                    <span>Occupancy</span>
+                    <span>${occupancy} / ${capacity}</span>
+                </div>
+                <div style="
+                    width: 100%;
+                    height: 6px;
+                    background: #e5e7eb;
+                    border-radius: 99px;
+                    overflow: hidden;
+                ">
+                    <div style="
+                        width: ${Math.min(percent, 100)}%;
+                        height: 100%;
+                        background: ${barColor};
+                        border-radius: 99px;
+                        transition: width 0.3s;
+                    "></div>
+                </div>
+            </div>
+
+            <div style="
+                font-size: 11px;
+                color: #9ca3af;
+                text-align: right;
+                margin-top: 4px;
+            ">${percent}% filled</div>
+        </div>
+    `);
+
         markerLayerGroup.addLayer(marker);
     }
 

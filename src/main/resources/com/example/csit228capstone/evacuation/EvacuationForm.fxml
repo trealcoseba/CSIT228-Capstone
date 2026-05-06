@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="620.0" prefWidth="698.0" spacing="20" styleClass="panel-card" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.evacuation.EvacuationFormController">
+
+    <padding>
+        <Insets bottom="24" left="24" right="24" top="24" />
+    </padding>
+
+    <children>
+        <!-- Header -->
+        <VBox spacing="4">
+            <Label style="-fx-font-size: 18px;" styleClass="page-title" text="Add New Evacuation Center" />
+            <Label style="-fx-text-fill: #666;" text="Enter the details for the new facility below." />
+        </VBox>
+
+        <Separator />
+
+        <!-- Form Fields -->
+        <GridPane hgap="12" vgap="16">
+            <columnConstraints>
+                <ColumnConstraints prefWidth="160.0" />
+                <ColumnConstraints hgrow="ALWAYS" />
+            </columnConstraints>
+
+            <children>
+                <Label text="Center Name:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <TextField fx:id="txtName" promptText="e.g. Central Elementary" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                <Label text="Max Capacity:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <TextField fx:id="txtCapacity" promptText="420 persons" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                <Label text="Manager Name:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <TextField fx:id="txtManager" promptText="Full Name" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                <Label text="Manager Contact Number:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <TextField fx:id="txtContact" prefHeight="36.0" prefWidth="504.0" promptText="e.g. 0917 XXX XXXX" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                <Label text="Location/Address:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                    <children>
+                        <TextField fx:id="txtLocation" editable="false" promptText="Pin location on map..." HBox.hgrow="ALWAYS" />
+                        <Button minWidth="100.0" onAction="#handleOpenMap" styleClass="quick-action-btn, qa-warning" text="Pin on Map" />
+                    </children>
+                </HBox>
+
+                <!-- NEW ACTIVE STATUS ROW -->
+                <Label text="Operational Status:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                <CheckBox fx:id="chkActive" selected="true" text="Active / Open" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+
+            </children>
+            <rowConstraints>
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+            </rowConstraints>
+        </GridPane>
+
+        <Region VBox.vgrow="ALWAYS" />
+
+        <HBox alignment="CENTER_RIGHT" spacing="12">
+            <children>
+                <Button onAction="#handleCancel" prefHeight="39.0" prefWidth="100.0" text="Cancel">
+                    <styleClass>
+                        <String fx:value="quick-action-btn" />
+                        <String fx:value="qa-danger" />
+                    </styleClass>
+                </Button>
+                <Button onAction="#handleSave" prefHeight="39.0" prefWidth="120.0" styleClass="quick-action-btn" text="Save Center" />
+            </children>
+        </HBox>
+    </children>
+</VBox>
