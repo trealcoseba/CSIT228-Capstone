@@ -73,7 +73,7 @@ public class ResidentRepository {
 
 
     public List<Resident> search(String query) {
-        // Search by name and keep chronological order
+        // Search by getName and keep chronological order
         String sql = "SELECT * FROM residents WHERE LOWER(first_name || ' ' || last_name) LIKE ? " +
                 "ORDER BY created_at ASC";
         List<Resident> list = new ArrayList<>();
@@ -169,7 +169,7 @@ public class ResidentRepository {
     }
 
     public void addVulnerability(UUID residentId, VulnerabilityTag tag) {
-        // We use .name() to get "SENIOR_CITIZEN" and cast it to the custom enum type
+        // We use .getName() to get "SENIOR_CITIZEN" and cast it to the custom enum type
         String sql = "INSERT INTO resident_vulnerabilities (resident_id, tag) VALUES (?, ?::vulnerability_tag)";
         try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setObject(1, residentId);
