@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Hyperlink?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ProgressBar?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<ScrollPane fitToWidth="true" prefHeight="800.0" prefWidth="1000.0" styleClass="dashboard-scroll" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.dashboard.DashboardController">
+<ScrollPane fx:id="mainContent" fitToWidth="true" prefHeight="800.0" prefWidth="1000.0" styleClass="dashboard-scroll" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.dashboard.DashboardController">
 
     <VBox alignment="TOP_CENTER" spacing="24">
         <padding><Insets topRightBottomLeft="16" /></padding>
@@ -52,10 +44,10 @@
                 </HBox>
                 <TableView fx:id="incidentTable" prefHeight="250" styleClass="incident-table" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="colSeverity" minWidth="8.000030279159546" prefWidth="8.000030279159546" text="" />
-                        <TableColumn fx:id="colType" prefWidth="211.99997806549072" text="Incident" />
-                        <TableColumn fx:id="colLocation" prefWidth="221.59999084472656" text="Location" />
-                        <TableColumn fx:id="colTime" prefWidth="113.60003662109375" text="Time" />
+                        <TableColumn fx:id="colSeverity" prefWidth="30" text="" />
+                        <TableColumn fx:id="colType" prefWidth="140" text="Incident" />
+                        <TableColumn fx:id="colLocation" prefWidth="130" text="Location" />
+                        <TableColumn fx:id="colTime" prefWidth="80" text="Time" />
                         <TableColumn fx:id="colStatus" prefWidth="100" text="Status" />
                     </columns>
                <columnResizePolicy>

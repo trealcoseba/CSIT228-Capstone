@@ -1,5 +1,6 @@
 package com.example.csit228capstone.controller.login;
 
+import com.example.csit228capstone.repository.UserRepository;
 import com.example.csit228capstone.util.SupabaseConnectionManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,36 +23,31 @@ public class LoginController {
 
     @FXML private TextField tfUsername;
     @FXML private PasswordField tfPassword;
+    private final UserRepository repository = new UserRepository();
+
+    @FXML
+    public void initialize() {
+        tfUsername.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.contains(" ")) { tfUsername.setText(newValue.replaceAll("\\s", ""));}
+        });
+        tfPassword.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.contains(" ")) {tfPassword.setText(newValue.replaceAll("\\s", ""));}
+        });
+    }
 
     @FXML
     public void handleLogin(ActionEvent actionEvent) {
         String username = tfUsername.getText();
         String password = tfPassword.getText();
 
-        if (authenticate(username, password)) {
+        if(repository.authenticate(username, password)) {
             navigateToDashboard(actionEvent);
         } else {
-            showError("Invalid Credentials", "The username or password you entered is incorrect.");
+            showError("Login Failed", "Invalid username or password.");
         }
-    }
 
-    private boolean authenticate(String username, String password) {
-        // SQL checks our simplified users table
-        String sql = "SELECT * FROM users WHERE username = ? AND password_hash = ?";
 
-        try (Connection conn = SupabaseConnectionManager.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, username);
-            ps.setString(2, password); // Currently '1234' in your DB
-
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next(); // Returns true if a match is found
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
     }
 
     private void navigateToDashboard(ActionEvent event) {

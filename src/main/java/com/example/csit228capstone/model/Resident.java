@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public class Resident {
     private UUID id;
-    private UUID householdId;
+    private UUID residentLocationsId;   // replaces householdId — FK to resident_locations.id
     private String firstName;
     private String middleName;
     private String lastName;
@@ -23,42 +23,71 @@ public class Resident {
     private boolean isHouseholdHead;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private double latitude;
+    private double longitude;
     private List<VulnerabilityTag> vulnerabilities = new ArrayList<>();
 
+    // Joined field — not a DB column on residents, comes from resident_locations
+    private String address;
 
     public Resident() {}
 
     // --- Getters & Setters ---
+
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
-    public UUID getHouseholdId() { return householdId; }
-    public void setHouseholdId(UUID householdId) { this.householdId = householdId; }
+
+    public UUID getResidentLocationsId() { return residentLocationsId; }
+    public void setResidentLocationsId(UUID residentLocationsId) { this.residentLocationsId = residentLocationsId; }
+
     public String getFirstName() { return firstName; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
+
     public String getMiddleName() { return middleName; }
     public void setMiddleName(String middleName) { this.middleName = middleName; }
+
     public String getLastName() { return lastName; }
     public void setLastName(String lastName) { this.lastName = lastName; }
+
     public String getSuffix() { return suffix; }
     public void setSuffix(String suffix) { this.suffix = suffix; }
+
     public LocalDate getDateOfBirth() { return dateOfBirth; }
     public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
+
     public String getSex() { return sex; }
     public void setSex(String sex) { this.sex = sex; }
+
     public String getCivilStatus() { return civilStatus; }
     public void setCivilStatus(String civilStatus) { this.civilStatus = civilStatus; }
+
     public String getContactNumber() { return contactNumber; }
     public void setContactNumber(String contactNumber) { this.contactNumber = contactNumber; }
+
     public String getPhotoUrl() { return photoUrl; }
     public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
+
     public boolean isHouseholdHead() { return isHouseholdHead; }
     public void setHouseholdHead(boolean householdHead) { isHouseholdHead = householdHead; }
+
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
     public List<VulnerabilityTag> getVulnerabilities() { return vulnerabilities; }
     public void setVulnerabilities(List<VulnerabilityTag> vulnerabilities) { this.vulnerabilities = vulnerabilities; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public double getLatitude() { return latitude; }
+    public void setLatitude(double latitude) { this.latitude = latitude; }
+    public double getLongitude() { return longitude; }
+    public void setLongitude(double longitude) { this.longitude = longitude; }
+
+    // --- Computed ---
 
     public String getFullName() {
         StringBuilder sb = new StringBuilder();

@@ -109,9 +109,9 @@
                                     <TextArea fx:id="alertMessage" prefRowCount="6" promptText="Enter your alert message..." wrapText="true" />
 
                                     <Label styleClass="resource-label" text="Recipients:" />
-                                    <CheckBox fx:id="chkAll" text="Send to All Residents" />
-                                    <CheckBox fx:id="chkVulnerable" text="Vulnerable Groups Only" />
-                                    <CheckBox fx:id="chkOfficials" text="Officials Only" />
+                                    <CheckBox fx:id="chkAll" style="-fx-text-fill: #1A1815;" text="Send to All Residents" />
+                                    <CheckBox fx:id="chkVulnerable" style="-fx-text-fill: #1A1815;" text="Vulnerable Groups Only" />
+                                    <CheckBox fx:id="chkOfficials" style="-fx-text-fill: #1A1815;" text="Officials Only" />
 
                                     <!-- FIXED HBOX -->
                                     <HBox spacing="8">

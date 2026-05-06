@@ -16,14 +16,17 @@ public class ResidentRepository {
         return SupabaseConnectionManager.getInstance().getConnection();
     }
 
+    // ─── READ ─────────────────────────────────────────────────────────────────
+
     public List<Resident> findAll() {
         List<Resident> list = new ArrayList<>();
-        // This query gets all resident details AND their tags in one go
-        String sql = "SELECT r.*, string_agg(rv.tag::text, ',') as tags " +
+
+        String sql = "SELECT r.*, rl.address, rl.latitude, rl.longitude, " +
+                "string_agg(rv.tag::text, ', ') as tags " +
                 "FROM residents r " +
-                "LEFT JOIN resident_vulnerabilities rv ON r.id = rv.resident_id " +
-                "GROUP BY r.id " +
-                "ORDER BY r.created_at ASC"; // Keeps your ID ordering intact
+                "LEFT JOIN resident_locations rl ON r.resident_locations_id = rl.id " +
+                "LEFT JOIN resident_vulnerabilities rv ON rv.resident_id = r.id " +
+                "GROUP BY r.id, rl.address, rl.latitude, rl.longitude";
 
         try (Connection c = getConn();
              PreparedStatement ps = c.prepareStatement(sql);
@@ -31,16 +34,16 @@ public class ResidentRepository {
 
             while (rs.next()) {
                 Resident r = mapRow(rs);
+                r.setAddress(rs.getString("address"));
 
                 String tagsString = rs.getString("tags");
                 if (tagsString != null && !tagsString.isBlank()) {
                     for (String tagName : tagsString.split(",")) {
                         try {
-                            // Now r.getVulnerabilities() won't be null
-                            r.getVulnerabilities().add(VulnerabilityTag.valueOf(tagName.trim().toUpperCase()));
-                        } catch (IllegalArgumentException e) {
-                            // Ignore tags that don't match the enum
-                        }
+                            r.getVulnerabilities().add(
+                                    VulnerabilityTag.valueOf(tagName.trim().toUpperCase())
+                            );
+                        } catch (IllegalArgumentException ignored) {}
                     }
                 }
                 list.add(r);
@@ -52,45 +55,39 @@ public class ResidentRepository {
     }
 
     public Optional<Resident> findById(UUID id) {
-        String sql = "SELECT * FROM residents WHERE id = ?";
+        String sql = "SELECT r.*, rl.address, rl.latitude, rl.longitude " +
+                "FROM residents r " +
+                "LEFT JOIN resident_locations rl ON r.resident_locations_id = rl.id " +
+                "WHERE r.id = ?";
         try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setObject(1, id);
             try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? Optional.of(mapRow(rs)) : Optional.empty();
+                if (rs.next()) {
+                    Resident r = mapRow(rs);
+                    r.setAddress(rs.getString("address"));
+                    return Optional.of(r);
+                }
+                return Optional.empty();
             }
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public List<Resident> findByPurok(String purok) {
-        String sql = "SELECT r.* FROM residents r JOIN households h ON r.household_id = h.id WHERE h.purok = ? ORDER BY r.last_name";
-        List<Resident> list = new ArrayList<>();
-        try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, purok);
-            try (ResultSet rs = ps.executeQuery()) { while (rs.next()) list.add(mapRow(rs)); }
-        } catch (SQLException e) { throw new RuntimeException(e); }
-        return list;
-    }
-
-
-    public List<Resident> search(String query) {
-        // Search by getName and keep chronological order
-        String sql = "SELECT * FROM residents WHERE LOWER(first_name || ' ' || last_name) LIKE ? " +
-                "ORDER BY created_at ASC";
-        List<Resident> list = new ArrayList<>();
-        try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, "%" + query.toLowerCase() + "%");
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) list.add(mapRow(rs));
-            }
-        } catch (SQLException e) { throw new RuntimeException(e); }
-        return list;
-    }
+    // ─── WRITE ────────────────────────────────────────────────────────────────
 
     public UUID insert(Resident r) {
-        String sql = "INSERT INTO residents (household_id, first_name, middle_name, last_name, suffix, date_of_birth, sex, civil_status, contact_number, photo_url, is_household_head) " +
-                     "VALUES (?,?,?,?,?,?,?,?,?,?,?) RETURNING id";
+        UUID locationId = null;
+        if (r.getAddress() != null && !r.getAddress().isBlank()) {
+            locationId = findOrInsertLocation(r.getAddress(), r.getLatitude(), r.getLongitude());
+        }
+
+        String sql = "INSERT INTO residents " +
+                "(resident_locations_id, first_name, middle_name, last_name, suffix, " +
+                "date_of_birth, sex, civil_status, contact_number, photo_url, is_household_head) " +
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?) RETURNING id";
         try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setObject(1, r.getHouseholdId());
+            ps.setObject(1, locationId);
             ps.setString(2, r.getFirstName());
             ps.setString(3, r.getMiddleName());
             ps.setString(4, r.getLastName());
@@ -105,13 +102,43 @@ public class ResidentRepository {
                 rs.next();
                 return rs.getObject("id", UUID.class);
             }
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void update(Resident r) {
-        String sql = "UPDATE residents SET household_id=?, first_name=?, middle_name=?, last_name=?, suffix=?, date_of_birth=?, sex=?, civil_status=?, contact_number=?, photo_url=?, is_household_head=?, updated_at=now() WHERE id=?";
+        UUID existingLocationId = getLocationId(r.getId());
+        String newAddress = r.getAddress();
+        UUID locationId;
+
+        if (newAddress != null && !newAddress.isBlank()) {
+            if (existingLocationId != null) {
+                // Shared household logic: update the row — moves everyone at this address
+                updateLocation(existingLocationId, newAddress, r.getLatitude(), r.getLongitude());
+                locationId = existingLocationId;
+            } else {
+                // No location yet — find a matching one or create new
+                locationId = findOrInsertLocation(newAddress, r.getLatitude(), r.getLongitude());
+            }
+        } else {
+            // Address cleared — only delete if no other resident shares it
+            if (existingLocationId != null && !isLocationShared(existingLocationId, r.getId())) {
+                deleteLocation(existingLocationId);
+            }
+            locationId = null;
+        }
+
+        String sql = "SELECT r.*, rl.address, rl.latitude, rl.longitude, " +
+                "string_agg(rv.tag::text, ', ') as tags " +
+                "FROM residents r " +
+                "LEFT JOIN resident_locations rl ON r.resident_locations_id = rl.id " +
+                "LEFT JOIN resident_vulnerabilities rv ON rv.resident_id = r.id " +
+                "GROUP BY r.id, rl.address, rl.latitude, rl.longitude " +
+                "ORDER BY r.created_at DESC";
+        
         try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setObject(1, r.getHouseholdId());
+            ps.setObject(1, locationId);
             ps.setString(2, r.getFirstName());
             ps.setString(3, r.getMiddleName());
             ps.setString(4, r.getLastName());
@@ -124,56 +151,130 @@ public class ResidentRepository {
             ps.setBoolean(11, r.isHouseholdHead());
             ps.setObject(12, r.getId());
             ps.executeUpdate();
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void delete(UUID id) {
-        try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement("DELETE FROM residents WHERE id=?")) {
-            ps.setObject(1, id);
+    public void delete(UUID residentId) {
+        UUID locationId = getLocationId(residentId);
+
+        // 1. Delete resident first to remove the FK reference
+        try (Connection c = getConn();
+             PreparedStatement ps = c.prepareStatement("DELETE FROM residents WHERE id=?")) {
+            ps.setObject(1, residentId);
             ps.executeUpdate();
-        } catch (SQLException e) { throw new RuntimeException(e); }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 2. Only delete the location row if no other resident still uses it
+        if (locationId != null && !isLocationShared(locationId, null)) {
+            deleteLocation(locationId);
+        }
     }
 
-    public int countAll() {
-        try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement("SELECT COUNT(*) FROM residents");
-             ResultSet rs = ps.executeQuery()) {
-            rs.next(); return rs.getInt(1);
-        } catch (SQLException e) { throw new RuntimeException(e); }
-    }
+    // ─── LOCATION HELPERS ─────────────────────────────────────────────────────
 
-    public int countByVulnerability(VulnerabilityTag tag) {
-        String sql = "SELECT COUNT(*) FROM resident_vulnerabilities WHERE tag = ?::vulnerability_tag";
+    /**
+     * Finds an existing location row by address (case-insensitive).
+     * If none exists, inserts a new one and returns its UUID.
+     */
+    private UUID findOrInsertLocation(String address, double latitude, double longitude) {
+        String sql = "SELECT id FROM resident_locations WHERE LOWER(address) = LOWER(?) LIMIT 1";
         try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, tag.name().toLowerCase());
-            try (ResultSet rs = ps.executeQuery()) { rs.next(); return rs.getInt(1); }
-        } catch (SQLException e) { throw new RuntimeException(e); }
+            ps.setString(1, address);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getObject("id", UUID.class); // ✅ reuse existing
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return insertLocation(address, latitude, longitude); // ✅ create new (was wrongly recursive before)
     }
 
-    private Resident mapRow(ResultSet rs) throws SQLException {
-        Resident r = new Resident();
-        r.setId(rs.getObject("id", UUID.class));
-        r.setHouseholdId(rs.getObject("household_id", UUID.class));
-        r.setFirstName(rs.getString("first_name"));
-        r.setMiddleName(rs.getString("middle_name"));
-        r.setLastName(rs.getString("last_name"));
-        r.setSuffix(rs.getString("suffix"));
-        r.setDateOfBirth(rs.getDate("date_of_birth").toLocalDate());
-        r.setSex(rs.getString("sex"));
-        r.setCivilStatus(rs.getString("civil_status"));
-        r.setContactNumber(rs.getString("contact_number"));
-        r.setPhotoUrl(rs.getString("photo_url"));
-        r.setHouseholdHead(rs.getBoolean("is_household_head"));
-        r.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-        r.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-        return r;
+    private UUID insertLocation(String address, double latitude, double longitude) {
+        String sql = "INSERT INTO resident_locations (id, address, latitude, longitude) " +
+                "VALUES (gen_random_uuid(), ?, ?, ?) RETURNING id";
+        try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, address);
+            ps.setDouble(2, latitude);
+            ps.setDouble(3, longitude);
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                return rs.getObject("id", UUID.class);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Could not insert location", e);
+        }
     }
 
-    public void addVulnerability(UUID residentId, VulnerabilityTag tag) {
-        // We use .getName() to get "SENIOR_CITIZEN" and cast it to the custom enum type
-        String sql = "INSERT INTO resident_vulnerabilities (resident_id, tag) VALUES (?, ?::vulnerability_tag)";
+    private void updateLocation(UUID locationId, String address, double latitude, double longitude) {
+        String sql = "UPDATE resident_locations SET address=?, latitude=?, longitude=? WHERE id=?";
+        try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, address);
+            ps.setDouble(2, latitude);
+            ps.setDouble(3, longitude);
+            ps.setObject(4, locationId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Could not update location", e);
+        }
+    }
+
+    private void deleteLocation(UUID locationId) {
+        String sql = "DELETE FROM resident_locations WHERE id = ?";
+        try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setObject(1, locationId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Could not delete location", e);
+        }
+    }
+
+    private UUID getLocationId(UUID residentId) {
+        String sql = "SELECT resident_locations_id FROM residents WHERE id = ?";
         try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setObject(1, residentId);
-            ps.setString(2, tag.name().toLowerCase()); // Matches 'senior_citizen' in DB
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getObject("resident_locations_id", UUID.class);
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Could not fetch location ID", e);
+        }
+    }
+
+    /**
+     * Returns true if any resident OTHER than excludeResidentId still references this location.
+     * Pass excludeResidentId = null when checking after the resident has already been deleted.
+     */
+    private boolean isLocationShared(UUID locationId, UUID excludeResidentId) {
+        String sql = excludeResidentId != null
+                ? "SELECT COUNT(*) FROM residents WHERE resident_locations_id = ? AND id != ?"
+                : "SELECT COUNT(*) FROM residents WHERE resident_locations_id = ?";
+        try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setObject(1, locationId);
+            if (excludeResidentId != null) ps.setObject(2, excludeResidentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Could not check location usage", e);
+        }
+    }
+
+    // ─── VULNERABILITIES ──────────────────────────────────────────────────────
+
+    public void addVulnerability(UUID residentId, VulnerabilityTag tag) {
+        String sql = "INSERT INTO resident_vulnerabilities (resident_id, tag) " +
+                "VALUES (?, ?::vulnerability_tag)";
+        try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setObject(1, residentId);
+            ps.setString(2, tag.name().toLowerCase());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error adding vulnerability: " + tag.getDisplayName(), e);
@@ -188,5 +289,52 @@ public class ResidentRepository {
         } catch (SQLException e) {
             throw new RuntimeException("Error clearing vulnerabilities", e);
         }
+    }
+
+    // ─── COUNTS ───────────────────────────────────────────────────────────────
+
+    public int countAll() {
+        try (Connection c = getConn();
+             PreparedStatement ps = c.prepareStatement("SELECT COUNT(*) FROM residents");
+             ResultSet rs = ps.executeQuery()) {
+            rs.next();
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int countByVulnerability(VulnerabilityTag tag) {
+        String sql = "SELECT COUNT(*) FROM resident_vulnerabilities WHERE tag = ?::vulnerability_tag";
+        try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, tag.name().toLowerCase());
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // ─── MAPPING ──────────────────────────────────────────────────────────────
+
+    private Resident mapRow(ResultSet rs) throws SQLException {
+        Resident r = new Resident();
+        r.setId(rs.getObject("id", UUID.class));
+        r.setResidentLocationsId(rs.getObject("resident_locations_id", UUID.class));
+        r.setFirstName(rs.getString("first_name"));
+        r.setMiddleName(rs.getString("middle_name"));
+        r.setLastName(rs.getString("last_name"));
+        r.setSuffix(rs.getString("suffix"));
+        r.setDateOfBirth(rs.getDate("date_of_birth").toLocalDate());
+        r.setSex(rs.getString("sex"));
+        r.setCivilStatus(rs.getString("civil_status"));
+        r.setContactNumber(rs.getString("contact_number"));
+        r.setPhotoUrl(rs.getString("photo_url"));
+        r.setHouseholdHead(rs.getBoolean("is_household_head"));
+        r.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+        r.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+        return r;
     }
 }
