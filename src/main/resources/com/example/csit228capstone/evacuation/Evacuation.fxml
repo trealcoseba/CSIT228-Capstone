@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.web.*?>
+
+<ScrollPane fitToWidth="true" prefHeight="800.0" prefWidth="1000.0" styleClass="dashboard-scroll" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.evacuation.EvacuationController">
+
+    <content>
+        <VBox fillWidth="true" spacing="16">
+            <padding>
+                <Insets topRightBottomLeft="16" />
+            </padding>
+
+            <!-- Header -->
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <children>
+                    <Label styleClass="page-title" text="Evacuation Management" />
+                    <Region HBox.hgrow="ALWAYS" />
+
+                    <CheckBox fx:id="chkShowMap" alignment="CENTER" contentDisplay="BOTTOM" selected="true" style="-fx-text-fill: #1A1815;" text="Show Map View" />
+
+                    <Button onAction="#activateEvacuation" styleClass="quick-action-btn, qa-danger" text="Activate Evacuation" />
+                </children>
+            </HBox>
+
+            <!-- Status Card -->
+            <VBox spacing="12" styleClass="panel-card">
+                <children>
+                    <Label styleClass="panel-title" text="Evacuation Status" />
+
+                    <HBox alignment="CENTER_LEFT" spacing="16">
+                        <children>
+
+                            <VBox HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label styleClass="resource-label" text="Evacuation Status:" />
+                                    <HBox alignment="CENTER_LEFT" spacing="8">
+                                        <children>
+                                            <Label fx:id="lblEvacStatus" styleClass="kpi-value" text="Not Active" />
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </VBox>
+
+                            <VBox HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label styleClass="resource-label" text="Total Evacuees:" />
+                                    <Label fx:id="lblTotalEvacuees" styleClass="kpi-value" text="0" />
+                                </children>
+                            </VBox>
+
+                            <VBox HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label styleClass="resource-label" text="Centers Active:" />
+                                    <Label fx:id="lblCentersActive" styleClass="kpi-value" text="0" />
+                                </children>
+                            </VBox>
+
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
+
+            <!-- Main Row -->
+            <HBox spacing="16" VBox.vgrow="ALWAYS">
+
+                <!-- Map Panel -->
+                <VBox spacing="12"
+                      styleClass="panel-card"
+                      HBox.hgrow="ALWAYS"
+                      VBox.vgrow="ALWAYS">
+
+                    <children>
+                        <Label styleClass="panel-title"
+                               text="Evacuation Map"/>
+
+                        <!-- FIXED MAP CONTAINER -->
+                        <StackPane maxHeight="500" minHeight="500" prefHeight="500" VBox.vgrow="ALWAYS">
+                            <WebView fx:id="mapWebView" maxHeight="498.0" maxWidth="545.0" minHeight="400" minWidth="400" prefHeight="498.0" prefWidth="505.0" StackPane.alignment="CENTER" />
+                        </StackPane>
+                    </children>
+                </VBox>
+
+                <!-- Centers Panel -->
+                <VBox prefWidth="350"
+                      spacing="12"
+                      styleClass="panel-card">
+
+                    <children>
+                        <Label styleClass="panel-title"
+                               text="Evacuation Centers"/>
+
+                        <ListView fx:id="centersList"
+                                  prefHeight="250"
+                                  VBox.vgrow="ALWAYS"/>
+
+                        <Button maxWidth="Infinity"
+                                onAction="#addCenter"
+                                styleClass="quick-action-btn"
+                                text="➕ Add Center"/>
+                    </children>
+                </VBox>
+
+            </HBox>
+
+            <!-- Table -->
+            <VBox spacing="12"
+                  styleClass="panel-card"
+                  VBox.vgrow="ALWAYS">
+
+                <children>
+                    <Label styleClass="panel-title"
+                           text="Evacuation Centers Details"/>
+
+                    <TableView fx:id="centersTable"
+                               prefHeight="250"
+                               styleClass="incident-table"
+                               VBox.vgrow="ALWAYS">
+
+                        <columns>
+                            <TableColumn fx:id="colName"
+                                         prefWidth="150"
+                                         text="Center Name"/>
+                            <TableColumn fx:id="colCapacity"
+                                         prefWidth="80"
+                                         text="Capacity"/>
+                            <TableColumn fx:id="colOccupancy"
+                                         prefWidth="100"
+                                         text="Current Count"/>
+                            <TableColumn fx:id="colStatus"
+                                         prefWidth="100"
+                                         text="Status"/>
+                            <TableColumn fx:id="colManager"
+                                         prefWidth="120"
+                                         text="Manager"/>
+                            <TableColumn fx:id="colContact"
+                                         prefWidth="120"
+                                         text="Contact"/>
+                            <TableColumn fx:id="colActions"
+                                         prefWidth="80"
+                                         text="Actions"/>
+                        </columns>
+
+                    </TableView>
+                </children>
+            </VBox>
+
+            <!-- Stats -->
+            <HBox spacing="16">
+                <children>
+
+                    <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <children>
+                            <Label styleClass="kpi-label"
+                                   text="Available Capacity"/>
+                            <Label fx:id="lblCapacityAvailable"
+                                   styleClass="kpi-value"
+                                   text="0"/>
+                        </children>
+                    </VBox>
+
+                    <VBox styleClass="kpi-card kpi-warning"
+                          HBox.hgrow="ALWAYS">
+                        <children>
+                            <Label styleClass="kpi-label"
+                                   text="Capacity Remaining %"/>
+                            <Label fx:id="lblCapacityPercent"
+                                   styleClass="kpi-value"
+                                   text="0%"/>
+                        </children>
+                    </VBox>
+
+                    <VBox styleClass="kpi-card kpi-info"
+                          HBox.hgrow="ALWAYS">
+                        <children>
+                            <Label styleClass="kpi-label"
+                                   text="Avg. Per Center"/>
+                            <Label fx:id="lblAvgPerCenter"
+                                   styleClass="kpi-value"
+                                   text="0"/>
+                        </children>
+                    </VBox>
+
+                </children>
+            </HBox>
+
+        </VBox>
+    </content>
+</ScrollPane>

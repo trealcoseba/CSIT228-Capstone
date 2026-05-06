@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="layoutPane" prefHeight="800.0" prefWidth="1000.0" styleClass="root-pane" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.mainlayout.MainLayoutController">
+
+    <!-- SIDEBAR -->
+    <left>
+        <VBox fx:id="sidebar" prefWidth="260" spacing="0" styleClass="sidebar">
+
+            <!-- Logo/Brand -->
+            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="sidebar-brand">
+                <padding><Insets bottom="20.0" left="20.0" right="20.0" top="30.0" /></padding>
+            <ImageView fitHeight="67.0" fitWidth="81.0" pickOnBounds="true" preserveRatio="true">
+               <HBox.margin>
+                  <Insets left="-14.0" right="-7.0" top="-2.0" />
+               </HBox.margin>
+               <image>
+                  <Image url="@../../../../images/ligtas-brgy-logo.png" />
+               </image>
+            </ImageView>
+                <VBox spacing="2">
+                    <Label styleClass="brand-title" text="LIGTAS-Brgy">
+                  <padding>
+                     <Insets top="10.0" />
+                  </padding></Label>
+                    <Label style="-fx-text-fill: #ffe626;" styleClass="brand-subtitle" text="Barangay Command Center" />
+                </VBox>
+            </HBox>
+
+            <Separator styleClass="sidebar-separator" />
+
+            <!-- MAIN Section -->
+            <Label styleClass="section-label" text="MAIN" />
+            <Button fx:id="btnDashboard" maxWidth="Infinity" onAction="#showDashboard" styleClass="nav-button, nav-active" text="Dashboard" />
+            <Button fx:id="btnIncidents" maxWidth="Infinity" onAction="#showIncidents" styleClass="nav-button" text="Incidents" />
+            <Button fx:id="btnResidents" maxWidth="Infinity" onAction="#showResidents" styleClass="nav-button" text="Residents" />
+            <Button fx:id="btnDocuments" maxWidth="Infinity" onAction="#showDocuments" styleClass="nav-button" text="Documents" />
+
+            <!-- DISASTER OPS Section -->
+            <Label styleClass="section-label" text="DISASTER OPS" />
+            <Button fx:id="btnEvacuation" maxWidth="Infinity" onAction="#showEvacuation" styleClass="nav-button" text="Evacuation Map" />
+            <Button fx:id="btnResources" maxWidth="Infinity" onAction="#showResources" styleClass="nav-button" text="Resources" />
+            <Button fx:id="btnAlerts" maxWidth="Infinity" onAction="#showAlerts" styleClass="nav-button" text="Alerts &amp; Broadcast" />
+
+            <!-- ADMIN Section -->
+            <Label styleClass="section-label" text="ADMIN" />
+            <Button fx:id="btnReports" maxWidth="Infinity" onAction="#showReports" styleClass="nav-button" text="Reports" />
+            <Button fx:id="btnAnalytics" layoutX="18.0" layoutY="573.0" maxWidth="Infinity" onAction="#showAnalytics" styleClass="nav-button" text="Analytics" />
+            <Button fx:id="btnChatbot" maxWidth="Infinity" onAction="#showChatbot" styleClass="nav-button" text="AI Chatbot Logs" />
+            <Button fx:id="btnSettings" maxWidth="Infinity" onAction="#showSettings" styleClass="nav-button" text="Settings" />
+         <Region prefHeight="300.0" prefWidth="200.0" />
+
+            <!-- Emergency Mode Card -->
+            <VBox spacing="8" styleClass="emergency-card" VBox.vgrow="NEVER">
+                <padding><Insets topRightBottomLeft="16" /></padding>
+                <Label styleClass="emergency-title" text=" Emergency Mode" />
+                <Label styleClass="emergency-desc" text="Activate full disaster response protocol" wrapText="true" />
+                <Button maxWidth="Infinity" onAction="#activateEmergency" styleClass="emergency-button" text="Activate" />
+            </VBox>
+         <Region prefHeight="200.0" prefWidth="200.0" />
+
+            <padding><Insets bottom="16" left="8" right="8" /></padding>
+        </VBox>
+    </left>
+
+    <!-- MAIN CONTENT -->
+    <center>
+        <VBox fx:id="contentArea" styleClass="content-area" VBox.vgrow="ALWAYS">
+
+            <!-- Top Bar -->
+            <HBox fx:id="topBar" alignment="CENTER_RIGHT" spacing="12" styleClass="top-bar">
+                <padding><Insets topRightBottomLeft="12" /></padding>
+            <Button fx:id="btnLogout" onAction="#handleLogout" styleClass="quick-action-btn, qa-warning" text="LOGOUT" />
+                <Region prefHeight="29.0" prefWidth="250.0" HBox.hgrow="ALWAYS" />
+                <Label fx:id="lblActiveIncidents" styleClass="active-incidents-badge" text="● 0 Active Incidents" />
+                <HBox alignment="CENTER" spacing="8">
+                    <Label styleClass="avatar-circle" text="BA" />
+                    <Label styleClass="avatar-name" text="Brgy. Admin" />
+                </HBox>
+            <VBox.margin>
+               <Insets />
+            </VBox.margin>
+            </HBox>
+
+            <!-- Dynamic Content Pane -->
+            <StackPane fx:id="contentPane" VBox.vgrow="ALWAYS">
+                <padding><Insets topRightBottomLeft="24" /></padding>
+            </StackPane>
+
+        </VBox>
+    </center>
+
+</BorderPane>

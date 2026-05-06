@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LIGTAS-Brgy Unified Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body, html, #map { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #E5E0D8; }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    // Initialize map centering on Bacolod City (LIGTAS-Brgy project location)
+    const map = L.map('map', { zoomControl: true }).setView([10.3077, 123.8941], 14);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    let markerLayerGroup = L.layerGroup().addTo(map);
+    let selectionMarker = null;
+
+    // --- USE CASE 1: RESIDENT PINNING (Reverse Geocoding) ---
+    map.on('click', async function(e) {
+        const { lat, lng } = e.latlng;
+
+        // Update visual marker
+        if (selectionMarker) {
+            selectionMarker.setLatLng(e.latlng);
+        } else {
+            selectionMarker = L.marker(e.latlng, { draggable: true }).addTo(map);
+        }
+
+        // Fetch actual address using Nominatim (Free)
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`, {
+                headers: { 'User-Agent': 'LIGTAS-Brgy-Capstone' }
+            });
+            const data = await response.json();
+            const address = data.display_name || `Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`;
+
+            // Send back to Java Controller (MapPickerController)
+            if (window.javaConnector) {
+                window.javaConnector.setAddress(address, lat, lng);
+            }
+        } catch (error) {
+            window.javaConnector.setAddress(`Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`, lat, lng);
+        }
+    });
+
+    // --- USE CASE 2: EVACUATION CENTER DISPLAY ---
+    function clearMarkers() {
+        markerLayerGroup.clearLayers();
+    }
+
+    function addCenterMarker(id, lat, lng, name, occupancy, capacity) {
+        const marker = L.marker([lat, lng]);
+        const status = (occupancy >= capacity) ? "<b style='color:red;'>FULL</b>" : "Available";
+
+        marker.bindPopup(`
+            <b>${name}</b><br>
+            Status: ${status}<br>
+            Occupancy: ${occupancy} / ${capacity}
+        `);
+        markerLayerGroup.addLayer(marker);
+    }
+
+    // Fix for JavaFX "Grey Box" rendering issue
+    function fixMapSize() {
+        setTimeout(() => {
+            map.invalidateSize();
+            // Update this line to match CIT-U as well
+            map.setView([10.3077, 123.8941], 15, { animate: false });
+        }, 300);
+    }
+
+    async function searchAddress(query) {
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`);
+            const data = await response.json();
+            if (data && data.length > 0) {
+                const result = data[0];
+                const lat = parseFloat(result.lat);
+                const lon = parseFloat(result.lon);
+
+                // Move map and marker
+                map.flyTo([lat, lon], 17);
+                if (selectionMarker) {
+                    selectionMarker.setLatLng([lat, lon]);
+                } else {
+                    selectionMarker = L.marker([lat, lon]).addTo(map);
+                }
+
+                // Update Java side with the "official" formatted address
+                window.javaConnector.setAddress(result.display_name, lat, lon);
+            }
+        } catch (e) {
+            console.error("Search failed", e);
+        }
+    }
+
+    // Center view on specific coordinates (For focusing on a center)
+    function focusLocation(lat, lng) {
+        map.flyTo([lat, lng], 17);
+    }
+</script>
+</body>
+</html>
