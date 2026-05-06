@@ -210,13 +210,11 @@ public class ResidentFormController {
 
             UUID residentId;
             if (currentResidentId != null) {
-                // ── UPDATE: repository.update() handles location insert/update/delete internally
                 r.setId(currentResidentId);
                 repository.update(r);
                 residentId = currentResidentId;
                 repository.deleteVulnerabilities(residentId);
             } else {
-                // ── INSERT: repository.insert() creates location row first if needed
                 residentId = repository.insert(r);
             }
 

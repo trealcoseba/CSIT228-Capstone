@@ -47,6 +47,8 @@ module ligtas.brgy {
     opens com.example.csit228capstone.controller.alerts to javafx.fxml;
     exports com.example.csit228capstone.controller.evacuation;
     opens com.example.csit228capstone.controller.evacuation to javafx.fxml;
+    exports com.example.csit228capstone.controller.analytics;
+    opens com.example.csit228capstone.controller.analytics to javafx.fxml;
     exports com.example.csit228capstone.controller.map;
     opens com.example.csit228capstone.controller.map to javafx.fxml;
     exports com.example.csit228capstone.model.incident;

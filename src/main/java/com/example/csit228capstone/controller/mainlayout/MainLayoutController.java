@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -12,11 +13,14 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import com.example.csit228capstone.service.IncidentService;
 import com.example.csit228capstone.util.AlertEventBus;
+import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.List;
 
 public class MainLayoutController {
+
 
     @FXML private StackPane contentPane;
     @FXML private BorderPane layoutPane;
@@ -26,6 +30,7 @@ public class MainLayoutController {
     @FXML private Button btnDashboard, btnIncidents, btnResidents, btnDocuments;
     @FXML private Button btnEvacuation, btnResources, btnAlerts;
     @FXML private Button btnReports, btnChatbot, btnSettings;
+    @FXML private Button btnAnalytics;
     @FXML private Button btnLogout;
 
     private List<Button> navButtons;
@@ -34,7 +39,7 @@ public class MainLayoutController {
     @FXML
     public void initialize() {
         navButtons = List.of(btnDashboard, btnIncidents, btnResidents, btnDocuments,
-                btnEvacuation, btnResources, btnAlerts, btnReports, btnChatbot, btnSettings);
+                btnEvacuation, btnResources, btnAlerts, btnReports, btnChatbot, btnSettings, btnAnalytics);
 
         // Subscribe to events for live badge updates
         AlertEventBus.getInstance().subscribe(event -> javafx.application.Platform.runLater(this::refreshBadge));
@@ -92,6 +97,7 @@ public class MainLayoutController {
     @FXML void showReports(ActionEvent e)    { loadView("report", "Reports", btnReports); }
     @FXML void showChatbot(ActionEvent e)    { loadView("chatbot", "Chatbot", btnChatbot); }
     @FXML void showSettings(ActionEvent e)   { loadView("settings", "Settings", btnSettings); }
+    @FXML void showAnalytics(ActionEvent e)  { loadView("analytics", "Analytics", btnAnalytics); }
 
     @FXML
     void activateEmergency(ActionEvent e) {
@@ -99,14 +105,24 @@ public class MainLayoutController {
     }
 
     public void handleLogout(ActionEvent actionEvent) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/csit228capstone/login/Login.fxml"));
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/com/example/csit228capstone/login/Login.fxml")
+        );
         Parent root = loader.load();
 
-        layoutPane.setCenter(root);
+        Scene scene = new Scene(root, 1440, 900);
+        scene.getStylesheets().add(
+                getClass().getResource("/css/application.css").toExternalForm()
+        );
 
+        Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
 
-
-
-
+        stage.setScene(scene);
+        stage.centerOnScreen();
+        stage.setMinWidth(1200);
+        stage.setMinHeight(800);
+        stage.show();
     }
+
+
 }

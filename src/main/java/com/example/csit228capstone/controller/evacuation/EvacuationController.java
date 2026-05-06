@@ -15,7 +15,6 @@ public class EvacuationController {
 
     @FXML
     private WebView mapWebView;
-
     private WebEngine webEngine;
 
     private final List<EvacuationCenter> centersData = new ArrayList<>();
@@ -84,20 +83,14 @@ public class EvacuationController {
 
     public void refreshMapMarkers() {
         if (webEngine == null) return;
-
-        if (webEngine.getLoadWorker().getState() != Worker.State.SUCCEEDED) {
-            return;
-        }
+        if (webEngine.getLoadWorker().getState() != Worker.State.SUCCEEDED) { return; }
 
         try {
-            // Leaflet clear markers
             webEngine.executeScript("clearMarkers()");
 
             for (EvacuationCenter center : centersData) {
                 if (center.getLatitude() != null && center.getLongitude() != null) {
-
                     String safeName = center.getName().replace("'", "\\'");
-
                     String script = String.format(
                             "addCenterMarker('%s', %f, %f, '%s', %d, %d)",
                             center.getId(),
@@ -107,11 +100,9 @@ public class EvacuationController {
                             center.getCurrentOccupancy(),
                             center.getMaxCapacity()
                     );
-
                     webEngine.executeScript(script);
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -119,15 +110,9 @@ public class EvacuationController {
 
     private void handleCenterSelection(EvacuationCenter center) {
         if (center == null) return;
-
         if (center.getLatitude() == null || center.getLongitude() == null) return;
 
-        String script = String.format(
-                "map.setView([%f, %f], 16)",
-                center.getLatitude(),
-                center.getLongitude()
-        );
-
+        String script = String.format("map.setView([%f, %f], 16)", center.getLatitude(), center.getLongitude());
         webEngine.executeScript(script);
     }
 

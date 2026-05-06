@@ -49,6 +49,7 @@
             <!-- ADMIN Section -->
             <Label styleClass="section-label" text="ADMIN" />
             <Button fx:id="btnReports" maxWidth="Infinity" onAction="#showReports" styleClass="nav-button" text="Reports" />
+            <Button fx:id="btnAnalytics" layoutX="18.0" layoutY="573.0" maxWidth="Infinity" onAction="#showAnalytics" styleClass="nav-button" text="Analytics" />
             <Button fx:id="btnChatbot" maxWidth="Infinity" onAction="#showChatbot" styleClass="nav-button" text="AI Chatbot Logs" />
             <Button fx:id="btnSettings" maxWidth="Infinity" onAction="#showSettings" styleClass="nav-button" text="Settings" />
          <Region prefHeight="300.0" prefWidth="200.0" />

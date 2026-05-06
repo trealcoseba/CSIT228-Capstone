@@ -26,7 +26,8 @@ public class ResidentRepository {
                 "FROM residents r " +
                 "LEFT JOIN resident_locations rl ON r.resident_locations_id = rl.id " +
                 "LEFT JOIN resident_vulnerabilities rv ON rv.resident_id = r.id " +
-                "GROUP BY r.id, rl.address, rl.latitude, rl.longitude";
+                "GROUP BY r.id, rl.address, rl.latitude, rl.longitude " +
+                "ORDER BY r.created_at DESC";
 
         try (Connection c = getConn();
              PreparedStatement ps = c.prepareStatement(sql);
@@ -114,29 +115,26 @@ public class ResidentRepository {
 
         if (newAddress != null && !newAddress.isBlank()) {
             if (existingLocationId != null) {
-                // Shared household logic: update the row — moves everyone at this address
                 updateLocation(existingLocationId, newAddress, r.getLatitude(), r.getLongitude());
                 locationId = existingLocationId;
             } else {
-                // No location yet — find a matching one or create new
                 locationId = findOrInsertLocation(newAddress, r.getLatitude(), r.getLongitude());
             }
         } else {
-            // Address cleared — only delete if no other resident shares it
             if (existingLocationId != null && !isLocationShared(existingLocationId, r.getId())) {
                 deleteLocation(existingLocationId);
             }
             locationId = null;
         }
 
-        String sql = "SELECT r.*, rl.address, rl.latitude, rl.longitude, " +
-                "string_agg(rv.tag::text, ', ') as tags " +
-                "FROM residents r " +
-                "LEFT JOIN resident_locations rl ON r.resident_locations_id = rl.id " +
-                "LEFT JOIN resident_vulnerabilities rv ON rv.resident_id = r.id " +
-                "GROUP BY r.id, rl.address, rl.latitude, rl.longitude " +
-                "ORDER BY r.created_at DESC";
-        
+        // ✅ FIXED: correct UPDATE sql
+        String sql = "UPDATE residents SET " +
+                "resident_locations_id = ?, " +
+                "first_name = ?, middle_name = ?, last_name = ?, suffix = ?, " +
+                "date_of_birth = ?, sex = ?, civil_status = ?, " +
+                "contact_number = ?, photo_url = ?, is_household_head = ?, updated_at = ? " +
+                "WHERE id = ?";
+
         try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setObject(1, locationId);
             ps.setString(2, r.getFirstName());
@@ -149,7 +147,8 @@ public class ResidentRepository {
             ps.setString(9, r.getContactNumber());
             ps.setString(10, r.getPhotoUrl());
             ps.setBoolean(11, r.isHouseholdHead());
-            ps.setObject(12, r.getId());
+            ps.setTimestamp(12, Timestamp.valueOf(r.getUpdatedAt()));
+            ps.setObject(13, r.getId());
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -176,23 +175,19 @@ public class ResidentRepository {
 
     // ─── LOCATION HELPERS ─────────────────────────────────────────────────────
 
-    /**
-     * Finds an existing location row by address (case-insensitive).
-     * If none exists, inserts a new one and returns its UUID.
-     */
     private UUID findOrInsertLocation(String address, double latitude, double longitude) {
         String sql = "SELECT id FROM resident_locations WHERE LOWER(address) = LOWER(?) LIMIT 1";
         try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, address);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getObject("id", UUID.class); // ✅ reuse existing
+                    return rs.getObject("id", UUID.class);
                 }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return insertLocation(address, latitude, longitude); // ✅ create new (was wrongly recursive before)
+        return insertLocation(address, latitude, longitude);
     }
 
     private UUID insertLocation(String address, double latitude, double longitude) {
@@ -247,10 +242,6 @@ public class ResidentRepository {
         }
     }
 
-    /**
-     * Returns true if any resident OTHER than excludeResidentId still references this location.
-     * Pass excludeResidentId = null when checking after the resident has already been deleted.
-     */
     private boolean isLocationShared(UUID locationId, UUID excludeResidentId) {
         String sql = excludeResidentId != null
                 ? "SELECT COUNT(*) FROM residents WHERE resident_locations_id = ? AND id != ?"

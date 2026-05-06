@@ -7,7 +7,6 @@ public class EvacuationCenter {
     private UUID id;
     private String name;
     private String address;
-    private String purok;
     private Double latitude;
     private Double longitude;
     private int maxCapacity;
@@ -23,8 +22,6 @@ public class EvacuationCenter {
     public void setName(String name) { this.name = name; }
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
-    public String getPurok() { return purok; }
-    public void setPurok(String purok) { this.purok = purok; }
     public Double getLatitude() { return latitude; }
     public void setLatitude(Double latitude) { this.latitude = latitude; }
     public Double getLongitude() { return longitude; }

@@ -77,18 +77,15 @@ public class ResidentsController {
 
         if (file != null) {
             ResidentRepository repo = new ResidentRepository();
-            List<Resident> residents = repo.findAll(); // Now automatically sorted by SQL
+            List<Resident> residents = repo.findAll();
 
             residents.sort((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt()));
 
-            // Define a format for the date (e.g., 2026-05-05 14:30)
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
             try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file)))) {
-                // 1. Updated Header
                 writer.println("Date Created,ID,First Name,Last Name,Sex,Birth Date,Address,Vulnerabilities,Household Head");
 
-                // 2. Write Rows
                 for (Resident r : residents) {
                     StringBuilder row = new StringBuilder();
 
@@ -121,8 +118,6 @@ public class ResidentsController {
     public void openRegistration(ActionEvent actionEvent) {
         openForm(null);
     }
-
-
 
 
 
@@ -200,41 +195,13 @@ public class ResidentsController {
 
     private void setupTableColumns() {
 
-        colId.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.10));
-        colName.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.20));
-        colAge.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.05));
-        colCategory.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.15));
-        colStatus.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.10));
-        colPhoneNumber.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.12));
-        colRegisteredDate.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.10));
-        colActions.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.15));
-        colAddress.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.20));
-
-        colId.setResizable(false);
-        colAddress.setResizable(false);
-        colName.setResizable(false);
-        colAge.setResizable(false);
-        colCategory.setResizable(false);
-        colStatus.setResizable(false);
-        colPhoneNumber.setResizable(false);
-        colRegisteredDate.setResizable(false);
-        colActions.setResizable(false);
-
-        colId.setReorderable(false);
-        colAddress.setReorderable(false);
-        colName.setReorderable(false);
-        colAge.setReorderable(false);
-        colCategory.setReorderable(false);
-        colStatus.setReorderable(false);
-        colPhoneNumber.setReorderable(false);
-        colRegisteredDate.setReorderable(false);
-        colActions.setReorderable(false);
+        //FORMAT TABLE
+        formatTable();
 
         colId.setCellValueFactory(cellData -> {
             String fullId = cellData.getValue().getId().toString();
             String shortId = (fullId.length() > 8) ? fullId.substring(0, 8) : fullId;
 
-            // Alternative to SimpleStringWrapper
             return new javafx.beans.property.ReadOnlyStringWrapper(shortId.toUpperCase());
         });
 
@@ -343,5 +310,38 @@ public class ResidentsController {
             return "\"" + data.replace("\"", "\"\"") + "\"";
         }
         return data;
+    }
+
+
+    private void formatTable(){
+        colId.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.10));
+        colName.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.20));
+        colAge.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.05));
+        colCategory.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.15));
+        colStatus.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.10));
+        colPhoneNumber.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.12));
+        colRegisteredDate.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.10));
+        colActions.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.15));
+        colAddress.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.20));
+
+        colId.setResizable(false);
+        colAddress.setResizable(false);
+        colName.setResizable(false);
+        colAge.setResizable(false);
+        colCategory.setResizable(false);
+        colStatus.setResizable(false);
+        colPhoneNumber.setResizable(false);
+        colRegisteredDate.setResizable(false);
+        colActions.setResizable(false);
+
+        colId.setReorderable(false);
+        colAddress.setReorderable(false);
+        colName.setReorderable(false);
+        colAge.setReorderable(false);
+        colCategory.setReorderable(false);
+        colStatus.setReorderable(false);
+        colPhoneNumber.setReorderable(false);
+        colRegisteredDate.setReorderable(false);
+        colActions.setReorderable(false);
     }
 }
