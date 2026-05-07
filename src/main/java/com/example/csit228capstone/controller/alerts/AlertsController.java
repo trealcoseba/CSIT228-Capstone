@@ -55,6 +55,7 @@ public class AlertsController implements Initializable {
             Alert alert = createAlertFromUI();
             saveAlert(alert);
             loadAlertData();
+            updateKPIs(); // Refresh the numbers at the top
             clearForm();
         }
     }
@@ -153,7 +154,50 @@ public class AlertsController implements Initializable {
     }
 
     private void updateKPIs() {
-        // Logic to count rows in DB and update lblAlertsMonth, lblBroadcasts, etc.
+        // 1. Count alerts created in the current calendar month
+        String sqlMonth = "SELECT COUNT(*) FROM tblalerts WHERE created_at >= date_trunc('month', current_date)";
+
+        // 2. Count "Critical" alerts (Assuming 'Unread' in your UI refers to urgent/active issues)
+        // Alternatively: SELECT COUNT(*) FROM tblalerts WHERE is_read = false (if you add that column)
+        String sqlCritical = "SELECT COUNT(*) FROM tblalerts WHERE priority = 'CRITICAL'";
+
+        // 3. Count total Broadcasts
+        String sqlBroadcasts = "SELECT COUNT(*) FROM tblalerts WHERE is_broadcast = true";
+
+        // 4. Count Scheduled (Alerts where the expiration date is in the future)
+        String sqlScheduled = "SELECT COUNT(*) FROM tblalerts WHERE expires_at > now()";
+
+        try (Connection conn = SupabaseConnectionManager.getInstance().getConnection();
+             Statement stmt = conn.createStatement()) {
+
+            // Execute Month Count
+            ResultSet rs = stmt.executeQuery(sqlMonth);
+            if (rs.next()) {
+                lblAlertsMonth.setText(String.valueOf(rs.getInt(1)));
+            }
+
+            // Execute Critical/Unread Count
+            rs = stmt.executeQuery(sqlCritical);
+            if (rs.next()) {
+                lblUnread.setText(String.valueOf(rs.getInt(1)));
+            }
+
+            // Execute Broadcast Count
+            rs = stmt.executeQuery(sqlBroadcasts);
+            if (rs.next()) {
+                lblBroadcasts.setText(String.valueOf(rs.getInt(1)));
+            }
+
+            // Execute Scheduled Count
+            rs = stmt.executeQuery(sqlScheduled);
+            if (rs.next()) {
+                lblScheduled.setText(String.valueOf(rs.getInt(1)));
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error updating KPIs: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     // Required by your FXML header buttons
