@@ -20,7 +20,7 @@
         <HBox alignment="CENTER_LEFT" spacing="12">
             <Label styleClass="page-title" text="Incidents Management" />
             <Region HBox.hgrow="ALWAYS" />
-            <TextField prefWidth="200" promptText="🔍 Search incidents..." styleClass="search-field" />
+            <TextField fx:id="searchField" prefWidth="200" promptText="🔍 Search incidents..." styleClass="search-field" />
             <Button onAction="#openNewIncident" styleClass="quick-action-btn" text="➕ New Incident" />
         </HBox>
 
