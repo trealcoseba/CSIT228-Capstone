@@ -16,6 +16,7 @@ module ligtas.brgy {
 
     opens com.example.csit228capstone.app to javafx.fxml;
     opens com.example.csit228capstone.model to javafx.base;
+    opens com.example.csit228capstone.incident to javafx.fxml;
 
     exports com.example.csit228capstone.app;
     exports com.example.csit228capstone.model;
