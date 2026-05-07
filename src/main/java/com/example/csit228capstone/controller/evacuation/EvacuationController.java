@@ -1,7 +1,7 @@
 package com.example.csit228capstone.controller.evacuation;
 
 import com.example.csit228capstone.model.EvacuationCenter;
-import com.example.csit228capstone.util.SupabaseConnectionManager;
+import com.example.csit228capstone.service.EvacuationService;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,17 +27,10 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.Comparator;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.UUID;
 
 public class EvacuationController {
-
 
     @FXML private Label lblTotalEvacuees;
     @FXML private Label lblCentersActive;
@@ -45,13 +38,13 @@ public class EvacuationController {
     @FXML private TableColumn colAddress;
     @FXML private WebView mapWebView;
     @FXML private TableView centersTable;
-    @FXML private TableColumn<EvacuationCenter, String> colName;
-    @FXML private TableColumn<EvacuationCenter, String> colCapacity;
+    @FXML private TableColumn<EvacuationCenter, String>  colName;
+    @FXML private TableColumn<EvacuationCenter, String>  colCapacity;
     @FXML private TableColumn<EvacuationCenter, Integer> colOccupancy;
     @FXML private TableColumn<EvacuationCenter, Integer> colStatus;
-    @FXML private TableColumn<EvacuationCenter, String> colManager;
-    @FXML private TableColumn<EvacuationCenter, String> colContact;
-    @FXML private TableColumn<EvacuationCenter, Void> colActions;
+    @FXML private TableColumn<EvacuationCenter, String>  colManager;
+    @FXML private TableColumn<EvacuationCenter, String>  colContact;
+    @FXML private TableColumn<EvacuationCenter, Void>    colActions;
     @FXML private ListView<EvacuationCenter> centersList;
 
     @FXML private ComboBox<String> filterStatus;
@@ -59,11 +52,18 @@ public class EvacuationController {
     @FXML private TextField tfSearch;
 
     private FilteredList<EvacuationCenter> filteredData;
-    private SortedList<EvacuationCenter> sortedData;
+    private SortedList<EvacuationCenter>   sortedData;
 
+    private final ObservableList<EvacuationCenter> centersData =
+            FXCollections.observableArrayList();
 
-    private final ObservableList<EvacuationCenter> centersData = FXCollections.observableArrayList();
     private WebEngine webEngine;
+
+    private final EvacuationService service = EvacuationService.getInstance();
+
+    // -------------------------------------------------------------------------
+    // Initialization
+    // -------------------------------------------------------------------------
 
     @FXML
     public void initialize() {
@@ -73,7 +73,12 @@ public class EvacuationController {
         setUpTables();
     }
 
-    @FXML  private void addCenter(ActionEvent event) {
+    // -------------------------------------------------------------------------
+    // Add / Activate
+    // -------------------------------------------------------------------------
+
+    @FXML
+    private void addCenter(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/com/example/csit228capstone/evacuation/EvacuationForm.fxml"));
@@ -84,38 +89,39 @@ public class EvacuationController {
             stage.setScene(new Scene(root));
             stage.showAndWait();
             loadCentersData();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    @FXML public void activateEvacuation(ActionEvent actionEvent) {
+    @FXML
+    public void activateEvacuation(ActionEvent actionEvent) {
         System.out.println("Evacuation activated");
     }
 
+    // -------------------------------------------------------------------------
+    // Table setup
+    // -------------------------------------------------------------------------
+
     private void setUpTables() {
-        // Column bindings — only need to run once but safe to repeat
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colCapacity.setCellValueFactory(new PropertyValueFactory<>("maxCapacity"));
         colOccupancy.setCellValueFactory(new PropertyValueFactory<>("currentOccupancy"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colManager.setCellValueFactory(new PropertyValueFactory<>("managerName"));
         colAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
-        setupActionButtons(); // move colActions cellFactory here
-        loadCentersData(); // ← separate data loading
+        setupActionButtons();
+        loadCentersData();
         centersTable.setEditable(false);
     }
 
-    private void setUpMap(){
+    // -------------------------------------------------------------------------
+    // Map
+    // -------------------------------------------------------------------------
+
+    private void setUpMap() {
         if (mapWebView == null) return;
         webEngine = mapWebView.getEngine();
-        mapWebView.widthProperty().addListener((obs, oldVal, newVal) ->
-                System.out.println("WebView width changed: " + newVal)
-        );
-        mapWebView.heightProperty().addListener((obs, oldVal, newVal) ->
-                System.out.println("WebView height changed: " + newVal)
-        );
 
         webEngine.setOnAlert(event ->
                 System.out.println("JS Alert: " + event.getData())
@@ -126,7 +132,6 @@ public class EvacuationController {
                     .getResource("/map/map.html")
                     .toExternalForm();
             webEngine.load(mapUrl);
-
         } catch (Exception e) {
             System.err.println("Failed to load map.html");
             e.printStackTrace();
@@ -141,14 +146,6 @@ public class EvacuationController {
             }
         });
 
-        mapWebView.widthProperty().addListener((obs, oldVal, newVal) ->
-                System.out.println("WebView width changed: " + newVal)
-        );
-        mapWebView.heightProperty().addListener((obs, oldVal, newVal) ->
-                System.out.println("WebView height changed: " + newVal)
-        );
-
-        // Fix map on resize
         mapWebView.widthProperty().addListener((obs, oldVal, newVal) -> {
             if (webEngine.getLoadWorker().getState() == Worker.State.SUCCEEDED) {
                 webEngine.executeScript("fixMapSize()");
@@ -164,14 +161,13 @@ public class EvacuationController {
 
     private void refreshMapMarkers() {
         if (webEngine == null) return;
-        if (webEngine.getLoadWorker().getState() != Worker.State.SUCCEEDED) {
-            return;
-        }
+        if (webEngine.getLoadWorker().getState() != Worker.State.SUCCEEDED) return;
 
         try {
             webEngine.executeScript("clearMarkers()");
 
-            Iterable<EvacuationCenter> source = (filteredData != null) ? filteredData : centersData;
+            Iterable<EvacuationCenter> source =
+                    (filteredData != null) ? filteredData : centersData;
 
             for (EvacuationCenter center : source) {
                 if (center.getLatitude() != null && center.getLongitude() != null) {
@@ -195,9 +191,11 @@ public class EvacuationController {
         }
     }
 
-    private void setupCentersList() {
-        // DO NOT call centersList.setItems() here — setupFiltersAndSearch() owns that binding
+    // -------------------------------------------------------------------------
+    // Centers list (sidebar)
+    // -------------------------------------------------------------------------
 
+    private void setupCentersList() {
         centersList.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(EvacuationCenter center, boolean empty) {
@@ -223,7 +221,9 @@ public class EvacuationController {
                 lblName.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1a1a1a;");
 
                 String rawAddress = center.getAddress() != null ? center.getAddress() : "No address";
-                String shortAddress = rawAddress.length() > 28 ? rawAddress.substring(0, 28) + "…" : rawAddress;
+                String shortAddress = rawAddress.length() > 28
+                        ? rawAddress.substring(0, 28) + "…"
+                        : rawAddress;
                 Label lblAddress = new Label(shortAddress);
                 lblAddress.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 11px;");
 
@@ -248,7 +248,8 @@ public class EvacuationController {
                 card.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
                 card.setPadding(new javafx.geometry.Insets(8, 12, 8, 12));
 
-                selectedProperty().addListener((obs, wasSelected, isSelected) -> applyCardStyle(card, lblName, lblAddress, lblAvailable, lblEvacuees, isSelected));
+                selectedProperty().addListener((obs, wasSelected, isSelected) ->
+                        applyCardStyle(card, lblName, lblAddress, lblAvailable, lblEvacuees, isSelected));
                 applyCardStyle(card, lblName, lblAddress, lblAvailable, lblEvacuees, isSelected());
 
                 setGraphic(card);
@@ -257,7 +258,6 @@ public class EvacuationController {
             }
         });
 
-        // Register selection → map fly-to ONCE
         centersList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, selected) -> {
             if (selected != null && selected.getLatitude() != null && selected.getLongitude() != null) {
                 if (webEngine != null && webEngine.getLoadWorker().getState() == Worker.State.SUCCEEDED) {
@@ -271,6 +271,9 @@ public class EvacuationController {
         });
     }
 
+    // -------------------------------------------------------------------------
+    // Edit / Delete / Manage dialogs
+    // -------------------------------------------------------------------------
 
     private void openEditForm(EvacuationCenter center) {
         try {
@@ -279,7 +282,7 @@ public class EvacuationController {
             Parent root = loader.load();
 
             EvacuationFormController formController = loader.getController();
-            formController.populateForEdit(center); // ← we'll add this method
+            formController.populateForEdit(center);
 
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -301,16 +304,9 @@ public class EvacuationController {
 
         confirm.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                String sql = "DELETE FROM evacuation_centers WHERE id = ?";
-                try (Connection conn = SupabaseConnectionManager.getInstance().getConnection();
-                     PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-                    stmt.setObject(1, center.getId());
-                    stmt.executeUpdate();
-
+                try {
+                    service.deleteCenter(center.getId());
                     loadCentersData();
-                    setUpTables();
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -318,30 +314,60 @@ public class EvacuationController {
         });
     }
 
-    private void updateStats() {
-        int totalEvacuees = centersData.stream()
-                .mapToInt(EvacuationCenter::getCurrentOccupancy)
-                .sum();
+    private void openManageEvacueesDialog(EvacuationCenter center) {
+        Dialog<Integer> dialog = new Dialog<>();
+        dialog.setTitle("Manage Evacuees");
+        dialog.setHeaderText("Update occupancy for:\n" + center.getName());
 
-        long activeCenters = centersData.stream()
-                .filter(EvacuationCenter::isActive)
-                .count();
+        ButtonType saveBtn = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
 
-        lblTotalEvacuees.setText(String.valueOf(totalEvacuees));
-        lblCentersActive.setText(String.valueOf(activeCenters));
+        Spinner<Integer> spinner = new Spinner<>(0, center.getMaxCapacity(), center.getCurrentOccupancy());
+        spinner.setEditable(true);
+        spinner.setPrefWidth(120);
+
+        int available = center.getMaxCapacity() - center.getCurrentOccupancy();
+        Label lblInfo = new Label(String.format(
+                "Current: %d / %d  (%d slots remaining)",
+                center.getCurrentOccupancy(), center.getMaxCapacity(), available));
+        lblInfo.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 11px;");
+
+        VBox content = new VBox(10,
+                lblInfo,
+                new Label("New occupancy count:"),
+                spinner);
+        content.setPadding(new javafx.geometry.Insets(16));
+        dialog.getDialogPane().setContent(content);
+
+        dialog.setResultConverter(btn -> btn == saveBtn ? spinner.getValue() : null);
+
+        dialog.showAndWait().ifPresent(newOccupancy -> {
+            try {
+                service.updateOccupancy(center.getId(), newOccupancy);
+                loadCentersData();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
+
+    // -------------------------------------------------------------------------
+    // Filters & sort
+    // -------------------------------------------------------------------------
 
     private void setupFiltersAndSearch() {
         filterStatus.getItems().setAll("All", "Available", "Full", "Inactive");
         filterStatus.setValue("All");
 
-        filterAscOrDesc.getItems().setAll("Name A→Z", "Name Z→A", "Occupancy ↑", "Occupancy ↓", "Capacity ↑", "Capacity ↓");
+        filterAscOrDesc.getItems().setAll(
+                "Name A→Z", "Name Z→A",
+                "Occupancy ↑", "Occupancy ↓",
+                "Capacity ↑",  "Capacity ↓");
         filterAscOrDesc.setValue("Name A→Z");
 
         filteredData = new FilteredList<>(centersData, p -> true);
-        sortedData = new SortedList<>(filteredData);
+        sortedData   = new SortedList<>(filteredData);
 
-        // These bindings are set ONCE and never overwritten
         centersTable.setItems(sortedData);
         centersList.setItems(sortedData);
 
@@ -359,15 +385,13 @@ public class EvacuationController {
         String status = filterStatus.getValue();
 
         filteredData.setPredicate(center -> {
-            // Status filter
             boolean statusMatch = switch (status) {
                 case "Available" -> center.getStatus().equalsIgnoreCase("available");
                 case "Full"      -> center.getStatus().equalsIgnoreCase("full");
                 case "Inactive"  -> !center.isActive();
-                default          -> true; // "All"
+                default          -> true;
             };
 
-            // Search filter — matches name, address, or manager
             boolean searchMatch = search.isEmpty()
                     || center.getName().toLowerCase().contains(search)
                     || (center.getAddress() != null && center.getAddress().toLowerCase().contains(search))
@@ -376,7 +400,6 @@ public class EvacuationController {
             return statusMatch && searchMatch;
         });
 
-        // Refresh map markers to match filtered results
         refreshMapMarkers();
         updateStats();
     }
@@ -392,56 +415,17 @@ public class EvacuationController {
             case "Occupancy ↓" -> Comparator.comparingInt(EvacuationCenter::getCurrentOccupancy).reversed();
             case "Capacity ↑"  -> Comparator.comparingInt(EvacuationCenter::getMaxCapacity);
             case "Capacity ↓"  -> Comparator.comparingInt(EvacuationCenter::getMaxCapacity).reversed();
-            default            -> Comparator.comparing(EvacuationCenter::getName, String.CASE_INSENSITIVE_ORDER); // "Name A→Z"
+            default            -> Comparator.comparing(EvacuationCenter::getName, String.CASE_INSENSITIVE_ORDER);
         };
 
         sortedData.setComparator(comparator);
     }
 
-    private void openManageEvacueesDialog(EvacuationCenter center) {
-        // Input dialog
-        Dialog<Integer> dialog = new Dialog<>();
-        dialog.setTitle("Manage Evacuees");
-        dialog.setHeaderText("Update occupancy for:\n" + center.getName());
+    // -------------------------------------------------------------------------
+    // Action buttons (table column)
+    // -------------------------------------------------------------------------
 
-        ButtonType saveBtn = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
-
-        // Layout
-        Spinner<Integer> spinner = new Spinner<>(0, center.getMaxCapacity(), center.getCurrentOccupancy());
-        spinner.setEditable(true);
-        spinner.setPrefWidth(120);
-
-        int available = center.getMaxCapacity() - center.getCurrentOccupancy();
-        Label lblInfo = new Label(String.format(
-                "Current: %d / %d  (%d slots remaining)",
-                center.getCurrentOccupancy(), center.getMaxCapacity(), available));
-        lblInfo.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 11px;");
-
-        VBox content = new VBox(10, lblInfo, new Label("New occupancy count:"), spinner);
-        content.setPadding(new javafx.geometry.Insets(16));
-        dialog.getDialogPane().setContent(content);
-
-        dialog.setResultConverter(btn -> btn == saveBtn ? spinner.getValue() : null);
-
-        dialog.showAndWait().ifPresent(newOccupancy -> {
-            String sql = "UPDATE evacuation_centers SET current_occupancy = ? WHERE id = ?";
-            try (Connection conn = SupabaseConnectionManager.getInstance().getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-                stmt.setInt(1, newOccupancy);
-                stmt.setObject(2, center.getId());
-                stmt.executeUpdate();
-
-                loadCentersData();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    private void setupActionButtons(){
+    private void setupActionButtons() {
         colActions.setCellFactory(new Callback<>() {
             @Override
             public TableCell<EvacuationCenter, Void> call(TableColumn<EvacuationCenter, Void> param) {
@@ -452,48 +436,43 @@ public class EvacuationController {
 
                     {
                         btnManage.setStyle("""
-                            -fx-background-color: #bbf7d0;
-                            -fx-text-fill: #166534;
-                            -fx-font-size: 10px;
-                            -fx-padding: 3 8 3 8;
-                            -fx-background-radius: 4;
-                            -fx-cursor: hand;
-                            """);
-
+                                -fx-background-color: #bbf7d0;
+                                -fx-text-fill: #166534;
+                                -fx-font-size: 10px;
+                                -fx-padding: 3 8 3 8;
+                                -fx-background-radius: 4;
+                                -fx-cursor: hand;
+                                """);
                         btnEdit.setStyle("""
-                            -fx-background-color: #bfdbfe;
-                            -fx-text-fill: #1e40af;
-                            -fx-font-size: 10px;
-                            -fx-padding: 3 8 3 8;
-                            -fx-background-radius: 4;
-                            -fx-cursor: hand;
-                            """);
-
+                                -fx-background-color: #bfdbfe;
+                                -fx-text-fill: #1e40af;
+                                -fx-font-size: 10px;
+                                -fx-padding: 3 8 3 8;
+                                -fx-background-radius: 4;
+                                -fx-cursor: hand;
+                                """);
                         btnDelete.setStyle("""
-                            -fx-background-color: #fecaca;
-                            -fx-text-fill: #991b1b;
-                            -fx-font-size: 10px;
-                            -fx-padding: 3 8 3 8;
-                            -fx-background-radius: 4;
-                            -fx-cursor: hand;
-                            """);
+                                -fx-background-color: #fecaca;
+                                -fx-text-fill: #991b1b;
+                                -fx-font-size: 10px;
+                                -fx-padding: 3 8 3 8;
+                                -fx-background-radius: 4;
+                                -fx-cursor: hand;
+                                """);
 
                         btnEdit.setOnAction(e -> {
                             EvacuationCenter center = getTableView().getItems().get(getIndex());
                             openEditForm(center);
                         });
-
                         btnDelete.setOnAction(e -> {
                             EvacuationCenter center = getTableView().getItems().get(getIndex());
                             confirmAndDelete(center);
                         });
-
                         btnManage.setOnAction(e -> {
                             EvacuationCenter center = getTableView().getItems().get(getIndex());
                             openManageEvacueesDialog(center);
                         });
                     }
-
 
                     @Override
                     protected void updateItem(Void item, boolean empty) {
@@ -501,7 +480,6 @@ public class EvacuationController {
                         if (empty) {
                             setGraphic(null);
                         } else {
-                            // Re-apply text fill every render to fight TableView selection CSS
                             btnManage.setTextFill(javafx.scene.paint.Color.WHITE);
                             btnEdit.setTextFill(javafx.scene.paint.Color.WHITE);
                             btnDelete.setTextFill(javafx.scene.paint.Color.WHITE);
@@ -511,70 +489,77 @@ public class EvacuationController {
                             setGraphic(box);
                         }
                     }
-
                 };
-
             }
-
-
         });
     }
 
+    // -------------------------------------------------------------------------
+    // Data loading & stats
+    // -------------------------------------------------------------------------
+
     private void loadCentersData() {
         centersData.clear();
-        String query = "SELECT * FROM evacuation_centers";
-
-        try (Connection conn = SupabaseConnectionManager.getInstance().getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
-
-            while (rs.next()) {
-                EvacuationCenter center = new EvacuationCenter();
-                center.setId(UUID.fromString(rs.getString("id")));
-                center.setName(rs.getString("name"));
-                center.setAddress(rs.getString("address"));
-                center.setMaxCapacity(rs.getInt("max_capacity"));
-                center.setCurrentOccupancy(rs.getInt("current_occupancy"));
-                center.setActive(rs.getBoolean("is_active"));
-                center.setManagerName(rs.getString("manager_of_center"));
-                center.setLatitude(rs.getDouble("latitude"));
-                center.setLongitude(rs.getDouble("longitude"));
-                centersData.add(center);
-            }
-
+        try {
+            List<EvacuationCenter> loaded = service.fetchAllCenters();
+            centersData.addAll(loaded);
             refreshMapMarkers();
             updateStats();
             applyFilters();
-
         } catch (Exception e) {
             System.err.println("Database Error: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void applyCardStyle(HBox card, Label lblName, Label lblAddress, Label lblAvailable, Label lblEvacuees, boolean selected) {
+    private void updateStats() {
+        try {
+            lblTotalEvacuees.setText(String.valueOf(service.getTotalEvacuees()));
+        } catch (Exception e) { e.printStackTrace(); }
+
+        lblCentersActive.setText(String.valueOf(service.getTotalActiveCenters(centersData)));
+    }
+
+    // -------------------------------------------------------------------------
+    // Public accessors for the Dashboard
+    // -------------------------------------------------------------------------
+
+
+    public int getTotalEvacuees() {
+        try { return service.getTotalEvacuees(); } catch (Exception e) { e.printStackTrace(); return 0; }
+    }
+
+
+    public long getTotalActiveCenters() {
+        return service.getTotalActiveCenters(centersData);
+    }
+
+    // -------------------------------------------------------------------------
+    // UI helpers
+    // -------------------------------------------------------------------------
+
+    private void applyCardStyle(HBox card, Label lblName, Label lblAddress,
+                                Label lblAvailable, Label lblEvacuees, boolean selected) {
         if (selected) {
             card.setStyle("""
-            -fx-background-color: #fefce8;
-            -fx-border-color: #eab308;
-            -fx-border-width: 2;
-            -fx-border-radius: 8;
-            -fx-background-radius: 8;
-            """);
+                    -fx-background-color: #fefce8;
+                    -fx-border-color: #eab308;
+                    -fx-border-width: 2;
+                    -fx-border-radius: 8;
+                    -fx-background-radius: 8;
+                    """);
         } else {
             card.setStyle("""
-            -fx-background-color: white;
-            -fx-border-color: #e5e7eb;
-            -fx-border-width: 1;
-            -fx-border-radius: 8;
-            -fx-background-radius: 8;
-            """);
+                    -fx-background-color: white;
+                    -fx-border-color: #e5e7eb;
+                    -fx-border-width: 1;
+                    -fx-border-radius: 8;
+                    -fx-background-radius: 8;
+                    """);
         }
         lblName.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1a1a1a;");
         lblAddress.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 11px;");
         lblAvailable.setStyle("-fx-font-size: 11px; -fx-text-fill: #374151;");
         lblEvacuees.setStyle("-fx-font-size: 11px; -fx-text-fill: #6b7280;");
     }
-
-
 }

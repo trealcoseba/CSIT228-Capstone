@@ -1,5 +1,7 @@
 package com.example.csit228capstone.controller.dashboard;
 
+import com.example.csit228capstone.controller.evacuation.EvacuationController;
+import com.example.csit228capstone.service.EvacuationService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -25,7 +27,6 @@ import java.util.List;
 
 public class DashboardController {
 
-
     @FXML private Label lblTotalResidents, lblActiveIncidents, lblPendingDocs, lblEvacuees;
     @FXML private Label lblSenior, lblPwd, lblPregnant, lblChildren;
     @FXML private TableView<Incident> incidentTable;
@@ -35,6 +36,7 @@ public class DashboardController {
     private final IncidentService incidentService = new IncidentService();
     private final DocumentService documentService = new DocumentService();
     private final ResidentRepository residentRepo = new ResidentRepository();
+    private final EvacuationService evacuationService = new EvacuationService();
 
     @FXML
     public void initialize() {
@@ -83,7 +85,8 @@ public class DashboardController {
             lblTotalResidents.setText(String.valueOf(residentRepo.countAll()));
             lblActiveIncidents.setText(String.valueOf(incidentService.getActiveCount()));
             lblPendingDocs.setText(String.valueOf(documentService.getPendingCount()));
-            lblEvacuees.setText("0"); // TODO: sum current_occupancy from evacuation_centers
+            lblEvacuees.setText(String.valueOf(evacuationService.getTotalEvacuees()));
+
 
             List<Incident> active = incidentService.getActiveIncidents();
             incidentTable.setItems(FXCollections.observableArrayList(active));

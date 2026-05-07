@@ -2,7 +2,7 @@ package com.example.csit228capstone.controller.evacuation;
 
 import com.example.csit228capstone.controller.map.MapPickerController;
 import com.example.csit228capstone.model.EvacuationCenter;
-import com.example.csit228capstone.util.SupabaseConnectionManager;
+import com.example.csit228capstone.service.EvacuationService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,8 +14,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.util.UUID;
 
 public class EvacuationFormController {
@@ -31,6 +29,12 @@ public class EvacuationFormController {
     private double selectedLng = 0.0;
 
     private UUID editingId = null;
+
+    private final EvacuationService service = EvacuationService.getInstance();
+
+    // -------------------------------------------------------------------------
+    // Map picker
+    // -------------------------------------------------------------------------
 
     @FXML
     public void handleOpenMap() {
@@ -58,6 +62,10 @@ public class EvacuationFormController {
         }
     }
 
+    // -------------------------------------------------------------------------
+    // Save (insert or update)
+    // -------------------------------------------------------------------------
+
     @FXML
     public void handleSave(ActionEvent actionEvent) {
         String name        = txtName.getText().trim();
@@ -66,6 +74,7 @@ public class EvacuationFormController {
         String contact     = txtContact.getText().trim();
         String capacityStr = txtCapacity.getText().trim();
 
+        // --- Validation ---
         if (name.isEmpty() || address.isEmpty() || capacityStr.isEmpty()) {
             showAlert("Validation Error", "Name, location, and capacity are required.");
             return;
@@ -85,60 +94,60 @@ public class EvacuationFormController {
             return;
         }
 
-        try (Connection conn = SupabaseConnectionManager.getInstance().getConnection()) {
+        // --- Build model ---
+        EvacuationCenter center = new EvacuationCenter();
+        center.setId(editingId);
+        center.setName(name);
+        center.setAddress(address);
+        center.setLatitude(selectedLat);
+        center.setLongitude(selectedLng);
+        center.setMaxCapacity(maxCapacity);
+        center.setActive(chkActive.isSelected());
+        center.setManagerName(manager.isEmpty() ? null : manager);
+        center.setContactNumber(contact.isEmpty() ? null : contact);
 
+        // --- Delegate to service ---
+        try {
             if (editingId == null) {
-                // INSERT
-                String sql = """
-                    INSERT INTO evacuation_centers
-                        (name, address, latitude, longitude, max_capacity,
-                         current_occupancy, status, is_active, manager_of_center, contact_number)
-                    VALUES (?, ?, ?, ?, ?, 0, 'available', ?, ?, ?)
-                    """;
-                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                    stmt.setString(1, name);
-                    stmt.setString(2, address);
-                    stmt.setDouble(3, selectedLat);
-                    stmt.setDouble(4, selectedLng);
-                    stmt.setInt(5, maxCapacity);
-                    stmt.setBoolean(6, chkActive.isSelected());
-                    stmt.setString(7, manager.isEmpty() ? null : manager);
-                    stmt.setString(8, contact.isEmpty() ? null : manager);
-                    stmt.executeUpdate();
-                }
+                service.insertCenter(center);
             } else {
-                // UPDATE
-                String sql = """
-                    UPDATE evacuation_centers
-                    SET name = ?, address = ?, latitude = ?, longitude = ?,
-                        max_capacity = ?, is_active = ?, manager_of_center = ?, contact_number = ?
-                    WHERE id = ?
-                    """;
-                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                    stmt.setString(1, name);
-                    stmt.setString(2, address);
-                    stmt.setDouble(3, selectedLat);
-                    stmt.setDouble(4, selectedLng);
-                    stmt.setInt(5, maxCapacity);
-                    stmt.setBoolean(6, chkActive.isSelected());
-                    stmt.setString(7, manager.isEmpty() ? null : manager);
-                    stmt.setString(8, contact.isEmpty() ? null : contact);
-                    stmt.setObject(9, editingId);
-                    stmt.executeUpdate();
-                }
+                service.updateCenter(center);
             }
             closeWindow();
-
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("Database Error", "Failed to save: " + e.getMessage());
         }
     }
 
+    // -------------------------------------------------------------------------
+    // Cancel
+    // -------------------------------------------------------------------------
+
     @FXML
     private void handleCancel() {
         closeWindow();
     }
+
+    // -------------------------------------------------------------------------
+    // Populate for edit mode
+    // -------------------------------------------------------------------------
+
+    public void populateForEdit(EvacuationCenter center) {
+        editingId = center.getId();
+        txtName.setText(center.getName());
+        txtLocation.setText(center.getAddress() != null ? center.getAddress() : "");
+        txtCapacity.setText(String.valueOf(center.getMaxCapacity()));
+        txtManager.setText(center.getManagerName() != null ? center.getManagerName() : "");
+        txtContact.setText(center.getContactNumber() != null ? center.getContactNumber() : "");
+        chkActive.setSelected(center.isActive());
+        selectedLat = center.getLatitude() != null ? center.getLatitude() : 0.0;
+        selectedLng = center.getLongitude() != null ? center.getLongitude() : 0.0;
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -151,16 +160,5 @@ public class EvacuationFormController {
     private void closeWindow() {
         Stage stage = (Stage) txtName.getScene().getWindow();
         stage.close();
-    }
-
-    public void populateForEdit(EvacuationCenter center) {
-        editingId = center.getId();
-        txtName.setText(center.getName());
-        txtLocation.setText(center.getAddress() != null ? center.getAddress() : "");
-        txtCapacity.setText(String.valueOf(center.getMaxCapacity()));
-        txtManager.setText(center.getManagerName() != null ? center.getManagerName() : "");
-        chkActive.setSelected(center.isActive());
-        selectedLat = center.getLatitude() != null ? center.getLatitude() : 0.0;
-        selectedLng = center.getLongitude() != null ? center.getLongitude() : 0.0;
     }
 }
