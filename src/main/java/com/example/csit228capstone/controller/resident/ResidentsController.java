@@ -284,6 +284,7 @@ public class ResidentsController {
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle(resident == null ? "Register New Resident" : "Edit Resident");
             stage.setScene(new Scene(root));
+            stage.setFullScreen(false);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();

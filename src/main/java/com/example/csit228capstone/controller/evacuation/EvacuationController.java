@@ -87,6 +87,7 @@ public class EvacuationController {
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("Add Center");
             stage.setScene(new Scene(root));
+            stage.setFullScreen(false);
             stage.showAndWait();
             loadCentersData();
         } catch (IOException e) {
@@ -104,12 +105,16 @@ public class EvacuationController {
     // -------------------------------------------------------------------------
 
     private void setUpTables() {
+        formatTables();;
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colCapacity.setCellValueFactory(new PropertyValueFactory<>("maxCapacity"));
         colOccupancy.setCellValueFactory(new PropertyValueFactory<>("currentOccupancy"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colManager.setCellValueFactory(new PropertyValueFactory<>("managerName"));
         colAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
+        colContact.setCellValueFactory(new PropertyValueFactory<>("contactNumber"));
+
+        colName.setResizable(false);
         setupActionButtons();
         loadCentersData();
         centersTable.setEditable(false);
@@ -288,6 +293,7 @@ public class EvacuationController {
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("Edit Center");
             stage.setScene(new Scene(root));
+            stage.setFullScreen(false);
             stage.showAndWait();
 
             loadCentersData();
@@ -561,5 +567,37 @@ public class EvacuationController {
         lblAddress.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 11px;");
         lblAvailable.setStyle("-fx-font-size: 11px; -fx-text-fill: #374151;");
         lblEvacuees.setStyle("-fx-font-size: 11px; -fx-text-fill: #6b7280;");
+    }
+
+    private void formatTables() {
+        // 1. Bind widths to percentages of the table width (Total: 1.0)
+        colName.setMinWidth(200);
+        colAddress.setMinWidth(300);    // Give address plenty of space
+        colCapacity.setMinWidth(100);
+        colOccupancy.setMinWidth(120);
+        colStatus.setMinWidth(120);
+        colManager.setMinWidth(150);
+        colContact.setMinWidth(150);
+        colActions.setMinWidth(250);
+
+        // 2. Disable Resizing for all columns
+        colName.setResizable(false);
+        colCapacity.setResizable(false);
+        colOccupancy.setResizable(false);
+        colStatus.setResizable(false);
+        colManager.setResizable(false);
+        colAddress.setResizable(false);
+        colContact.setResizable(false);
+        colActions.setResizable(false);
+
+        // 3. Disable Reordering (prevents users from dragging columns around)
+        colName.setReorderable(false);
+        colCapacity.setReorderable(false);
+        colOccupancy.setReorderable(false);
+        colStatus.setReorderable(false);
+        colManager.setReorderable(false);
+        colAddress.setReorderable(false);
+        colContact.setReorderable(false);
+        colActions.setReorderable(false);
     }
 }

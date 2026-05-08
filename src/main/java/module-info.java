@@ -25,7 +25,6 @@ module ligtas.brgy {
     exports com.example.csit228capstone.service;
     exports com.example.csit228capstone.repository;
     exports com.example.csit228capstone.util;
-    exports com.example.csit228capstone.ai;
     exports com.example.csit228capstone.controller.resident;
     opens com.example.csit228capstone.controller.resident to javafx.fxml;
     exports com.example.csit228capstone.controller.login;

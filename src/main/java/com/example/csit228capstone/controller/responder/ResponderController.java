@@ -10,5 +10,6 @@ public class ResponderController {
     }
 
     public void clearDispatchFilters(ActionEvent actionEvent) {
+
     }
 }
