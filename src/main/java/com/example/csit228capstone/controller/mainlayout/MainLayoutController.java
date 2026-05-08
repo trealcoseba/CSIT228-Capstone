@@ -29,9 +29,9 @@ public class MainLayoutController {
     @FXML private Label lblActiveIncidents;
     @FXML private VBox sidebar;
 
-    @FXML private Button btnDashboard, btnIncidents, btnResidents, btnDocuments;
+    @FXML private Button btnDashboard, btnIncidents, btnResidents, btnResponder;
     @FXML private Button btnEvacuation, btnResources, btnAlerts;
-    @FXML private Button btnReports, btnChatbot, btnSettings;
+    @FXML private Button btnReports, btnSettings;
     @FXML private Button btnAnalytics;
     @FXML private Button btnLogout;
 
@@ -40,8 +40,8 @@ public class MainLayoutController {
 
     @FXML
     public void initialize() {
-        navButtons = List.of(btnDashboard, btnIncidents, btnResidents, btnDocuments,
-                btnEvacuation, btnResources, btnAlerts, btnReports, btnChatbot, btnSettings, btnAnalytics);
+        navButtons = List.of(btnDashboard, btnIncidents, btnResidents, btnResponder,
+                btnEvacuation, btnResources, btnAlerts, btnReports, btnSettings, btnAnalytics);
 
         // Subscribe to events for live badge updates
         AlertEventBus.getInstance().subscribe(event -> javafx.application.Platform.runLater(this::refreshBadge));
@@ -92,12 +92,11 @@ public class MainLayoutController {
     @FXML void showResidents(ActionEvent e)  { loadView("resident", "Residents", btnResidents); }
 
     // Example calls for other potential sub-packages
-    @FXML void showDocuments(ActionEvent e)  { loadView("document", "Documents", btnDocuments); }
+    @FXML void showResponders(ActionEvent e)  { loadView("responder", "Responder", btnResponder); }
     @FXML void showEvacuation(ActionEvent e) { loadView("evacuation", "Evacuation", btnEvacuation); }
     @FXML void showResources(ActionEvent e)  { loadView("resource", "Resources", btnResources); }
     @FXML void showAlerts(ActionEvent e)     { loadView("alerts", "Alerts", btnAlerts); }
     @FXML void showReports(ActionEvent e)    { loadView("report", "Reports", btnReports); }
-    @FXML void showChatbot(ActionEvent e)    { loadView("chatbot", "Chatbot", btnChatbot); }
     @FXML void showSettings(ActionEvent e)   { loadView("settings", "Settings", btnSettings); }
     @FXML void showAnalytics(ActionEvent e)  { loadView("analytics", "Analytics", btnAnalytics); }
 

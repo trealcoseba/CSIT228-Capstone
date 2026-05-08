@@ -1,6 +1,5 @@
 package com.example.csit228capstone.controller.dashboard;
 
-import com.example.csit228capstone.controller.evacuation.EvacuationController;
 import com.example.csit228capstone.service.EvacuationService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -10,13 +9,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import com.example.csit228capstone.model.incident.Incident;
 import com.example.csit228capstone.model.vulnerability.VulnerabilityTag;
 import com.example.csit228capstone.repository.ResidentRepository;
-import com.example.csit228capstone.service.DocumentService;
 import com.example.csit228capstone.service.IncidentService;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -34,7 +31,6 @@ public class DashboardController {
     @FXML private ScrollPane mainContent;
 
     private final IncidentService incidentService = new IncidentService();
-    private final DocumentService documentService = new DocumentService();
     private final ResidentRepository residentRepo = new ResidentRepository();
     private final EvacuationService evacuationService = new EvacuationService();
 
@@ -84,7 +80,6 @@ public class DashboardController {
         try {
             lblTotalResidents.setText(String.valueOf(residentRepo.countAll()));
             lblActiveIncidents.setText(String.valueOf(incidentService.getActiveCount()));
-            lblPendingDocs.setText(String.valueOf(documentService.getPendingCount()));
             lblEvacuees.setText(String.valueOf(evacuationService.getTotalEvacuees()));
 
 
