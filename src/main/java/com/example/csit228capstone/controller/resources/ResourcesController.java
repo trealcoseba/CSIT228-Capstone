@@ -1,7 +1,10 @@
 package com.example.csit228capstone.controller.resources;
 
+import com.example.csit228capstone.model.EvacuationCenter;
 import com.example.csit228capstone.model.Resource;
+import com.example.csit228capstone.model.ResourceLog;
 import com.example.csit228capstone.repository.ResourceRepository;
+import com.example.csit228capstone.service.EvacuationService;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
@@ -10,6 +13,8 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.util.StringConverter;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,7 +25,9 @@ public class ResourcesController {
 
     @FXML private TabPane resourcesTabPane;
     @FXML private Tab inventoryTab;
+    @FXML private Tab logTab;
     @FXML private Tab addResourceTab;
+    @FXML private Tab useResourceTab;
 
     @FXML private TableView<Resource> resourcesTable;
     @FXML private TableColumn<Resource, String> colId;
@@ -32,6 +39,14 @@ public class ResourcesController {
     @FXML private TableColumn<Resource, String> colLocation;
     @FXML private TableColumn<Resource, String> colLastUpdated;
     @FXML private TableColumn<Resource, Void> colActions;
+
+    @FXML private TableView<ResourceLog> resourceLogTable;
+    @FXML private TableColumn<ResourceLog, String> colLogDate;
+    @FXML private TableColumn<ResourceLog, String> colLogResource;
+    @FXML private TableColumn<ResourceLog, String> colLogCenter;
+    @FXML private TableColumn<ResourceLog, String> colLogPurpose;
+    @FXML private TableColumn<ResourceLog, String> colLogQty;
+    @FXML private TableColumn<ResourceLog, String> colLogAvailable;
 
     @FXML private Label lblReliefGoods;
     @FXML private Label lblMedicalSupplies;
@@ -52,17 +67,29 @@ public class ResourcesController {
     @FXML private TextField tfUnit;
     @FXML private Label lblFormStatus;
 
+    @FXML private ComboBox<Resource> cbUseResource;
+    @FXML private Label lblUseAvailable;
+    @FXML private ComboBox<EvacuationCenter> cbUseEvacCenter;
+    @FXML private TextField tfUseQuantity;
+    @FXML private TextArea taUsePurpose;
+    @FXML private Label lblUseStatus;
+
     private final ResourceRepository repository = new ResourceRepository();
+    private final EvacuationService evacuationService = EvacuationService.getInstance();
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
 
     @FXML
     public void initialize() {
         setupTableColumns();
+        setupLogTableColumns();
         setupFormDefaults();
+        setupUseFormDefaults();
         loadData();
+        loadEvacuationCenters();
 
-        // Keep inventory clean by opening the add tab only when requested.
+        // Keep inventory clean by opening form tabs only when requested.
         resourcesTabPane.getTabs().remove(addResourceTab);
+        resourcesTabPane.getTabs().remove(useResourceTab);
     }
 
     public void addResource(ActionEvent actionEvent) {
@@ -127,12 +154,54 @@ public class ResourcesController {
         resourcesTabPane.getSelectionModel().select(inventoryTab);
     }
 
-    public void newPurchaseRequest(ActionEvent actionEvent) {
+    public void openUseResourceForm(ActionEvent actionEvent) {
+        openUseResourceFormForResource(null);
     }
 
-    public void newTransferRequest(ActionEvent actionEvent) {
-
+    public void closeUseResourceTab(ActionEvent actionEvent) {
+        resourcesTabPane.getTabs().remove(useResourceTab);
+        resourcesTabPane.getSelectionModel().select(inventoryTab);
     }
+
+    public void saveResourceUsage(ActionEvent actionEvent) {
+        Resource resource = cbUseResource.getValue();
+        EvacuationCenter center = cbUseEvacCenter.getValue();
+        String purpose = taUsePurpose.getText() == null ? "" : taUsePurpose.getText().trim();
+
+        if (resource == null) {
+            showUseError("Resource is required.");
+            return;
+        }
+        if (center == null) {
+            showUseError("Evacuation center is required.");
+            return;
+        }
+        if (purpose.isBlank()) {
+            showUseError("Purpose is required.");
+            return;
+        }
+
+        Double quantityUsed = parseUseQty(tfUseQuantity.getText(), "Quantity used");
+        if (quantityUsed == null) return;
+        if (quantityUsed > resource.getAvailableQty()) {
+            showUseError("Quantity used cannot be greater than available quantity.");
+            return;
+        }
+
+        try {
+            repository.useResource(resource.getId(), center.getId(), center.getName(), purpose, quantityUsed);
+            loadData();
+            loadEvacuationCenters();
+            closeUseResourceTab(null);
+            resourcesTabPane.getSelectionModel().select(logTab);
+            showInfo("Usage recorded", "Resource inventory and usage log were updated.");
+        } catch (IllegalArgumentException ex) {
+            showUseError(ex.getMessage());
+        } catch (RuntimeException ex) {
+            showUseError("Failed to save usage log. Please check database connection.");
+        }
+    }
+
 
     private void setupTableColumns() {
         resourcesTable.getColumns().forEach(col -> col.setStyle("-fx-alignment: CENTER;"));
@@ -155,6 +224,8 @@ public class ResourcesController {
 
         colActions.setCellFactory(col -> new TableCell<>() {
             private final Button viewBtn = new Button("View");
+            private final Button useBtn = new Button("Use");
+            private final HBox actions = new HBox(6, viewBtn, useBtn);
             {
                 viewBtn.getStyleClass().addAll("quick-action-btn", "qa-navy");
                 viewBtn.setOnAction(e -> {
@@ -163,14 +234,43 @@ public class ResourcesController {
                         openEditDialog(resource);
                     }
                 });
+
+                useBtn.getStyleClass().addAll("quick-action-btn");
+                useBtn.setOnAction(e -> {
+                    Resource resource = getTableRow() == null ? null : getTableRow().getItem();
+                    if (resource != null) {
+                        openUseResourceFormForResource(resource);
+                    }
+                });
             }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : viewBtn);
+                setGraphic(empty ? null : actions);
             }
         });
+    }
+
+    private void setupLogTableColumns() {
+        resourceLogTable.getColumns().forEach(col -> col.setStyle("-fx-alignment: CENTER;"));
+        colLogPurpose.setStyle("-fx-alignment: CENTER-LEFT;");
+
+        colLogDate.setCellValueFactory(cd -> {
+            LocalDateTime dt = cd.getValue().getDateUsed();
+            return new ReadOnlyStringWrapper(dt == null ? "-" : dt.format(DATE_FMT));
+        });
+        colLogResource.setCellValueFactory(cd -> new ReadOnlyStringWrapper(safeText(cd.getValue().getResourceName())));
+        colLogCenter.setCellValueFactory(cd -> new ReadOnlyStringWrapper(safeText(cd.getValue().getEvacuationCenterName())));
+        colLogPurpose.setCellValueFactory(cd -> new ReadOnlyStringWrapper(safeText(cd.getValue().getPurpose())));
+        colLogQty.setCellValueFactory(cd -> new ReadOnlyStringWrapper(formatQtyWithUnit(
+                cd.getValue().getQuantityUsed(),
+                cd.getValue().getResourceUnit()
+        )));
+        colLogAvailable.setCellValueFactory(cd -> new ReadOnlyStringWrapper(formatQtyWithUnit(
+                cd.getValue().getQuantityAvailableAtTime(),
+                cd.getValue().getResourceUnit()
+        )));
     }
 
     private void setupFormDefaults() {
@@ -184,14 +284,55 @@ public class ResourcesController {
         ));
     }
 
+    private void setupUseFormDefaults() {
+        cbUseResource.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Resource resource) {
+                if (resource == null) return "";
+                return resource.getName() + " (" + formatQtyWithUnit(resource.getAvailableQty(), resource.getUnit()) + ")";
+            }
+
+            @Override
+            public Resource fromString(String value) {
+                return null;
+            }
+        });
+
+        cbUseEvacCenter.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(EvacuationCenter center) {
+                return center == null ? "" : center.getName();
+            }
+
+            @Override
+            public EvacuationCenter fromString(String value) {
+                return null;
+            }
+        });
+
+        cbUseResource.valueProperty().addListener((obs, oldValue, newValue) -> updateUseAvailability(newValue));
+    }
+
     private void loadData() {
         try {
             List<Resource> resources = repository.findAll();
             resourcesTable.setItems(FXCollections.observableArrayList(resources));
+            cbUseResource.setItems(FXCollections.observableArrayList(resources));
+            resourceLogTable.setItems(FXCollections.observableArrayList(repository.findUsageLogs()));
             updateOverview(resources);
         } catch (RuntimeException ex) {
             resourcesTable.setItems(FXCollections.observableArrayList());
+            cbUseResource.setItems(FXCollections.observableArrayList());
+            resourceLogTable.setItems(FXCollections.observableArrayList());
             showInfo("Database connection error", "Could not fetch resources from the database.");
+        }
+    }
+
+    private void loadEvacuationCenters() {
+        try {
+            cbUseEvacCenter.setItems(FXCollections.observableArrayList(evacuationService.fetchAllCenters()));
+        } catch (Exception ex) {
+            cbUseEvacCenter.setItems(FXCollections.observableArrayList());
         }
     }
 
@@ -257,6 +398,46 @@ public class ResourcesController {
             showFormError(label + " must be a valid number.");
             return null;
         }
+    }
+
+    private Double parseUseQty(String raw, String label) {
+        if (raw == null || raw.isBlank()) {
+            showUseError(label + " is required.");
+            return null;
+        }
+        try {
+            double value = Double.parseDouble(raw.trim());
+            if (value <= 0) {
+                showUseError(label + " must be greater than zero.");
+                return null;
+            }
+            return value;
+        } catch (NumberFormatException ex) {
+            showUseError(label + " must be a valid number.");
+            return null;
+        }
+    }
+
+    private void openUseResourceFormForResource(Resource selectedResource) {
+        if (!resourcesTabPane.getTabs().contains(useResourceTab)) {
+            int addTabIndex = resourcesTabPane.getTabs().contains(addResourceTab)
+                    ? resourcesTabPane.getTabs().indexOf(addResourceTab)
+                    : resourcesTabPane.getTabs().size();
+            resourcesTabPane.getTabs().add(addTabIndex, useResourceTab);
+        }
+        resetUseForm();
+        if (selectedResource != null) {
+            cbUseResource.setValue(selectedResource);
+        }
+        resourcesTabPane.getSelectionModel().select(useResourceTab);
+    }
+
+    private void updateUseAvailability(Resource resource) {
+        if (resource == null) {
+            lblUseAvailable.setText("-");
+            return;
+        }
+        lblUseAvailable.setText(formatQtyWithUnit(resource.getAvailableQty(), resource.getUnit()));
     }
 
     private void openEditDialog(Resource resource) {
@@ -403,8 +584,21 @@ public class ResourcesController {
         lblFormStatus.setText("");
     }
 
+    private void resetUseForm() {
+        cbUseResource.getSelectionModel().clearSelection();
+        cbUseEvacCenter.getSelectionModel().clearSelection();
+        tfUseQuantity.clear();
+        taUsePurpose.clear();
+        lblUseStatus.setText("");
+        updateUseAvailability(null);
+    }
+
     private void showFormError(String message) {
         lblFormStatus.setText(message);
+    }
+
+    private void showUseError(String message) {
+        lblUseStatus.setText(message);
     }
 
     private void showInfo(String title, String message) {
@@ -432,5 +626,10 @@ public class ResourcesController {
             return String.format("%.0f", value);
         }
         return String.format("%.2f", value);
+    }
+
+    private String formatQtyWithUnit(double value, String unit) {
+        String formatted = formatQty(value);
+        return unit == null || unit.isBlank() ? formatted : formatted + " " + unit;
     }
 }
