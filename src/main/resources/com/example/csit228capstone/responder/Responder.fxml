@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="800.0" prefWidth="1000.0" spacing="16" styleClass="root-pane" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.responder.ResponderController">
+    <padding><Insets topRightBottomLeft="16" /></padding>
+
+    <!-- Header Section -->
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <VBox>
+            <Label styleClass="page-title" text="Responder Management" />
+            <Label style="-fx-text-fill: #6b7280; -fx-font-size: 12px;" text="Manage personnel and track active deployments." />
+        </VBox>
+        <Region HBox.hgrow="ALWAYS" />
+        <TextField fx:id="tfSearch" prefWidth="250" promptText="🔍 Search by name or ID..." styleClass="search-field" />
+        <Button onAction="#handleRegisterResponder" styleClass="quick-action-btn" text="➕ Add Responder" />
+    </HBox>
+
+    <!-- Main Content Tabs -->
+    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+
+        <!-- TAB 1: Responder List -->
+        <Tab text="Responders Registry">
+            <VBox spacing="16" style="-fx-padding: 16 0 0 0;">
+
+                <!-- Mini KPI Row -->
+                <HBox spacing="16">
+                    <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label styleClass="kpi-label" text="Available Personnel" />
+                        <Label fx:id="lblAvailable" styleClass="kpi-value" text="0" />
+                    </VBox>
+                    <VBox styleClass="kpi-card, kpi-info" HBox.hgrow="ALWAYS">
+                        <Label styleClass="kpi-label" text="Total Strength" />
+                        <Label fx:id="lblTotal" styleClass="kpi-value" text="0" />
+                    </VBox>
+                </HBox>
+
+                <!-- FILTER ROW FOR REGISTRY -->
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <ComboBox fx:id="filterAgency" prefWidth="150" promptText="Agency (BFP, PNP, etc.)" />
+                    <ComboBox fx:id="filterStatus" prefWidth="130" promptText="Status" />
+                    <ComboBox fx:id="sortOrder" prefWidth="130" promptText="Sort By" />
+                    <Button onAction="#clearRegistryFilters" styleClass="btn-outline" text="Clear Filters" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <!-- Visual Legend -->
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Label style="-fx-text-fill: #00ff88; -fx-font-size: 10px;" text="● Available" />
+                        <Label style="-fx-text-fill: #ffb300; -fx-font-size: 10px;" text="● On Mission" />
+                        <Label style="-fx-text-fill: #6b7280; -fx-font-size: 10px;" text="● Off Duty" />
+                    </HBox>
+                </HBox>
+
+                <VBox spacing="12" styleClass="panel-card" VBox.vgrow="ALWAYS">
+                    <Label styleClass="panel-title" text="Personnel Registry" />
+                    <TableView fx:id="tblResponders" styleClass="incident-table" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colId" prefWidth="80" text="ID" />
+                            <TableColumn fx:id="colName" prefWidth="200" text="Name" />
+                            <TableColumn fx:id="colAgency" prefWidth="150" text="Agency" />
+                            <TableColumn fx:id="colContact" prefWidth="150" text="Contact" />
+                            <TableColumn fx:id="colDispaches" prefWidth="120" text="Dispatches" />
+                            <TableColumn fx:id="colStatus" prefWidth="150" text="Status" />
+                            <TableColumn fx:id="colAction" prefWidth="140" text="Actions" />
+                        </columns>
+                    </TableView>
+                </VBox>
+            </VBox>
+        </Tab>
+
+        <!-- TAB 2: Dispatched Responders -->
+        <Tab text="Active Deployments">
+            <VBox spacing="16" style="-fx-padding: 16 0 0 0;">
+
+                <!-- FILTER ROW FOR DEPLOYMENTS -->
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <ComboBox fx:id="filterIncident" prefWidth="180" promptText="Filter by Incident" />
+                    <ComboBox fx:id="filterZone" prefWidth="150" promptText="Deployment Zone" />
+                    <Button onAction="#clearDispatchFilters" styleClass="btn-outline" text="Reset View" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label style="-fx-text-fill: #ff4757; -fx-font-weight: bold; -fx-font-size: 11px;" text="📡 LIVE TRACKING ACTIVE" />
+                </HBox>
+
+                <VBox spacing="12" styleClass="panel-card" VBox.vgrow="ALWAYS">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label styleClass="panel-title" text="Operational Deployments" />
+                    </HBox>
+
+                    <TableView fx:id="tblDispatched" styleClass="incident-table" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colDispatchName" prefWidth="180" text="Responder" />
+                            <TableColumn fx:id="colIncidentId" prefWidth="120" text="Incident ID" />
+                            <TableColumn fx:id="colLocation" prefWidth="200" text="Deployment Site" />
+                            <TableColumn fx:id="colDispatchTime" prefWidth="150" text="Time Dispatched" />
+                            <TableColumn fx:id="colEta" prefWidth="100" text="ETA" />
+                            <TableColumn fx:id="colDispatchActions" prefWidth="150" text="Operations" />
+                        </columns>
+                        <placeholder>
+                            <Label style="-fx-text-fill: #4b5563;" text="No active deployments recorded." />
+                        </placeholder>
+                    </TableView>
+                </VBox>
+            </VBox>
+        </Tab>
+    </TabPane>
+</VBox>
