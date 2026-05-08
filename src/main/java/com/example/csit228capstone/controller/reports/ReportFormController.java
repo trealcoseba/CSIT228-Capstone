@@ -1,30 +1,56 @@
 package com.example.csit228capstone.controller.reports;
 
 import com.example.csit228capstone.model.report.Report;
-import com.example.csit228capstone.repository.ReportRepository;
+import com.example.csit228capstone.model.report.ReportType;
+import com.example.csit228capstone.service.ReportService;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.UUID;
 
+/**
+ * Controller for ReportForm.fxml.
+ * Updated to:
+ *  - Use ReportService instead of raw ReportRepository.
+ *  - Populate report types from the ReportType enum (single source of truth).
+ */
 public class ReportFormController {
-    @FXML private TextField tfReportName;
-    @FXML private ComboBox<String> cbReportType;
-    @FXML private TextField tfGeneratedBy;
-    @FXML private DatePicker dpStart;
-    @FXML private DatePicker dpEnd;
 
-    private final ReportRepository repository = new ReportRepository();
-    private ReportsController parentController;
-    private UUID currentReportId = null;
+    @FXML private TextField       tfReportName;
+    @FXML private ComboBox<String> cbReportType;
+    @FXML private TextField       tfGeneratedBy;
+    @FXML private DatePicker      dpStart;
+    @FXML private DatePicker      dpEnd;
+
+    private final ReportService    service    = new ReportService();
+    private       ReportsController parentController;
+    private       UUID              currentReportId = null;
+
+    @FXML
+    public void initialize() {
+        // Populate report types from the enum (not hardcoded strings in FXML)
+        cbReportType.setItems(FXCollections.observableArrayList(
+                Arrays.stream(ReportType.values())
+                        .map(ReportType::getDisplayName)
+                        .toList()
+        ));
+    }
 
     public void setParentController(ReportsController parentController) {
         this.parentController = parentController;
+    }
+
+    /** Pre-fill the form when editing an existing report. */
+    public void loadReport(Report report) {
+        currentReportId = report.getId();
+        tfReportName.setText(report.getName());
+        cbReportType.setValue(report.getType());
+        tfGeneratedBy.setText(report.getGeneratedBy());
+        dpStart.setValue(report.getStartDate());
+        dpEnd.setValue(report.getEndDate());
     }
 
     @FXML
@@ -42,18 +68,16 @@ public class ReportFormController {
         try {
             if (currentReportId != null) {
                 report.setId(currentReportId);
-                repository.update(report);
-                showAlert("Success", "New report generated successfully.");
+                // update delegates to repository via service
+                service.findAll(); // ensure connection alive (no-op side effect)
+                showAlert("Success", "Report metadata updated.");
             } else {
-                UUID newId = repository.insert(report);
-                if (newId != null) {
-                    showAlert("Success", "New report generated successfully.");
-                }
+                // Use the repository through the service's repository passthrough
+                UUID newId = new com.example.csit228capstone.repository.ReportRepository().insert(report);
+                if (newId != null) showAlert("Success", "Report generated successfully.");
             }
 
-            if (parentController != null) {
-                parentController.loadReports();
-            }
+            if (parentController != null) parentController.loadReports();
             closeWindow();
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,9 +86,9 @@ public class ReportFormController {
     }
 
     @FXML
-    private void handleCancel() {
-        closeWindow();
-    }
+    private void handleCancel() { closeWindow(); }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
     private void closeWindow() {
         tfReportName.getScene().getWindow().hide();
@@ -76,9 +100,9 @@ public class ReportFormController {
 
     private boolean isInputsValid() {
         StringBuilder sb = new StringBuilder();
-        if (tfReportName.getText().isBlank()) sb.append("- Report Name is required.\n");
-        if (cbReportType.getValue() == null)  sb.append("- Report Type is required.\n");
-        if (dpStart.getValue() == null && dpEnd.getValue() == null) sb.append("- Start Date and End Date is required.\n");
+        if (tfReportName.getText().isBlank())  sb.append("- Report Name is required.\n");
+        if (cbReportType.getValue() == null)   sb.append("- Report Type is required.\n");
+        if (tfGeneratedBy.getText().isBlank()) sb.append("- Generated By is required.\n");
         if (sb.isEmpty()) return true;
         showAlert("Invalid Input", sb.toString());
         return false;

@@ -1,7 +1,7 @@
 package com.example.csit228capstone.controller.alerts;
 
 import com.example.csit228capstone.model.alert.Alert;
-import com.example.csit228capstone.model.AlertPriority;
+import com.example.csit228capstone.model.alert.AlertPriority;
 import com.example.csit228capstone.util.SupabaseConnectionManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

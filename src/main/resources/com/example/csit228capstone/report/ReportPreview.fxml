@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import java.lang.String?>
+<VBox fx:id="rootVBox" prefHeight="620.0" prefWidth="960.0"
+      spacing="12"
+      stylesheets="@../../../../css/application.css"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.csit228capstone.controller.reports.ReportPreviewController">
+
+    <padding>
+        <Insets top="20" right="24" bottom="20" left="24"/>
+    </padding>
+
+    <!-- ── Title Block ──────────────────────────────────────────────── -->
+    <VBox spacing="4" alignment="CENTER">
+        <Label fx:id="lblTitle" styleClass="page-title" text="Report Preview" wrapText="true"/>
+        <Label fx:id="lblMeta"  style="-fx-font-size:11;-fx-text-fill:#6b7280;" wrapText="true"/>
+        <Label fx:id="lblSummary"
+               style="-fx-font-size:11;-fx-font-weight:bold;-fx-text-fill:#1d9e75;"
+               wrapText="true" visible="false"/>
+    </VBox>
+
+    <Separator/>
+
+    <!-- ── Preview Table ────────────────────────────────────────────── -->
+    <TableView fx:id="previewTable" VBox.vgrow="ALWAYS">
+        <styleClass>
+            <String fx:value="incident-table"/>
+            <String fx:value="table-cell"/>
+        </styleClass>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
+
+    <Separator/>
+
+    <!-- ── Footer: format picker + buttons ──────────────────────────── -->
+    <HBox spacing="12" alignment="CENTER_RIGHT">
+        <Label text="Export Format:" style="-fx-font-size:12;"/>
+        <ComboBox fx:id="cbFormat" prefWidth="100"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnClose"  text="Close"
+                styleClass="quick-action-btn, qa-danger"
+                onAction="#handleClose" prefWidth="110"/>
+        <Button fx:id="btnExport" text="⬇ Download"
+                styleClass="quick-action-btn"
+                onAction="#handleExport" prefWidth="130"/>
+    </HBox>
+</VBox>
