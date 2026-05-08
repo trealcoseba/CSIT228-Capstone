@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" prefHeight="200" prefWidth="350" spacing="20" style="-fx-background-color: #0d1117; -fx-border-color: #ff4757; -fx-border-width: 2; -fx-padding: 30;" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.emergency.EmergencyAuthController">
+
+    <VBox alignment="CENTER" spacing="8">
+        <Label style="-fx-text-fill: #ff4757; -fx-font-weight: bold; -fx-font-size: 14px;" text="高 SECURITY CLEARANCE REQUIRED" />
+        <Label style="-fx-text-fill: #9ca3af; -fx-font-size: 11px;" text="Enter Admin Passkey to activate EOC" />
+    </VBox>
+
+    <PasswordField fx:id="txtPasskey" promptText="Enter Passkey" style="-fx-background-color: #161b22; -fx-text-fill: white; -fx-border-color: #374151; -fx-background-radius: 5; -fx-border-radius: 5;" />
+
+    <HBox alignment="CENTER" spacing="10">
+        <Button onAction="#handleCancel" style="-fx-cursor: hand;" styleClass="btn-outline" text="Cancel" />
+        <Button defaultButton="true" onAction="#handleAuthorize" prefHeight="34.0" prefWidth="70.0" style="-fx-background-color: #ff4757; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Authorize" />
+    </HBox>
+</VBox>
