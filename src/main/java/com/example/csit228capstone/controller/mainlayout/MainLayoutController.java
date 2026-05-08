@@ -1,5 +1,6 @@
 package com.example.csit228capstone.controller.mainlayout;
 
+import com.example.csit228capstone.controller.emergency.EmergencyAuthController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,6 +14,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import com.example.csit228capstone.service.IncidentService;
 import com.example.csit228capstone.util.AlertEventBus;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -101,7 +103,40 @@ public class MainLayoutController {
 
     @FXML
     void activateEmergency(ActionEvent e) {
-        System.out.println("EMERGENCY MODE ACTIVATED");
+        try {
+            FXMLLoader authLoader = new FXMLLoader(getClass().getResource(
+                    "/com/example/csit228capstone/emergency/EmergencyAuth.fxml"
+            ));
+            Parent authRoot = authLoader.load();
+
+            EmergencyAuthController authController = authLoader.getController();
+
+            Stage authStage = new Stage();
+            authStage.setTitle("Security Check");
+            authStage.setScene(new Scene(authRoot));
+
+            authStage.initModality(Modality.APPLICATION_MODAL);
+            authStage.setResizable(false);
+            authStage.initStyle(javafx.stage.StageStyle.UTILITY);
+
+            authStage.showAndWait();
+
+            if (authController.isAuthorized()) {
+                FXMLLoader mainLoader = new FXMLLoader(getClass().getResource(
+                        "/com/example/csit228capstone/emergency/Emergency.fxml"
+                ));
+                Parent mainRoot = mainLoader.load();
+
+                Stage mainStage = new Stage();
+                mainStage.setTitle("LIGTAS-BRGY — Emergency Operations Center");
+                mainStage.setScene(new Scene(mainRoot));
+                mainStage.setMaximized(true);
+                mainStage.show();
+            }
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void handleLogout(ActionEvent actionEvent) throws Exception {

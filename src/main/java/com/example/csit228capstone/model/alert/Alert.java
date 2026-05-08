@@ -1,7 +1,5 @@
 package com.example.csit228capstone.model.alert;
 
-import com.example.csit228capstone.model.AlertPriority;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 

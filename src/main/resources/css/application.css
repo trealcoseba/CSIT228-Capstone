@@ -876,3 +876,461 @@
 .table-cell:selected .button {
     -fx-text-fill: white !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHART OVERRIDES  –  add these rules to your existing application.css
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Shared: strip the ugly gray plot background ─────────────────────────── */
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.chart {
+    -fx-background-color: transparent;
+    -fx-padding: 8 4 8 4;
+}
+
+/* ── Grid lines: subtle, light ───────────────────────────────────────────── */
+.chart-vertical-grid-lines {
+    -fx-stroke: rgba(0, 0, 0, 0.06);
+    -fx-stroke-dash-array: 4 4;
+}
+
+.chart-horizontal-grid-lines {
+    -fx-stroke: rgba(0, 0, 0, 0.08);
+    -fx-stroke-dash-array: 4 4;
+}
+
+.chart-alternative-row-fill,
+.chart-alternative-column-fill {
+    -fx-fill: transparent;
+    -fx-stroke: transparent;
+}
+
+/* ── Axis labels & tick marks ────────────────────────────────────────────── */
+.axis {
+    -fx-tick-label-fill: #555;
+    -fx-tick-label-font-size: 11px;
+}
+
+.axis-label {
+    -fx-text-fill: #444;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/* ── Bar Chart: Incident Frequency (series 0 = blue-indigo) ─────────────── */
+#chartIncidentFrequency .default-color0.chart-bar {
+    -fx-bar-fill: #4F6BED;
+    -fx-background-radius: 4 4 0 0;
+}
+
+#chartIncidentFrequency .default-color0.chart-bar:hover {
+    -fx-bar-fill: #3651D4;
+}
+
+/* ── Bar Chart: Avg Resolution (series 0 = teal) ─────────────────────────── */
+#chartAvgResolution .default-color0.chart-bar {
+    -fx-bar-fill: #2BBFA4;
+    -fx-background-radius: 4 4 0 0;
+}
+
+#chartAvgResolution .default-color0.chart-bar:hover {
+    -fx-bar-fill: #1E9E87;
+}
+
+/* ── Stacked Bar Chart: Resource Usage ───────────────────────────────────── */
+/* series 0 = Used  (coral red) */
+#chartResourceUsage .default-color0.chart-bar {
+    -fx-bar-fill: #E8534A;
+    -fx-background-radius: 0;
+}
+
+/* series 1 = Available  (soft green) */
+#chartResourceUsage .default-color1.chart-bar {
+    -fx-bar-fill: #52C97E;
+    -fx-background-radius: 4 4 0 0;
+}
+
+/* ── Legend ──────────────────────────────────────────────────────────────── */
+.chart-legend {
+    -fx-background-color: transparent;
+    -fx-padding: 4 0 0 0;
+}
+
+.chart-legend-item {
+    -fx-text-fill: #444;
+    -fx-font-size: 11px;
+}
+
+/* ── Pie Chart ───────────────────────────────────────────────────────────── */
+.chart-pie-label {
+    -fx-font-size: 11px;
+    -fx-fill: #333;
+}
+
+.chart-pie-label-line {
+    -fx-stroke: #aaa;
+}
+
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.chart-alternative-row-fill {
+    -fx-fill: transparent;
+}
+/* ============================================================
+   CHART OVERRIDES  —  Analytics Dashboard
+   Matches the existing Navy/Gold/Teal/Red light theme.
+   Append these rules to the bottom of application.css.
+   ============================================================ */
+
+/* ── Kill the gray plot background on ALL charts ─────────────────────────── */
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.chart {
+    -fx-background-color: transparent;
+    -fx-padding: 8 4 8 4;
+}
+
+/* ── Grid lines: very subtle so they don't dominate ─────────────────────── */
+.chart-horizontal-grid-lines {
+    -fx-stroke: -gray-200;
+    -fx-stroke-dash-array: 4 4;
+    -fx-stroke-width: 1;
+}
+
+.chart-vertical-grid-lines {
+    -fx-stroke: transparent;
+}
+
+/* ── Remove banded row/column fills ─────────────────────────────────────── */
+.chart-alternative-row-fill,
+.chart-alternative-column-fill {
+    -fx-fill: transparent;
+    -fx-stroke: transparent;
+}
+
+/* ── Axis text ───────────────────────────────────────────────────────────── */
+.axis {
+    -fx-tick-label-fill: -gray-500;
+    -fx-tick-label-font-size: 11px;
+}
+
+.axis-label {
+    -fx-text-fill: -gray-500;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* ── Legend ──────────────────────────────────────────────────────────────── */
+.chart-legend {
+    -fx-background-color: transparent;
+    -fx-padding: 4 0 0 0;
+}
+
+.chart-legend-item {
+    -fx-text-fill: -gray-500;
+    -fx-font-size: 11px;
+}
+
+/* ── Bar Chart: Incident Frequency — navy blue ───────────────────────────── */
+#chartIncidentFrequency .default-color0.chart-bar {
+    -fx-bar-fill: -navy;
+    -fx-background-radius: 4 4 0 0;
+}
+
+#chartIncidentFrequency .default-color0.chart-bar:hover {
+    -fx-bar-fill: -navy-light;
+}
+
+/* ── Bar Chart: Avg Resolution Time — teal ───────────────────────────────── */
+#chartAvgResolution .default-color0.chart-bar {
+    -fx-bar-fill: -teal;
+    -fx-background-radius: 4 4 0 0;
+}
+
+#chartAvgResolution .default-color0.chart-bar:hover {
+    -fx-bar-fill: -teal-light;
+}
+
+/* ── Stacked Bar Chart: Resource Usage ───────────────────────────────────── */
+/* series 0 = Used  →  red */
+#chartResourceUsage .default-color0.chart-bar {
+    -fx-bar-fill: -red;
+    -fx-background-radius: 0;
+}
+
+/* series 1 = Available  →  teal */
+#chartResourceUsage .default-color1.chart-bar {
+    -fx-bar-fill: -teal;
+    -fx-background-radius: 4 4 0 0;
+}
+
+/* ── Pie Chart: Demographic Breakdown ────────────────────────────────────── */
+.chart-pie-label {
+    -fx-font-size: 11px;
+    -fx-fill: -gray-700;
+}
+
+.chart-pie-label-line {
+    -fx-stroke: -gray-300;
+}
+
+#chartDemographic .default-color0.chart-pie { -fx-pie-color: #0F2D5E; }
+#chartDemographic .default-color1.chart-pie { -fx-pie-color: #1D9E75; }
+#chartDemographic .default-color2.chart-pie { -fx-pie-color: #D4A017; }
+#chartDemographic .default-color3.chart-pie { -fx-pie-color: #C0392B; }
+#chartDemographic .default-color4.chart-pie { -fx-pie-color: #3498DB; }
+#chartDemographic .default-color5.chart-pie { -fx-pie-color: #27AE60; }
+#chartDemographic .default-color6.chart-pie { -fx-pie-color: #1A3D6E; }
+#chartDemographic .default-color7.chart-pie { -fx-pie-color: #E8C44A; }
+
+
+
+/* Pie slice palette */
+#chartDemographic .default-color0.chart-pie { -fx-pie-color: #4F6BED; }
+#chartDemographic .default-color1.chart-pie { -fx-pie-color: #2BBFA4; }
+#chartDemographic .default-color2.chart-pie { -fx-pie-color: #F5A623; }
+#chartDemographic .default-color3.chart-pie { -fx-pie-color: #E8534A; }
+#chartDemographic .default-color4.chart-pie { -fx-pie-color: #9B59B6; }
+#chartDemographic .default-color5.chart-pie { -fx-pie-color: #52C97E; }
+#chartDemographic .default-color6.chart-pie { -fx-pie-color: #3498DB; }
+#chartDemographic .default-color7.chart-pie { -fx-pie-color: #E67E22; }
+
+/* ══════════════════════════════════════════════════════════════════
+   CHART ENHANCEMENTS — append these rules to application.css
+   They are scoped to chart-specific classes and will NOT affect
+   your existing KPI cards, panels, buttons, or other components.
+   ══════════════════════════════════════════════════════════════════ */
+
+
+/* ── Chart container card ───────────────────────────────────────── */
+.chart-container {
+    -fx-background-color: -fx-base;      /* inherits your panel background */
+    -fx-background-radius: 10;
+    -fx-border-color: derive(-fx-base, -15%);
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 6, 0, 0, 2);
+}
+
+/* ── Header band (title + subtitle row) ─────────────────────────── */
+.chart-header-band {
+    -fx-padding: 14 16 10 16;
+    -fx-background-color: derive(-fx-base, 5%);
+    -fx-background-radius: 10 10 0 0;
+}
+
+.chart-title {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.chart-subtitle {
+    -fx-font-size: 11px;
+    -fx-text-fill: derive(-fx-text-base-color, 40%);
+}
+
+/* ── Inline legend pill ──────────────────────────────────────────── */
+.chart-legend-inline {
+    -fx-background-color: derive(-fx-base, -8%);
+    -fx-background-radius: 20;
+    -fx-padding: 4 10 4 10;
+}
+
+.chart-legend-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: derive(-fx-text-base-color, 20%);
+}
+
+/* ── Divider line below header ───────────────────────────────────── */
+.chart-divider {
+    -fx-padding: 0;
+    -fx-background-color: derive(-fx-base, -12%);
+}
+
+/* ── Body wrapper (contains the ScrollPane + chart) ─────────────── */
+.chart-body-wrap {
+    -fx-padding: 12 8 8 8;
+    -fx-background-color: transparent;
+}
+
+/* ── Chart ScrollPane — hide scroll track chrome ────────────────── */
+.chart-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: transparent;
+}
+
+.chart-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+/* ── Footer note row ─────────────────────────────────────────────── */
+.chart-footer {
+    -fx-padding: 4 14 10 14;
+    -fx-background-color: derive(-fx-base, 5%);
+    -fx-background-radius: 0 0 10 10;
+}
+
+.chart-footnote {
+    -fx-font-size: 10px;
+    -fx-font-style: italic;
+    -fx-text-fill: derive(-fx-text-base-color, 50%);
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   BARCHART / STACKEDBARCHART INTERNALS
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Remove the default chart background box and grid noise */
+.analytical-bar-chart {
+    -fx-background-color: transparent;
+    -fx-padding: 4 0 0 0;
+}
+
+.analytical-bar-chart .chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+/* Horizontal grid lines: subtle dashed guides */
+.analytical-bar-chart .chart-horizontal-grid-lines {
+    -fx-stroke: derive(-fx-base, -18%);
+    -fx-stroke-width: 1;
+    -fx-stroke-dash-array: 4 4;
+}
+
+/* Remove vertical grid lines — they add clutter to bar charts */
+.analytical-bar-chart .chart-vertical-grid-lines {
+    -fx-stroke: transparent;
+}
+
+/* Zero-line baseline — make it stand out slightly */
+.analytical-bar-chart .chart-zero-baseline {
+    -fx-stroke: derive(-fx-base, -30%);
+    -fx-stroke-width: 1.5;
+}
+
+/* Remove the border box drawn around the chart plot area */
+.analytical-bar-chart .chart-content {
+    -fx-padding: 0;
+}
+
+/* Bar colour — primary blue series */
+.analytical-bar-chart .default-color0.chart-bar {
+    -fx-background-color: linear-gradient(to top, #2f6fd4, #4f8ef7);
+    -fx-background-radius: 3 3 0 0;
+    -fx-border-width: 0;
+}
+
+/* Bar hover highlight */
+.analytical-bar-chart .default-color0.chart-bar:hover {
+    -fx-background-color: linear-gradient(to top, #1a55b5, #6aa3ff);
+    -fx-effect: dropshadow(gaussian, rgba(79,142,247,0.45), 8, 0, 0, 0);
+}
+
+/* Orange variant (Avg Response Time chart) */
+.analytical-bar-chart-orange .default-color0.chart-bar {
+    -fx-background-color: linear-gradient(to top, #c96a1f, #f7924f);
+    -fx-background-radius: 3 3 0 0;
+}
+
+.analytical-bar-chart-orange .default-color0.chart-bar:hover {
+    -fx-background-color: linear-gradient(to top, #a5530f, #ffa96b);
+    -fx-effect: dropshadow(gaussian, rgba(247,146,79,0.45), 8, 0, 0, 0);
+}
+
+/* Stacked bar chart — multi-series palette */
+.analytical-stacked-chart .default-color0.chart-bar { -fx-background-color: linear-gradient(to top, #2f6fd4, #4f8ef7); -fx-background-radius: 0; }
+.analytical-stacked-chart .default-color1.chart-bar { -fx-background-color: linear-gradient(to top, #c96a1f, #f7924f); -fx-background-radius: 0; }
+.analytical-stacked-chart .default-color2.chart-bar { -fx-background-color: linear-gradient(to top, #1a8a4a, #34c97a); -fx-background-radius: 0; }
+.analytical-stacked-chart .default-color3.chart-bar { -fx-background-color: linear-gradient(to top, #8a2fc9, #c47af7); -fx-background-radius: 0; }
+.analytical-stacked-chart .default-color4.chart-bar { -fx-background-color: linear-gradient(to top, #b8960a, #f7d34f); -fx-background-radius: 0; }
+/* Top bar of the stack gets rounded cap */
+.analytical-stacked-chart .chart-bar:last-child { -fx-background-radius: 3 3 0 0; }
+
+/* ── Axis styling ────────────────────────────────────────────────── */
+.chart-axis {
+    -fx-tick-label-font-size: 11px;
+    -fx-tick-label-fill: derive(-fx-text-base-color, 30%);
+}
+
+/* Axis label (the "No. of Incidents" text) */
+.chart-axis > .axis-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: derive(-fx-text-base-color, 20%);
+    -fx-padding: 4 0 0 0;
+}
+
+/* Tick marks — thin, low-contrast */
+.chart-axis .axis-tick-mark {
+    -fx-stroke: derive(-fx-base, -20%);
+    -fx-stroke-width: 1;
+}
+
+/* Minor ticks hidden (set minorTickVisible=false in FXML too) */
+.chart-axis .axis-minor-tick-mark {
+    -fx-stroke: transparent;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   PIE CHART
+   ══════════════════════════════════════════════════════════════════ */
+
+.analytical-pie-chart {
+    -fx-background-color: transparent;
+}
+
+.analytical-pie-chart .chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+/* Pie slice palette */
+.analytical-pie-chart .default-color0.chart-pie { -fx-pie-color: #4f8ef7; }
+.analytical-pie-chart .default-color1.chart-pie { -fx-pie-color: #f7924f; }
+.analytical-pie-chart .default-color2.chart-pie { -fx-pie-color: #34c97a; }
+.analytical-pie-chart .default-color3.chart-pie { -fx-pie-color: #c47af7; }
+.analytical-pie-chart .default-color4.chart-pie { -fx-pie-color: #f7d34f; }
+.analytical-pie-chart .default-color5.chart-pie { -fx-pie-color: #f75f7a; }
+.analytical-pie-chart .default-color6.chart-pie { -fx-pie-color: #4fd4d4; }
+.analytical-pie-chart .default-color7.chart-pie { -fx-pie-color: #ff9fc2; }
+
+/* Thin white gap between slices */
+.analytical-pie-chart .chart-pie {
+    -fx-border-color: white;
+    -fx-border-width: 2;
+}
+
+/* Slice hover lift */
+.analytical-pie-chart .chart-pie:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 0);
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+/* Slice labels */
+.analytical-pie-chart .chart-pie-label {
+    -fx-font-size: 11px;
+    -fx-fill: -fx-text-base-color;
+}
+
+/* Legend pills */
+.analytical-pie-chart .chart-legend {
+    -fx-background-color: transparent;
+    -fx-padding: 8 0 0 0;
+}
+
+.analytical-pie-chart .chart-legend-item {
+    -fx-font-size: 11px;
+    -fx-text-fill: derive(-fx-text-base-color, 20%);
+    -fx-padding: 2 8 2 0;
+}

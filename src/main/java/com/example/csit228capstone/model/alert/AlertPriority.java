@@ -1,4 +1,4 @@
-package com.example.csit228capstone.model;
+package com.example.csit228capstone.model.alert;
 
 public enum AlertPriority {
     INFO("Info", "#3498DB"),

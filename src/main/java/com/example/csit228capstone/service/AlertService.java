@@ -1,7 +1,7 @@
 package com.example.csit228capstone.service;
 
 import com.example.csit228capstone.model.alert.Alert;
-import com.example.csit228capstone.model.AlertPriority;
+import com.example.csit228capstone.model.alert.AlertPriority;
 import com.example.csit228capstone.util.AlertEventBus;
 import com.example.csit228capstone.util.AlertEventBus.EventType;
 import com.example.csit228capstone.util.SupabaseConnectionManager;

@@ -108,7 +108,7 @@ public class DashboardController {
 
     }
 
-    @FXML void evacuationOrder(ActionEvent e) {
+    @FXML void evacuationCenter(ActionEvent e) {
 
     }
 

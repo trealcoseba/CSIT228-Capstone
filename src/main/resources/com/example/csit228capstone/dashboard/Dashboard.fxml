@@ -60,7 +60,7 @@
             <VBox prefWidth="200" spacing="12" styleClass="panel-card">
                 <Label styleClass="panel-title" text="Quick Actions" />
                 <Button maxWidth="Infinity" onAction="#reportIncident" styleClass="quick-action-btn, qa-danger" text="Report Incident" />
-                <Button maxWidth="Infinity" onAction="#evacuationOrder" styleClass="quick-action-btn, qa-warning" text="Evacuation Order" />
+                <Button maxWidth="Infinity" onAction="#evacuationCenter" styleClass="quick-action-btn, qa-warning" text="Evacution Center" />
                 <Button maxWidth="Infinity" onAction="#addResident" styleClass="quick-action-btn" text="Add Resident" />
             </VBox>
         </HBox>
