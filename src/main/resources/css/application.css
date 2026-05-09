@@ -314,11 +314,21 @@
 }
 
 .incident-table .table-row-cell:selected {
-    -fx-background-color: rgba(15,45,94,0.08);
+    -fx-background-color: rgba(29, 158, 117, 0.15);
+    -fx-border-color: -teal;
+    -fx-border-width: 0 0 1.5 0;
 }
 
 .incident-table .table-row-cell:selected .text {
     -fx-fill: -gray-900;
+}
+
+.incident-table .table-row-cell:selected:hover {
+    -fx-background-color: rgba(29, 158, 117, 0.22);
+}
+
+.incident-table .table-row-cell:focused:selected {
+    -fx-background-color: rgba(29, 158, 117, 0.15);
 }
 
 .table-cell {
@@ -1333,4 +1343,12 @@
     -fx-font-size: 11px;
     -fx-text-fill: derive(-fx-text-base-color, 20%);
     -fx-padding: 2 8 2 0;
+}
+
+.incident-table:focused {
+    -fx-background-color: transparent;
+}
+
+.incident-table .table-row-cell:focused {
+    -fx-background-insets: 0;
 }

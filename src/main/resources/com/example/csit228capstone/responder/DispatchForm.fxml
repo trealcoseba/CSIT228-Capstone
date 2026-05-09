@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+    DispatchFormController opens this as a modal Stage.
+    Width ~520, Height ~500
+-->
+<VBox prefWidth="520" spacing="0"
+      styleClass="root-pane"
+      stylesheets="@../../../../css/application.css"
+      xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.csit228capstone.controller.responder.DispatchedFormController">
+
+    <!-- Title Bar -->
+    <HBox styleClass="dialog-header" alignment="CENTER_LEFT" spacing="12">
+        <padding><Insets topRightBottomLeft="16" /></padding>
+        <Label styleClass="dialog-title" text="📡 Log Dispatch Mission" />
+    </HBox>
+
+    <!-- Form Body -->
+    <VBox spacing="18" VBox.vgrow="ALWAYS">
+        <padding><Insets top="24" right="24" bottom="8" left="24" /></padding>
+
+        <!-- Responder -->
+        <VBox spacing="6">
+            <Label styleClass="form-label" text="Responder *" />
+            <ComboBox fx:id="cbResponder"
+                      prefWidth="1000"
+                      promptText="Select responder…"
+                      styleClass="form-input" />
+            <Label fx:id="errResponder" styleClass="form-error" text="" visible="false" managed="false" />
+        </VBox>
+
+        <!-- Incident ID -->
+        <VBox spacing="6">
+            <Label styleClass="form-label" text="Incident ID *" />
+            <ComboBox fx:id="cbIncident"
+                      prefWidth="1000"
+                      promptText="Select linked incident…"
+                      editable="true"
+                      styleClass="form-input" />
+            <Label fx:id="errIncident" styleClass="form-error" text="" visible="false" managed="false" />
+        </VBox>
+
+        <!-- Severity -->
+        <VBox spacing="6">
+            <Label styleClass="form-label" text="Severity" />
+            <ComboBox fx:id="cbSeverity"
+                      prefWidth="1000"
+                      styleClass="form-input" />
+        </VBox>
+
+        <!-- Deployment Location (map pin) -->
+        <VBox spacing="6">
+            <Label styleClass="form-label" text="Deployment Location *" />
+            <HBox spacing="10">
+                <TextField fx:id="tfLocation"
+                           editable="false"
+                           promptText="Pin location on map…"
+                           styleClass="form-input"
+                           HBox.hgrow="ALWAYS" />
+                <Button onAction="#handleOpenMap"
+                        styleClass="quick-action-btn, qa-warning"
+                        minWidth="110"
+                        text="📍 Pin on Map" />
+            </HBox>
+            <Label fx:id="errLocation" styleClass="form-error" text="" visible="false" managed="false" />
+        </VBox>
+
+        <!-- Time Occurred -->
+        <VBox spacing="6">
+            <Label styleClass="form-label" text="Time Incident Occurred" />
+            <HBox spacing="12">
+                <DatePicker fx:id="dpTimeOccurred"
+                            prefWidth="220"
+                            promptText="Date"
+                            styleClass="form-input" />
+                <TextField fx:id="tfTimeOccurred"
+                           prefWidth="120"
+                           promptText="HH:mm  (24h)"
+                           styleClass="form-input" />
+            </HBox>
+        </VBox>
+
+        <!-- Dispatch Status -->
+        <VBox spacing="6">
+            <Label styleClass="form-label" text="Initial Status" />
+            <ComboBox fx:id="cbDispatchStatus"
+                      prefWidth="1000"
+                      styleClass="form-input" />
+        </VBox>
+
+    </VBox>
+
+    <!-- Action Buttons -->
+    <HBox alignment="CENTER_RIGHT" spacing="12">
+        <padding><Insets top="16" right="24" bottom="24" left="24" /></padding>
+        <Button onAction="#handleCancel"
+                styleClass="btn-outline"
+                text="Cancel" />
+        <Button fx:id="btnDispatch"
+                onAction="#handleDispatch"
+                styleClass="quick-action-btn"
+                text="📡 Dispatch" />
+    </HBox>
+
+</VBox>

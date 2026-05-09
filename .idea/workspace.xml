@@ -4,14 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7f9927eb-169f-486c-98fc-cd8fa020e882" name="Changes" comment="added responders">
+    <list default="true" id="7f9927eb-169f-486c-98fc-cd8fa020e882" name="Changes" comment="fixed evacuation bug">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/ai/ChatbotService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/controller/evacuation/EvacuationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/controller/evacuation/EvacuationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/controller/resident/ResidentsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/controller/resident/ResidentsController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/controller/responder/ResponderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/controller/responder/ResponderController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/model/Responder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/model/responder/Responder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/repository/ResponderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/repository/ResponderRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/evacuation/Evacuation.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/evacuation/Evacuation.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/responder/Responder.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/responder/Responder.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/css/application.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/css/application.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,7 +81,7 @@
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "git-widget-placeholder": "thisisitpancit",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/jacyerlsangre/CSIT228-Capstone/src/main/resources/com/example/csit228capstone/emergency",
+    "last_opened_file_path": "/Users/jacyerlsangre/CSIT228-Capstone/src/main/resources/com/example/csit228capstone/responder",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -100,11 +100,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/responder" />
       <recent name="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/emergency" />
       <recent name="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone" />
       <recent name="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/analytics" />
       <recent name="$PROJECT_DIR$/src/main/resources/images" />
-      <recent name="$PROJECT_DIR$/src/main/resources/map/images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/emergency" />
@@ -154,7 +154,15 @@
       <option name="project" value="LOCAL" />
       <updated>1778250445701</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="fixed evacuation bug">
+      <option name="closed" value="true" />
+      <created>1778252842854</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1778252842854</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -175,7 +183,8 @@
     <MESSAGE value="Seperated Analytics and Reports FXML&#10;Fixed edit resident logic" />
     <MESSAGE value="Merge remote-tracking branch 'origin/thisisitpancit' into thisisitpancit&#10;&#10;# Conflicts:&#10;#&#9;src/main/java/com/example/csit228capstone/model/alert/AlertPriority.java" />
     <MESSAGE value="added responders" />
-    <option name="LAST_COMMIT_MESSAGE" value="added responders" />
+    <MESSAGE value="fixed evacuation bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed evacuation bug" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
