@@ -16,8 +16,7 @@ import java.util.ResourceBundle;
 
 public class IncidentsController implements Initializable {
 
-    // FXML Bindings
-    @FXML private TextField searchField; // Ensure fx:id="searchField" in FXML
+    @FXML private TextField searchField;
     @FXML private ComboBox<IncidentSeverity> filterSeverity;
     @FXML private ComboBox<IncidentStatus> filterStatus;
     @FXML private ComboBox<IncidentType> filterType;
@@ -28,8 +27,9 @@ public class IncidentsController implements Initializable {
     @FXML private TableColumn<Incident, String> colLocation;
     @FXML private TableColumn<Incident, String> colReporter;
     @FXML private TableColumn<Incident, String> colSeverity;
-    @FXML private TableColumn<Incident, IncidentStatus> colStatus; // Note the type change
+    @FXML private TableColumn<Incident, IncidentStatus> colStatus;
     @FXML private TableColumn<Incident, String> colTime;
+    @FXML private TableColumn<Incident, String> colResolved;
     @FXML private TableColumn<Incident, Void> colActions;
 
     @FXML private Label lblCritical;
@@ -111,6 +111,14 @@ public class IncidentsController implements Initializable {
         // Time
         colTime.setCellValueFactory(f -> new ReadOnlyObjectWrapper<>(f.getValue().getReportedAt().format(timeFormatter)));
 
+        colResolved.setCellValueFactory(f -> {
+            java.time.LocalDateTime resolvedTime = f.getValue().getResolvedAt();
+            if (resolvedTime == null) {
+                return new javafx.beans.property.ReadOnlyObjectWrapper<>("---");
+            }
+            return new javafx.beans.property.ReadOnlyObjectWrapper<>(resolvedTime.format(timeFormatter));
+        });
+
         // Actions
         setupActionButtons();
     }
@@ -183,18 +191,48 @@ public class IncidentsController implements Initializable {
 
     private void setupActionButtons() {
         colActions.setCellFactory(param -> new TableCell<>() {
-            private final Button viewBtn = new Button("View");
+            // Create the button
+            private final Button resolveBtn = new Button("Resolve");
+
             {
-                viewBtn.getStyleClass().add("btn-outline");
-                viewBtn.setOnAction(event -> {
+                // Apply your LIGTAS-Brgy CSS style
+                resolveBtn.getStyleClass().add("btn-outline");
+
+                resolveBtn.setOnAction(event -> {
+                    // Get the incident data for this specific row
                     Incident incident = getTableView().getItems().get(getIndex());
-                    System.out.println("Selected Incident: " + incident.getTitle());
+
+                    // 1. Update the Database using your Repository
+                    // This will set the status to 'resolved' and set 'resolved_at' to now()
+                    repository.updateStatus(
+                            incident.getId(),
+                            IncidentStatus.RESOLVED,
+                            incident.getReportedBy(), // The ID of the person changing it
+                            "Status updated to Resolved by Admin" // Note for the timeline
+                    );
+
+                    // 2. Refresh the table and the KPI cards at the bottom
+                    refreshData();
                 });
             }
+
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : viewBtn);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    Incident incident = getTableView().getItems().get(getIndex());
+
+                    // LOGIC: If it's already resolved, don't show the button anymore
+                    if (incident.getStatus() == IncidentStatus.RESOLVED) {
+                        Label doneLabel = new Label("Completed");
+                        doneLabel.setStyle("-fx-text-fill: -gray-500; -fx-font-style: italic;");
+                        setGraphic(doneLabel);
+                    } else {
+                        setGraphic(resolveBtn);
+                    }
+                }
             }
         });
     }
