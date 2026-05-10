@@ -46,6 +46,7 @@
                     <TableColumn fx:id="colSeverity" prefWidth="80" text="Severity" />
                     <TableColumn fx:id="colStatus" prefWidth="100" text="Status" />
                     <TableColumn fx:id="colTime" prefWidth="120" text="Time Reported" />
+                    <TableColumn fx:id="colResolved" prefWidth="120" text="Time Resolved" />
                     <TableColumn fx:id="colActions" prefWidth="80" text="Actions" />
                 </columns>
             <columnResizePolicy>
