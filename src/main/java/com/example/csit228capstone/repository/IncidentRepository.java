@@ -68,25 +68,33 @@ public class IncidentRepository {
     public void updateStatus(UUID incidentId, IncidentStatus newStatus, UUID changedBy, String note) {
         try (Connection c = getConn()) {
             c.setAutoCommit(false);
-            // Get old status
-            IncidentStatus oldStatus;
+
+            // 1. Get old status safely
+            IncidentStatus oldStatus = null;
             try (PreparedStatement ps = c.prepareStatement("SELECT status FROM incidents WHERE id=?")) {
                 ps.setObject(1, incidentId);
                 try (ResultSet rs = ps.executeQuery()) {
-                    rs.next();
-                    oldStatus = IncidentStatus.valueOf(rs.getString("status").toUpperCase());
+                    if (rs.next()) { // <--- THIS WAS THE MISSING SAFETY CHECK
+                        oldStatus = IncidentStatus.valueOf(rs.getString("status").toUpperCase());
+                    } else {
+                        // If we get here, the ID doesn't exist in the database
+                        throw new SQLException("Incident not found in database: " + incidentId);
+                    }
                 }
             }
-            // Update incident
+
+            // 2. Update the incident status
             String upd = newStatus == IncidentStatus.RESOLVED
                     ? "UPDATE incidents SET status=?::incident_status, resolved_at=now(), updated_at=now() WHERE id=?"
                     : "UPDATE incidents SET status=?::incident_status, updated_at=now() WHERE id=?";
+
             try (PreparedStatement ps = c.prepareStatement(upd)) {
                 ps.setString(1, newStatus.name().toLowerCase());
                 ps.setObject(2, incidentId);
                 ps.executeUpdate();
             }
-            // Insert timeline entry
+
+            // 3. Insert into the timeline
             try (PreparedStatement ps = c.prepareStatement(
                     "INSERT INTO incident_timeline (incident_id, old_status, new_status, changed_by, note) VALUES (?,?::incident_status,?::incident_status,?,?)")) {
                 ps.setObject(1, incidentId);
@@ -96,8 +104,13 @@ public class IncidentRepository {
                 ps.setString(5, note);
                 ps.executeUpdate();
             }
+
             c.commit();
-        } catch (SQLException e) { throw new RuntimeException(e); }
+            System.out.println("Incident " + incidentId + " successfully marked as " + newStatus);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Database error during status update: " + e.getMessage(), e);
+        }
     }
 
     public int countActive() {
