@@ -6,6 +6,8 @@ import com.example.csit228capstone.repository.IncidentRepository;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,11 +15,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -30,7 +30,6 @@ public class IncidentsController implements Initializable {
     @FXML private ComboBox<String> filterSeverity;
     @FXML private ComboBox<String> filterStatus;
     @FXML private ComboBox<String> filterType;
-
     @FXML private TableView<Incident> incidentsTable;
     @FXML private TableColumn<Incident, String> colId;
     @FXML private TableColumn<Incident, String> colType;
@@ -41,29 +40,40 @@ public class IncidentsController implements Initializable {
     @FXML private TableColumn<Incident, String> colTime;
     @FXML private TableColumn<Incident, String> colResolved;
     @FXML private TableColumn<Incident, Void> colActions;
-
     @FXML private Label lblCritical;
     @FXML private Label lblOngoing;
     @FXML private Label lblResolved;
 
     private IncidentRepository repository;
     private ObservableList<Incident> incidentList;
+    private FilteredList<Incident> filteredData;
+
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        repository = new IncidentRepository();
-        incidentList = FXCollections.observableArrayList();
-
-        setupFilters();
-        setupTableColumns();
-        loadIncidentsData();
+        try {
+            repository = new IncidentRepository();
+            incidentList = FXCollections.observableArrayList();
+            filteredData = new FilteredList<>(incidentList, b -> true);
+            setupFilters();
+            setupTableColumns();
+            setupFilteringLogic();
+            loadIncidentsData();
+        } catch (Exception e) {
+            System.err.println("CRITICAL ERROR IN INITIALIZE:");
+            e.printStackTrace();
+        }
     }
 
     private void setupFilters() {
-        filterSeverity.getItems().addAll("All", "LOW", "MODERATE", "HIGH", "CRITICAL");
+        filterSeverity.getItems().addAll("All", "Critical", "Major", "Minor");
         filterStatus.getItems().addAll("All", "Reported", "Dispatched", "Responding", "Monitoring", "Resolved");
         filterType.getItems().addAll("All", "NATURAL_DISASTER", "FIRE", "CRIME", "MEDICAL", "OTHER");
+
+        filterSeverity.getSelectionModel().selectFirst();
+        filterStatus.getSelectionModel().selectFirst();
+        filterType.getSelectionModel().selectFirst();
     }
 
     private void setupTableColumns() {
@@ -71,14 +81,22 @@ public class IncidentsController implements Initializable {
                 cell.getValue().getReportedBy() != null ? cell.getValue().getReportedBy().toString().substring(0, 8) : "N/A"
         ));
 
-        colType.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getType().name()));
-        colSeverity.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getSeverity().name()));
-        colStatus.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getStatus().getDisplayName()));
+        colType.setCellValueFactory(cell -> new SimpleStringProperty(
+                cell.getValue().getType() != null ? cell.getValue().getType().name() : "N/A"
+        ));
+
+        colSeverity.setCellValueFactory(cell -> new SimpleStringProperty(
+                cell.getValue().getSeverity() != null ? cell.getValue().getSeverity().getDisplayName() : "N/A"
+        ));
+
+        colStatus.setCellValueFactory(cell -> new SimpleStringProperty(
+                cell.getValue().getStatus() != null ? cell.getValue().getStatus().getDisplayName() : "N/A"
+        ));
 
         colLocation.setCellValueFactory(cell -> {
-            String purok = cell.getValue().getLocationPurok();
-            String detail = cell.getValue().getLocationDetail();
-            return new SimpleStringProperty(purok + (detail != null && !detail.isEmpty() ? " - " + detail : ""));
+            String purok = cell.getValue().getLocationPurok() != null ? cell.getValue().getLocationPurok() : "";
+            String detail = cell.getValue().getLocationDetail() != null ? cell.getValue().getLocationDetail() : "";
+            return new SimpleStringProperty(purok + (!detail.isEmpty() ? " - " + detail : ""));
         });
 
         colReporter.setCellValueFactory(cell -> new SimpleStringProperty("Resident"));
@@ -99,64 +117,62 @@ public class IncidentsController implements Initializable {
 
         colActions.setCellFactory(param -> new TableCell<>() {
             private final Button btnView = new Button("View");
-
             {
                 btnView.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-cursor: hand;");
                 btnView.setOnAction(event -> {
                     Incident selectedIncident = getTableView().getItems().get(getIndex());
-
-                    try {
-                        URL fxmlLocation = getClass().getResource("/com/example/csit228capstone/incident/ViewIncident.fxml");
-
-                        if (fxmlLocation == null) {
-                            Alert alert = new Alert(Alert.AlertType.ERROR, "Cannot find ViewIncident.fxml file!");
-                            alert.show();
-                            return;
-                        }
-
-                        FXMLLoader loader = new FXMLLoader(fxmlLocation);
-                        Parent root = loader.load();
-
-                        ViewIncidentController controller = loader.getController();
-                        controller.setIncidentData(selectedIncident);
-
-                        Stage stage = new Stage();
-                        stage.setTitle("Incident Details - " + selectedIncident.getType().name());
-                        stage.setScene(new Scene(root));
-                        stage.initModality(Modality.APPLICATION_MODAL);
-                        stage.setResizable(false);
-                        stage.showAndWait();
-
-                        if (controller.isUpdated()) {
-                            loadIncidentsData();
-                        }
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Alert alert = new Alert(Alert.AlertType.ERROR, "Error opening view: " + e.getMessage());
-                        alert.show();
-                    }
+                    openViewModal(selectedIncident);
                 });
             }
-
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(btnView);
-                }
+                setGraphic(empty ? null : btnView);
             }
         });
+    }
 
-        incidentsTable.setItems(incidentList);
+    private void setupFilteringLogic() {
+        Runnable updatePredicate = () -> {
+            filteredData.setPredicate(incident -> {
+                if (incident == null) return false;
+
+                String searchText = searchField.getText() == null ? "" : searchField.getText().toLowerCase();
+                String sevFilter = filterSeverity.getValue();
+                String statFilter = filterStatus.getValue();
+                String typeFilter = filterType.getValue();
+
+                boolean matchesSearch = searchText.isEmpty() ||
+                        (incident.getTitle() != null && incident.getTitle().toLowerCase().contains(searchText)) ||
+                        (incident.getLocationPurok() != null && incident.getLocationPurok().toLowerCase().contains(searchText)) ||
+                        (incident.getLocationDetail() != null && incident.getLocationDetail().toLowerCase().contains(searchText));
+
+                boolean matchesSeverity = sevFilter == null || sevFilter.equals("All") ||
+                        (incident.getSeverity() != null && incident.getSeverity().getDisplayName().equalsIgnoreCase(sevFilter));
+
+                boolean matchesStatus = statFilter == null || statFilter.equals("All") ||
+                        (incident.getStatus() != null && incident.getStatus().getDisplayName().equalsIgnoreCase(statFilter));
+
+                boolean matchesType = typeFilter == null || typeFilter.equals("All") ||
+                        (incident.getType() != null && incident.getType().name().equalsIgnoreCase(typeFilter));
+
+                return matchesSearch && matchesSeverity && matchesStatus && matchesType;
+            });
+        };
+
+        searchField.textProperty().addListener((obs, oldV, newV) -> updatePredicate.run());
+        filterSeverity.valueProperty().addListener((obs, oldV, newV) -> updatePredicate.run());
+        filterStatus.valueProperty().addListener((obs, oldV, newV) -> updatePredicate.run());
+        filterType.valueProperty().addListener((obs, oldV, newV) -> updatePredicate.run());
+
+        SortedList<Incident> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(incidentsTable.comparatorProperty());
+        incidentsTable.setItems(sortedData);
     }
 
     private void loadIncidentsData() {
         try {
             List<Incident> data = repository.findAll();
-
             if (data != null) {
                 incidentList.setAll(data);
                 updateKPIs();
@@ -177,14 +193,11 @@ public class IncidentsController implements Initializable {
             if (i.getSeverity() == IncidentSeverity.CRITICAL) {
                 criticalCount++;
             }
-
             if (i.getStatus() == IncidentStatus.DISPATCHED ||
                     i.getStatus() == IncidentStatus.RESPONDING ||
                     i.getStatus() == IncidentStatus.MONITORING) {
-
                 ongoingCount++;
             }
-
             if (i.getStatus() == IncidentStatus.RESOLVED && i.getUpdatedAt() != null) {
                 if (i.getUpdatedAt().toLocalDate().isEqual(today)) {
                     resolvedTodayCount++;
@@ -201,16 +214,13 @@ public class IncidentsController implements Initializable {
     public void openNewIncident(ActionEvent actionEvent) {
         try {
             URL fxmlLocation = getClass().getResource("/com/example/csit228capstone/incident/AddIncident.fxml");
-
             if (fxmlLocation == null) {
-                Alert error = new Alert(Alert.AlertType.ERROR, "Cannot find AddIncident.fxml file!");
-                error.show();
+                new Alert(Alert.AlertType.ERROR, "Cannot find AddIncident.fxml file!").show();
                 return;
             }
 
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
-
             AddIncidentController addController = loader.getController();
 
             Stage stage = new Stage();
@@ -222,21 +232,47 @@ public class IncidentsController implements Initializable {
             if (addController.isSaveClicked()) {
                 loadIncidentsData();
             }
-
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            Alert error = new Alert(Alert.AlertType.ERROR, "Error loading screen: " + e.getMessage());
-            error.show();
+            new Alert(Alert.AlertType.ERROR, "Error loading screen: " + e.getMessage()).show();
+        }
+    }
+
+    private void openViewModal(Incident selectedIncident) {
+        try {
+            URL fxmlLocation = getClass().getResource("/com/example/csit228capstone/incident/ViewIncident.fxml");
+            if (fxmlLocation == null) {
+                new Alert(Alert.AlertType.ERROR, "Cannot find ViewIncident.fxml file!").show();
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent root = loader.load();
+
+            ViewIncidentController controller = loader.getController();
+            controller.setIncidentData(selectedIncident);
+
+            Stage stage = new Stage();
+            stage.setTitle("Incident Details - " + selectedIncident.getType().name());
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+            stage.showAndWait();
+
+            if (controller.isUpdated()) {
+                loadIncidentsData();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, "Error opening view: " + e.getMessage()).show();
         }
     }
 
     @FXML
     public void resetFilters(ActionEvent actionEvent) {
         searchField.clear();
-        filterSeverity.getSelectionModel().selectFirst();
-        filterStatus.getSelectionModel().selectFirst();
-        filterType.getSelectionModel().selectFirst();
-
-        loadIncidentsData();
+        filterSeverity.getSelectionModel().select("All");
+        filterStatus.getSelectionModel().select("All");
+        filterType.getSelectionModel().select("All");
     }
 }
