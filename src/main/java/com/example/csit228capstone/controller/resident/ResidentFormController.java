@@ -80,23 +80,23 @@ public class ResidentFormController {
 
     @FXML
     public void handleTakePhoto(ActionEvent actionEvent) {
-        try {
-            Webcam webcam = Webcam.getWebcams().getFirst();
-            if (webcam != null) {
-                webcam.setViewSize(WebcamResolution.VGA.getSize());
-                webcam.open();
-                BufferedImage image = webcam.getImage();
-                File tempFile = new File("temp_capture.jpg");
-                ImageIO.write(image, "JPG", tempFile);
-                this.selectedImageFile = tempFile;
-                ivAvatar.setImage(new Image(tempFile.toURI().toString()));
-                lblFilePath.setText("Captured: " + tempFile.getName());
-                webcam.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Camera Error", "Hardware busy or not found: " + e.getMessage());
-        }
+//        try {
+//            Webcam webcam = Webcam.getWebcams().getFirst();
+//            if (webcam != null) {
+//                webcam.setViewSize(WebcamResolution.VGA.getSize());
+//                webcam.open();
+//                BufferedImage image = webcam.getImage();
+//                File tempFile = new File("temp_capture.jpg");
+//                ImageIO.write(image, "JPG", tempFile);
+//                this.selectedImageFile = tempFile;
+//                ivAvatar.setImage(new Image(tempFile.toURI().toString()));
+//                lblFilePath.setText("Captured: " + tempFile.getName());
+//                webcam.close();
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            showAlert("Camera Error", "Hardware busy or not found: " + e.getMessage());
+//        }
     }
 
     @FXML

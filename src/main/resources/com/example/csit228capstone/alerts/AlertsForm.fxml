@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox prefWidth="460" spacing="0" styleClass="dialog-root" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.alerts.AlertsFormController">
+
+    <!-- Title bar -->
+    <HBox alignment="CENTER_LEFT" spacing="8" styleClass="dialog-header">
+        <padding><Insets bottom="14" left="16" right="16" top="14" /></padding>
+        <Label styleClass="dialog-title" text="Create Broadcast">
+         <font>
+            <Font name="System Bold" size="16.0" />
+         </font></Label>
+        <Region HBox.hgrow="ALWAYS" />
+        <Button onAction="#handleCancel" styleClass="btn-icon-close" text="✕" />
+    </HBox>
+
+    <!-- Form body -->
+    <VBox spacing="14" VBox.vgrow="ALWAYS">
+        <padding><Insets bottom="8" left="20" right="20" top="20" /></padding>
+
+        <VBox spacing="4">
+            <Label styleClass="field-label" text="Alert Type *" />
+            <ComboBox fx:id="cmbType" maxWidth="Infinity" promptText="Select alert type" />
+        </VBox>
+
+        <VBox spacing="4">
+            <Label styleClass="field-label" text="Priority *" />
+            <ComboBox fx:id="cmbPriority" maxWidth="Infinity" promptText="Select priority" />
+        </VBox>
+
+        <VBox spacing="4">
+            <Label styleClass="field-label" text="Message *" />
+            <TextArea fx:id="txtMessage" prefRowCount="4" promptText="Enter your broadcast message here…" wrapText="true" />
+        </VBox>
+
+        <VBox spacing="6">
+            <CheckBox fx:id="chkSchedule" text="Schedule this broadcast" />
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                <Label styleClass="field-label" text="Expires on:" />
+                <DatePicker fx:id="dpExpires" promptText="Pick a date" />
+            </HBox>
+        </VBox>
+
+        <Label fx:id="lblStatus" styleClass="field-label" text="" wrapText="true" />
+    </VBox>
+
+    <!-- Action buttons -->
+    <HBox alignment="CENTER_RIGHT" spacing="10">
+        <padding><Insets bottom="20" left="20" right="20" top="12" /></padding>
+        <Button onAction="#handleCancel" styleClass="quick-action-btn, qa-danger" text="Cancel" />
+        <Button onAction="#handleSchedule" styleClass="quick-action-btn, qa-info" text="Schedule" />
+        <Button onAction="#handleSend" styleClass="quick-action-btn, qa-warning" text="Send Now" />
+    </HBox>
+
+</VBox>

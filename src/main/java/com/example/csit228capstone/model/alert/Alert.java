@@ -9,7 +9,7 @@ public class Alert {
     private String body;
     private AlertPriority priority;
     private boolean isBroadcast;
-    private String targetPurok;
+
     private UUID issuedBy;
     private LocalDateTime expiresAt;
     private LocalDateTime createdAt;
@@ -26,8 +26,6 @@ public class Alert {
     public void setPriority(AlertPriority priority) { this.priority = priority; }
     public boolean isBroadcast() { return isBroadcast; }
     public void setBroadcast(boolean broadcast) { isBroadcast = broadcast; }
-    public String getTargetPurok() { return targetPurok; }
-    public void setTargetPurok(String targetPurok) { this.targetPurok = targetPurok; }
     public UUID getIssuedBy() { return issuedBy; }
     public void setIssuedBy(UUID issuedBy) { this.issuedBy = issuedBy; }
     public LocalDateTime getExpiresAt() { return expiresAt; }
