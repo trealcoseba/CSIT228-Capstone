@@ -36,7 +36,7 @@ public class AlertsController implements Initializable {
     @FXML private TableColumn<Alert, String> colMessage;
     @FXML private TableColumn<Alert, String> colSentBy;
     @FXML private TableColumn<Alert, String> colSentDate;
-    @FXML private TableColumn<Alert, Void>   colAction;   // Edit + Delete buttons
+    @FXML private TableColumn<Alert, Void>   colAction;
 
     private final AlertsRepository repo = new AlertsRepository();
 
@@ -46,68 +46,64 @@ public class AlertsController implements Initializable {
         refresh();
     }
 
-    // ── FXML handlers ────────────────────────────────────────────────────────
+    // ── FXML handlers ─────────────────────────────────────────────────────────
 
     @FXML
     public void openCreateBroadcast(ActionEvent event) {
-        openDialog(null);   // null = create mode
+        openDialog(null);
     }
 
-    // backward-compat aliases
     @FXML public void sendBroadcast(ActionEvent e) { openCreateBroadcast(e); }
     @FXML public void sendAlert(ActionEvent e)     { openCreateBroadcast(e); }
     @FXML public void sendNow(ActionEvent e)       { openCreateBroadcast(e); }
 
-    // ── private helpers ──────────────────────────────────────────────────────
+    // ── private helpers ───────────────────────────────────────────────────────
 
     private void setupTable() {
         colType.setCellValueFactory(new PropertyValueFactory<>("title"));
         colPriority.setCellValueFactory(new PropertyValueFactory<>("priority"));
         colMessage.setCellValueFactory(new PropertyValueFactory<>("body"));
-        colSentBy.setCellValueFactory(new PropertyValueFactory<>("issuedBy"));
+
+        // ← uses sentByName instead of issuedBy (UUID) so the column shows a name
+        colSentBy.setCellValueFactory(new PropertyValueFactory<>("sentByName"));
+
         colSentDate.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
         setupActionColumn();
     }
 
-    /**
-     * Renders an Edit and a Delete button in every row of colAction.
-     */
     private void setupActionColumn() {
-        Callback<TableColumn<Alert, Void>, TableCell<Alert, Void>> factory = col -> new TableCell<>() {
+        Callback<TableColumn<Alert, Void>, TableCell<Alert, Void>> factory =
+                col -> new TableCell<>() {
 
-            private final Button btnEdit   = new Button("Edit");
-            private final Button btnDelete = new Button("Delete");
-            private final HBox   box       = new HBox(6, btnEdit, btnDelete);
+                    private final Button btnEdit   = new Button("Edit");
+                    private final Button btnDelete = new Button("Delete");
+                    private final HBox   box       = new HBox(6, btnEdit, btnDelete);
 
-            {
-                btnEdit.getStyleClass().addAll("quick-action-btn", "qa-info");
-                btnDelete.getStyleClass().addAll("quick-action-btn", "qa-danger");
+                    {
+                        btnEdit.getStyleClass().addAll("quick-action-btn", "qa-info");
+                        btnDelete.getStyleClass().addAll("quick-action-btn", "qa-danger");
 
-                btnEdit.setOnAction(e -> {
-                    Alert alert = getTableView().getItems().get(getIndex());
-                    openDialog(alert);   // pass the alert → edit mode
-                });
+                        btnEdit.setOnAction(e -> {
+                            Alert alert = getTableView().getItems().get(getIndex());
+                            openDialog(alert);
+                        });
 
-                btnDelete.setOnAction(e -> {
-                    Alert alert = getTableView().getItems().get(getIndex());
-                    confirmAndDelete(alert);
-                });
-            }
+                        btnDelete.setOnAction(e -> {
+                            Alert alert = getTableView().getItems().get(getIndex());
+                            confirmAndDelete(alert);
+                        });
+                    }
 
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                setGraphic(empty ? null : box);
-            }
-        };
+                    @Override
+                    protected void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setGraphic(empty ? null : box);
+                    }
+                };
 
         colAction.setCellFactory(factory);
     }
 
-    /**
-     * Opens the Create/Edit dialog.
-     * @param alert  null → create mode; non-null → edit mode (pre-fills form)
-     */
     private void openDialog(Alert alert) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
@@ -116,7 +112,7 @@ public class AlertsController implements Initializable {
 
             AlertsFormController ctrl = loader.getController();
             ctrl.setOnSaveCallback(this::refresh);
-            if (alert != null) ctrl.loadAlert(alert);   // edit mode
+            if (alert != null) ctrl.loadAlert(alert);
 
             Stage dialog = new Stage();
             dialog.setTitle(alert == null ? "Create Broadcast" : "Edit Broadcast");
@@ -130,12 +126,13 @@ public class AlertsController implements Initializable {
         }
     }
 
-    private void confirmAndDelete(com.example.csit228capstone.model.alert.Alert alert) {
+    private void confirmAndDelete(Alert alert) {
         javafx.scene.control.Alert confirm = new javafx.scene.control.Alert(
                 javafx.scene.control.Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Delete Broadcast");
         confirm.setHeaderText(null);
-        confirm.setContentText("Delete \"" + alert.getTitle() + "\"? This cannot be undone.");
+        confirm.setContentText(
+                "Delete \"" + alert.getTitle() + "\"? This cannot be undone.");
 
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {

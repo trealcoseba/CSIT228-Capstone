@@ -5,16 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7f9927eb-169f-486c-98fc-cd8fa020e882" name="Changes" comment="fixed evacuation bug">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_5_7_26__10_43PM__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_5_7_26__10_43PM__Changes_.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_5_8_26__10_07PM__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_5_8_26__10_07PM__Changes_.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_5_8_26__9_11PM__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_5_8_26__9_11PM__Changes_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/controller/alerts/AlertsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/controller/alerts/AlertsController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/controller/resident/ResidentFormController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/controller/resident/ResidentFormController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/controller/alerts/AlertsFormController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/controller/alerts/AlertsFormController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/model/alert/Alert.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/model/alert/Alert.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/model/alert/AlertPriority.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/model/alert/AlertPriority.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/service/AlertService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/alerts/Alerts.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/alerts/Alerts.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/alerts/AlertsForm.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/alerts/AlertsForm.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -20,6 +20,7 @@ public class AlertsFormController implements Initializable {
     @FXML private ComboBox<String> cmbType;
     @FXML private ComboBox<String> cmbPriority;
     @FXML private TextArea         txtMessage;
+    @FXML private TextField        txtSentBy;      // ← NEW
     @FXML private CheckBox         chkSchedule;
     @FXML private DatePicker       dpExpires;
     @FXML private Label            lblStatus;
@@ -47,7 +48,8 @@ public class AlertsFormController implements Initializable {
         cmbPriority.setValue("MEDIUM");
 
         dpExpires.setDisable(true);
-        chkSchedule.selectedProperty().addListener((obs, old, on) -> dpExpires.setDisable(!on));
+        chkSchedule.selectedProperty().addListener(
+                (obs, old, on) -> dpExpires.setDisable(!on));
     }
 
     /**
@@ -59,6 +61,7 @@ public class AlertsFormController implements Initializable {
         cmbType.setValue(alert.getTitle());
         cmbPriority.setValue(alert.getPriority().name().toUpperCase());
         txtMessage.setText(alert.getBody());
+        txtSentBy.setText(alert.getSentByName() != null ? alert.getSentByName() : "");
         if (alert.getExpiresAt() != null) {
             chkSchedule.setSelected(true);
             dpExpires.setValue(alert.getExpiresAt().toLocalDate());
@@ -68,6 +71,8 @@ public class AlertsFormController implements Initializable {
     public void setOnSaveCallback(Runnable callback) {
         this.onSaveCallback = callback;
     }
+
+    // ── FXML handlers ─────────────────────────────────────────────────────────
 
     @FXML
     private void handleSend(ActionEvent event) {
@@ -112,7 +117,7 @@ public class AlertsFormController implements Initializable {
         closeWindow();
     }
 
-    // ── helpers ──────────────────────────────────────────────────────────────
+    // ── helpers ───────────────────────────────────────────────────────────────
 
     /** Builds a brand-new Alert from the form (create path). */
     private Alert buildAlert(boolean useSchedule) {
@@ -129,6 +134,7 @@ public class AlertsFormController implements Initializable {
         a.setTitle(cmbType.getValue());
         a.setBody(txtMessage.getText().trim());
         a.setPriority(AlertPriority.valueOf(cmbPriority.getValue()));
+        a.setSentByName(txtSentBy.getText().trim());   // ← NEW
         a.setExpiresAt(useSchedule && dpExpires.getValue() != null
                 ? dpExpires.getValue().atTime(23, 59) : null);
     }
@@ -143,12 +149,17 @@ public class AlertsFormController implements Initializable {
         if (txtMessage.getText() == null || txtMessage.getText().isBlank()) {
             showStatus("Please enter a message.", true); return false;
         }
+        if (txtSentBy.getText() == null || txtSentBy.getText().isBlank()) {
+            showStatus("Please enter who is sending this broadcast.", true); return false;
+        }
         return true;
     }
 
     private void showStatus(String msg, boolean error) {
         lblStatus.setText(msg);
-        lblStatus.setStyle(error ? "-fx-text-fill: #e74c3c;" : "-fx-text-fill: #27ae60;");
+        lblStatus.setStyle(error
+                ? "-fx-text-fill: #c0392b; -fx-font-weight: bold;"
+                : "-fx-text-fill: #27ae60; -fx-font-weight: bold;");
     }
 
     private void notifyAndClose() {

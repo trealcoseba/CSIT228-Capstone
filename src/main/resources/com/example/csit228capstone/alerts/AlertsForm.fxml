@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<VBox prefWidth="460" spacing="0" styleClass="dialog-root" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.alerts.AlertsFormController">
+<?import javafx.scene.control.TextField?>
+<VBox prefWidth="460" spacing="0" styleClass="dialog-root" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.alerts.AlertsFormController">
 
     <!-- Title bar -->
     <HBox alignment="CENTER_LEFT" spacing="8" styleClass="dialog-header">
@@ -15,22 +23,35 @@
             <Font name="System Bold" size="16.0" />
          </font></Label>
         <Region HBox.hgrow="ALWAYS" />
-        <Button onAction="#handleCancel" styleClass="btn-icon-close" text="✕" />
     </HBox>
 
     <!-- Form body -->
     <VBox spacing="14" VBox.vgrow="ALWAYS">
         <padding><Insets bottom="8" left="20" right="20" top="20" /></padding>
-
-        <VBox spacing="4">
-            <Label styleClass="field-label" text="Alert Type *" />
-            <ComboBox fx:id="cmbType" maxWidth="Infinity" promptText="Select alert type" />
-        </VBox>
-
-        <VBox spacing="4">
-            <Label styleClass="field-label" text="Priority *" />
-            <ComboBox fx:id="cmbPriority" maxWidth="Infinity" promptText="Select priority" />
-        </VBox>
+      <HBox prefHeight="50.0" prefWidth="420.0">
+         <children>
+      
+              <VBox prefHeight="93.0" prefWidth="241.0" spacing="4">
+                  <Label styleClass="field-label" text="Alert Type *" />
+                  <ComboBox fx:id="cmbType" maxWidth="Infinity" prefHeight="31.0" prefWidth="250.0" promptText="Select alert type" />
+              </VBox>
+            <Region prefHeight="100.0" prefWidth="24.0" />
+      
+              <VBox prefHeight="100.0" prefWidth="173.0" spacing="4">
+                  <Label styleClass="field-label" text="Priority *" />
+                  <ComboBox fx:id="cmbPriority" maxWidth="Infinity" prefHeight="31.0" prefWidth="230.0" promptText="Select priority" />
+              </VBox>
+         </children>
+      </HBox>
+      <VBox spacing="4">
+         <children>
+            <Label styleClass="field-label" text="Sent By *" />
+             <TextField fx:id="txtSentBy"
+                        prefHeight="31.0"
+                        prefWidth="420.0"
+                        promptText="Full name or position of the official" />
+         </children>
+      </VBox>
 
         <VBox spacing="4">
             <Label styleClass="field-label" text="Message *" />
