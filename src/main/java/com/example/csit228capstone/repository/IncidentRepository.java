@@ -124,21 +124,34 @@ public class IncidentRepository {
     private Incident mapRow(ResultSet rs) throws SQLException {
         Incident i = new Incident();
         i.setId(rs.getObject("id", UUID.class));
-        i.setType(IncidentType.valueOf(rs.getString("type").toUpperCase()));
         i.setTitle(rs.getString("title"));
         i.setDescription(rs.getString("description"));
-        i.setSeverity(IncidentSeverity.valueOf(rs.getString("severity").toUpperCase()));
-        i.setStatus(IncidentStatus.valueOf(rs.getString("status").toUpperCase()));
         i.setLocationPurok(rs.getString("location_purok"));
         i.setLocationDetail(rs.getString("location_detail"));
         i.setLatitude((Double) rs.getObject("latitude"));
         i.setLongitude((Double) rs.getObject("longitude"));
         i.setReportedBy(rs.getObject("reported_by", UUID.class));
         i.setReportedAt(rs.getTimestamp("reported_at").toLocalDateTime());
+
         Timestamp resolved = rs.getTimestamp("resolved_at");
         if (resolved != null) i.setResolvedAt(resolved.toLocalDateTime());
         i.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         i.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+
+        try {
+            i.setType(IncidentType.valueOf(rs.getString("type").toUpperCase()));
+        } catch (Exception e) { i.setType(IncidentType.OTHER); }
+
+        try {
+            i.setSeverity(IncidentSeverity.valueOf(rs.getString("severity").toUpperCase()));
+        } catch (Exception e) { i.setSeverity(IncidentSeverity.MINOR); }
+
+        try {
+            i.setStatus(IncidentStatus.valueOf(rs.getString("status").toUpperCase()));
+        } catch (Exception e) {
+            i.setStatus(IncidentStatus.REPORTED);
+        }
+
         return i;
     }
 }
