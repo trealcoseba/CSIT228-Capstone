@@ -45,7 +45,6 @@
             <font><Font name="System Bold" size="12.0" /></font>
         </Label>
 
-        <!-- CHANGED: Now a ComboBox for editing status -->
         <Label text="Update Status:" textFill="#7f8c8d" GridPane.columnIndex="0" GridPane.rowIndex="2">
             <font><Font name="System Bold" size="13.0" /></font>
         </Label>
@@ -66,10 +65,9 @@
         <TextArea fx:id="txtDescription" editable="false" prefHeight="100.0" style="-fx-control-inner-background: #f8f9fa; -fx-background-color: transparent; -fx-border-color: #dcdde1; -fx-border-radius: 4;" wrapText="true" />
     </VBox>
 
-    <!-- CHANGED: Added Update button -->
     <HBox alignment="BOTTOM_RIGHT" spacing="15.0">
         <padding><Insets top="15.0" /></padding>
         <Button onAction="#handleClose" prefHeight="40.0" prefWidth="120.0" style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="Cancel" />
-        <Button onAction="#handleUpdate" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="Save Changes" />
+        <Button fx:id="btnUpdate" onAction="#handleUpdate" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="Save Changes" />
     </HBox>
 </VBox>
