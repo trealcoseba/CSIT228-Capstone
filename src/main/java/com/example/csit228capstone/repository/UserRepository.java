@@ -13,7 +13,7 @@ public class UserRepository {
     }
 
     public boolean authenticate(String username, String password) {
-        String query = "SELECT * FROM users WHERE username = ? AND password_hash = ?";
+        String query = "SELECT * FROM admin WHERE username = ? AND password = ?";
 
         try (Connection conn = getConn();
              PreparedStatement pstmt = conn.prepareStatement(query)) {

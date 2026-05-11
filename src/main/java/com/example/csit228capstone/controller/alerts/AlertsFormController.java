@@ -20,48 +20,45 @@ public class AlertsFormController implements Initializable {
     @FXML private ComboBox<String> cmbType;
     @FXML private ComboBox<String> cmbPriority;
     @FXML private TextArea         txtMessage;
-    @FXML private TextField        txtSentBy;      // ← NEW
+    @FXML private TextField        txtSentBy;
     @FXML private CheckBox         chkSchedule;
     @FXML private DatePicker       dpExpires;
     @FXML private Label            lblStatus;
 
-    /** Pre-populated when editing an existing alert; null when creating. */
     private Alert existingAlert;
-
     private Runnable onSaveCallback;
     private final AlertsRepository repo = new AlertsRepository();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         cmbType.getItems().addAll(
-                "Weather Advisory",
-                "Flood Warning",
-                "Evacuation Order",
-                "Health Notice",
-                "Security Alert",
-                "General Announcement"
+                "Weather Advisory", "Flood Warning", "Evacuation Order",
+                "Health Notice", "Security Alert", "General Announcement"
         );
 
+        // Populate UI with Uppercase names for professional look
+        cmbPriority.getItems().clear();
         for (AlertPriority p : AlertPriority.values()) {
             cmbPriority.getItems().add(p.name());
         }
         cmbPriority.setValue("MEDIUM");
 
         dpExpires.setDisable(true);
-        chkSchedule.selectedProperty().addListener(
-                (obs, old, on) -> dpExpires.setDisable(!on));
+        chkSchedule.selectedProperty().addListener((obs, old, on) -> dpExpires.setDisable(!on));
     }
 
-    /**
-     * Called by AlertsController when opening the dialog in EDIT mode.
-     * Populates all form fields with the alert's current values.
-     */
     public void loadAlert(Alert alert) {
         this.existingAlert = alert;
         cmbType.setValue(alert.getTitle());
-        cmbPriority.setValue(alert.getPriority().name().toUpperCase());
+
+        // Ensure the UI shows the priority in Uppercase even if DB is lowercase
+        if (alert.getPriority() != null) {
+            cmbPriority.setValue(alert.getPriority().name().toUpperCase());
+        }
+
         txtMessage.setText(alert.getBody());
         txtSentBy.setText(alert.getSentByName() != null ? alert.getSentByName() : "");
+
         if (alert.getExpiresAt() != null) {
             chkSchedule.setSelected(true);
             dpExpires.setValue(alert.getExpiresAt().toLocalDate());
@@ -71,8 +68,6 @@ public class AlertsFormController implements Initializable {
     public void setOnSaveCallback(Runnable callback) {
         this.onSaveCallback = callback;
     }
-
-    // ── FXML handlers ─────────────────────────────────────────────────────────
 
     @FXML
     private void handleSend(ActionEvent event) {
@@ -117,9 +112,6 @@ public class AlertsFormController implements Initializable {
         closeWindow();
     }
 
-    // ── helpers ───────────────────────────────────────────────────────────────
-
-    /** Builds a brand-new Alert from the form (create path). */
     private Alert buildAlert(boolean useSchedule) {
         Alert a = new Alert();
         a.setId(UUID.randomUUID());
@@ -129,12 +121,23 @@ public class AlertsFormController implements Initializable {
         return a;
     }
 
-    /** Applies form values onto any Alert instance (shared by create & edit). */
     private void applyFormTo(Alert a, boolean useSchedule) {
         a.setTitle(cmbType.getValue());
         a.setBody(txtMessage.getText().trim());
-        a.setPriority(AlertPriority.valueOf(cmbPriority.getValue()));
-        a.setSentByName(txtSentBy.getText().trim());   // ← NEW
+
+        // CRITICAL FIX: Convert UI String to Uppercase before valueOf
+        String selectedPriority = cmbPriority.getValue();
+        if (selectedPriority != null) {
+            try {
+                // valueOf is case-sensitive, so we MUST use toUpperCase()
+                a.setPriority(AlertPriority.valueOf(selectedPriority.toUpperCase().trim()));
+            } catch (IllegalArgumentException e) {
+                System.err.println("Invalid priority: " + selectedPriority);
+                a.setPriority(AlertPriority.MEDIUM); // safe fallback
+            }
+        }
+
+        a.setSentByName(txtSentBy.getText().trim());
         a.setExpiresAt(useSchedule && dpExpires.getValue() != null
                 ? dpExpires.getValue().atTime(23, 59) : null);
     }
@@ -168,6 +171,8 @@ public class AlertsFormController implements Initializable {
     }
 
     private void closeWindow() {
-        ((Stage) txtMessage.getScene().getWindow()).close();
+        if (txtMessage.getScene() != null) {
+            ((Stage) txtMessage.getScene().getWindow()).close();
+        }
     }
 }

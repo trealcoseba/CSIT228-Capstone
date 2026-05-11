@@ -29,7 +29,7 @@ public class AlertsRepository {
             ps.setObject(1, alert.getId());
             ps.setString(2, alert.getTitle());
             ps.setString(3, alert.getBody());
-            ps.setObject(4, toPGEnum(alert.getPriority()));   // ← proper enum cast
+            ps.setObject(4, toPGEnum(alert.getPriority()));
             ps.setBoolean(5, alert.isBroadcast());
             ps.setObject(6, alert.getIssuedBy());
             ps.setTimestamp(7, alert.getExpiresAt() != null
@@ -52,7 +52,7 @@ public class AlertsRepository {
 
             ps.setString(1, alert.getTitle());
             ps.setString(2, alert.getBody());
-            ps.setObject(3, toPGEnum(alert.getPriority()));   // ← proper enum cast
+            ps.setObject(3, toPGEnum(alert.getPriority()));
             ps.setTimestamp(4, alert.getExpiresAt() != null
                     ? Timestamp.valueOf(alert.getExpiresAt()) : null);
             ps.setObject(5, alert.getId());
@@ -89,17 +89,18 @@ public class AlertsRepository {
         return queryCount("SELECT COUNT(*) FROM alerts WHERE expires_at > now()");
     }
 
-    // ── helpers ──────────────────────────────────────────────────────────────
+    // ── CHANGES HERE ──────────────────────────────────────────────────────────
 
     /**
-     * Wraps a Java enum value into a PGobject so PostgreSQL receives the
-     * correct typed enum instead of a plain VARCHAR, avoiding the
-     * "invalid input value for enum" error.
+     * Java: AlertPriority.CRITICAL -> "CRITICAL"
+     * Postgres: 'critical'
+     * Conversion: .toLowerCase()
      */
     private PGobject toPGEnum(AlertPriority priority) throws SQLException {
         PGobject pg = new PGobject();
         pg.setType("alert_priority");
-        pg.setValue(priority.name());
+        // Convert to lowercase so Postgres accepts it
+        pg.setValue(priority != null ? priority.name().toLowerCase() : "medium");
         return pg;
     }
 
@@ -108,7 +109,18 @@ public class AlertsRepository {
         a.setId(UUID.fromString(rs.getString("id")));
         a.setTitle(rs.getString("title"));
         a.setBody(rs.getString("body"));
-        a.setPriority(AlertPriority.valueOf(rs.getString("priority")));
+
+        // Database: "critical" (lowercase) -> Java: AlertPriority.CRITICAL
+        // Conversion: .toUpperCase()
+        String dbPriority = rs.getString("priority");
+        if (dbPriority != null) {
+            try {
+                a.setPriority(AlertPriority.valueOf(dbPriority.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                a.setPriority(AlertPriority.MEDIUM); // safe fallback
+            }
+        }
+
         a.setBroadcast(rs.getBoolean("is_broadcast"));
 
         String issuedBy = rs.getString("issued_by");

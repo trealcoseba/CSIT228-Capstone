@@ -127,7 +127,7 @@ public class ResidentsController {
         filteredData = new FilteredList<>(masterData, p -> true);
 
         filterStatus.setItems(FXCollections.observableArrayList("All", "Single", "Married", "Widowed", "Separated"));
-        filterCategory.setItems(FXCollections.observableArrayList("All", "General", "Senior Citizen", "PWD", "Solo Parent", "Indigenous" , "Child"));
+        filterCategory.setItems(FXCollections.observableArrayList("All", "General", "Senior Citizen", "PWD", "Solo Parent", "Indigenous" , "Child", "Pregnant"));
         filterStatus.setValue("All");
         filterCategory.setValue("All");
 

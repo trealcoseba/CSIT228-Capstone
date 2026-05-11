@@ -35,9 +35,9 @@ public class EvacuationController {
     @FXML private Label lblTotalEvacuees;
     @FXML private Label lblCentersActive;
 
-    @FXML private TableColumn colAddress;
+    @FXML private TableColumn<EvacuationCenter, String> colAddress;
     @FXML private WebView mapWebView;
-    @FXML private TableView centersTable;
+    @FXML private TableView<EvacuationCenter> centersTable;
     @FXML private TableColumn<EvacuationCenter, String>  colName;
     @FXML private TableColumn<EvacuationCenter, String>  colCapacity;
     @FXML private TableColumn<EvacuationCenter, Integer> colOccupancy;
@@ -74,6 +74,21 @@ public class EvacuationController {
     }
 
     // -------------------------------------------------------------------------
+    // Refresh Logic
+    // -------------------------------------------------------------------------
+
+    @FXML
+    private void handleRefresh(ActionEvent event) {
+        // Reset Filter UI
+        tfSearch.clear();
+        filterStatus.setValue("All");
+        filterAscOrDesc.setValue("Name A→Z");
+
+        // Reload fresh data from database/service
+        loadCentersData();
+    }
+
+    // -------------------------------------------------------------------------
     // Add / Activate
     // -------------------------------------------------------------------------
 
@@ -105,7 +120,7 @@ public class EvacuationController {
     // -------------------------------------------------------------------------
 
     private void setUpTables() {
-        formatTables();;
+        formatTables();
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colCapacity.setCellValueFactory(new PropertyValueFactory<>("maxCapacity"));
         colOccupancy.setCellValueFactory(new PropertyValueFactory<>("currentOccupancy"));
@@ -114,7 +129,6 @@ public class EvacuationController {
         colAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
         colContact.setCellValueFactory(new PropertyValueFactory<>("contactNumber"));
 
-        colName.setResizable(false);
         setupActionButtons();
         loadCentersData();
         centersTable.setEditable(false);
@@ -570,9 +584,8 @@ public class EvacuationController {
     }
 
     private void formatTables() {
-        // 1. Bind widths to percentages of the table width (Total: 1.0)
         colName.setMinWidth(200);
-        colAddress.setMinWidth(300);    // Give address plenty of space
+        colAddress.setMinWidth(300);
         colCapacity.setMinWidth(100);
         colOccupancy.setMinWidth(120);
         colStatus.setMinWidth(120);
@@ -580,7 +593,6 @@ public class EvacuationController {
         colContact.setMinWidth(150);
         colActions.setMinWidth(250);
 
-        // 2. Disable Resizing for all columns
         colName.setResizable(false);
         colCapacity.setResizable(false);
         colOccupancy.setResizable(false);
@@ -590,7 +602,6 @@ public class EvacuationController {
         colContact.setResizable(false);
         colActions.setResizable(false);
 
-        // 3. Disable Reordering (prevents users from dragging columns around)
         colName.setReorderable(false);
         colCapacity.setReorderable(false);
         colOccupancy.setReorderable(false);

@@ -19,6 +19,8 @@ import javafx.util.Callback;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -35,10 +37,11 @@ public class AlertsController implements Initializable {
     @FXML private TableColumn<Alert, String> colPriority;
     @FXML private TableColumn<Alert, String> colMessage;
     @FXML private TableColumn<Alert, String> colSentBy;
-    @FXML private TableColumn<Alert, String> colSentDate;
+    @FXML private TableColumn<Alert, LocalDateTime> colSentDate; // Changed type to LocalDateTime
     @FXML private TableColumn<Alert, Void>   colAction;
 
     private final AlertsRepository repo = new AlertsRepository();
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -46,35 +49,56 @@ public class AlertsController implements Initializable {
         refresh();
     }
 
-    // ── FXML handlers ─────────────────────────────────────────────────────────
-
-    @FXML
-    public void openCreateBroadcast(ActionEvent event) {
-        openDialog(null);
-    }
-
-    @FXML public void sendBroadcast(ActionEvent e) { openCreateBroadcast(e); }
-    @FXML public void sendAlert(ActionEvent e)     { openCreateBroadcast(e); }
-    @FXML public void sendNow(ActionEvent e)       { openCreateBroadcast(e); }
-
-    // ── private helpers ───────────────────────────────────────────────────────
-
     private void setupTable() {
+        // 1. Basic Value Factories
         colType.setCellValueFactory(new PropertyValueFactory<>("title"));
         colPriority.setCellValueFactory(new PropertyValueFactory<>("priority"));
         colMessage.setCellValueFactory(new PropertyValueFactory<>("body"));
-
-        // ← uses sentByName instead of issuedBy (UUID) so the column shows a name
         colSentBy.setCellValueFactory(new PropertyValueFactory<>("sentByName"));
 
+        // 2. Custom Date Formatting for colSentDate
         colSentDate.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
+        colSentDate.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(LocalDateTime item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(dateFormatter.format(item));
+                }
+            }
+        });
+
+        // 3. Horizontal Scroll & Fixed Width Logic
+        formatTableColumns();
+
         setupActionColumn();
+    }
+
+    private void formatTableColumns() {
+        // Disable constrained resize to allow horizontal scrolling
+        alertsTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+
+        // Set Fixed Widths (adjust values as needed)
+        colType.setMinWidth(180);
+        colPriority.setMinWidth(100);
+        colMessage.setMinWidth(350);  // Longer for messages
+        colSentBy.setMinWidth(150);
+        colSentDate.setMinWidth(180);
+        colAction.setMinWidth(160);
+
+        // Optional: Prevent users from messing up the layout
+        List<TableColumn<Alert, ?>> cols = List.of(colType, colPriority, colMessage, colSentBy, colSentDate, colAction);
+        for (TableColumn<Alert, ?> c : cols) {
+            c.setResizable(false);
+            c.setReorderable(false);
+        }
     }
 
     private void setupActionColumn() {
         Callback<TableColumn<Alert, Void>, TableCell<Alert, Void>> factory =
                 col -> new TableCell<>() {
-
                     private final Button btnEdit   = new Button("Edit");
                     private final Button btnDelete = new Button("Delete");
                     private final HBox   box       = new HBox(6, btnEdit, btnDelete);
@@ -82,6 +106,7 @@ public class AlertsController implements Initializable {
                     {
                         btnEdit.getStyleClass().addAll("quick-action-btn", "qa-info");
                         btnDelete.getStyleClass().addAll("quick-action-btn", "qa-danger");
+                        box.setAlignment(javafx.geometry.Pos.CENTER);
 
                         btnEdit.setOnAction(e -> {
                             Alert alert = getTableView().getItems().get(getIndex());
@@ -100,9 +125,15 @@ public class AlertsController implements Initializable {
                         setGraphic(empty ? null : box);
                     }
                 };
-
         colAction.setCellFactory(factory);
     }
+
+    // ── FXML handlers & Dialog Logic ──────────────────────────────────────────
+
+    @FXML public void openCreateBroadcast(ActionEvent event) { openDialog(null); }
+    @FXML public void sendBroadcast(ActionEvent e) { openCreateBroadcast(e); }
+    @FXML public void sendAlert(ActionEvent e)     { openCreateBroadcast(e); }
+    @FXML public void sendNow(ActionEvent e)       { openCreateBroadcast(e); }
 
     private void openDialog(Alert alert) {
         try {
@@ -120,7 +151,6 @@ public class AlertsController implements Initializable {
             dialog.setScene(new Scene(root));
             dialog.setResizable(false);
             dialog.showAndWait();
-
         } catch (IOException e) {
             showError("Could not open the broadcast dialog.", e);
         }
@@ -131,8 +161,7 @@ public class AlertsController implements Initializable {
                 javafx.scene.control.Alert.AlertType.CONFIRMATION);
         confirm.setTitle("Delete Broadcast");
         confirm.setHeaderText(null);
-        confirm.setContentText(
-                "Delete \"" + alert.getTitle() + "\"? This cannot be undone.");
+        confirm.setContentText("Delete \"" + alert.getTitle() + "\"? This cannot be undone.");
 
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -170,8 +199,7 @@ public class AlertsController implements Initializable {
 
     private void showError(String message, Exception e) {
         e.printStackTrace();
-        javafx.scene.control.Alert err =
-                new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+        javafx.scene.control.Alert err = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
         err.setTitle("Error");
         err.setHeaderText(null);
         err.setContentText(message + "\n" + e.getMessage());

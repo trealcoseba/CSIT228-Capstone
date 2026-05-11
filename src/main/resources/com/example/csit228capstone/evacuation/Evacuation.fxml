@@ -75,10 +75,13 @@
             </HBox>
 
             <!-- Filters -->
-            <HBox spacing="12">
+            <HBox spacing="12" alignment="CENTER_LEFT">
                 <ComboBox fx:id="filterStatus" prefWidth="120" promptText="Status" />
                 <ComboBox fx:id="filterAscOrDesc" prefWidth="120" />
                 <Region HBox.hgrow="ALWAYS" />
+
+                <Button onAction="#handleRefresh" styleClass="quick-action-btn" text="Reset Filters" />
+
                 <TextField fx:id="tfSearch" prefWidth="200" promptText="🔍 Search residents..." styleClass="search-field" />
                 <padding>
                     <Insets top="30.0" />
