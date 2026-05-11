@@ -368,10 +368,6 @@
     -fx-font-weight: 600;
 }
 
-
-
-
-
 .quick-action-btn:hover {
     -fx-background-color: -teal-light;
     -fx-effect: dropshadow(gaussian, rgba(29,158,117,0.3), 6, 0, 0, 2);
@@ -1352,3 +1348,4 @@
 .incident-table .table-row-cell:focused {
     -fx-background-insets: 0;
 }
+

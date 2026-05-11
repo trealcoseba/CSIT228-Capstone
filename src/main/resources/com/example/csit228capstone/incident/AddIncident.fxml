@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox prefWidth="950.0" spacing="25.0" style="-fx-background-color: #ffffff;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.incidents.AddIncidentController">
+    <padding>
+        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+    </padding>
+
+    <!-- Header - Styled like "Resident Registration" -->
+    <VBox spacing="10.0">
+        <Label text="Incident Reporting" textFill="#224263">
+            <font>
+                <Font name="System Bold" size="24.0" />
+            </font>
+        </Label>
+        <Separator />
+    </VBox>
+
+    <!-- 4-Column Grid for Incident Details - Styled like Resident form -->
+    <GridPane hgap="30.0" vgap="20.0">
+        <columnConstraints>
+            <!-- Column constraints matched from Resident Registration image -->
+            <ColumnConstraints minWidth="130.0" prefWidth="130.0" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
+            <ColumnConstraints minWidth="100.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
+        </columnConstraints>
+
+        <!-- Row 1: Title & Type -->
+        <Label text="Incident Title:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <!-- Green border for the first text field, matched from resident form -->
+        <TextField fx:id="txtTitle" prefHeight="35.0" promptText="Enter incident title" style="-fx-border-color: #27ae60; -fx-border-radius: 4; -fx-background-radius: 4;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+        <Label text="Incident Type:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+        <ComboBox fx:id="cbType" maxWidth="Infinity" prefHeight="35.0" promptText="Select" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+        <!-- Row 2: Severity & Status -->
+        <Label text="Severity:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <ComboBox fx:id="cbSeverity" maxWidth="Infinity" prefHeight="35.0" promptText="Select" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <Label text="Status:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+        <ComboBox fx:id="cbStatus" maxWidth="Infinity" prefHeight="35.0" promptText="Select" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+
+        <!-- Row 3: Date & Area -->
+        <Label text="Reported Date:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <DatePicker fx:id="dpDate" maxWidth="Infinity" prefHeight="35.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+        <Label text="Purok / Area:" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+        <TextField fx:id="txtPurok" prefHeight="35.0" promptText="e.g. Purok 4" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+    </GridPane>
+
+    <!-- Immediate Needs Checkboxes - Styled like "Vulnerabilities" -->
+    <HBox alignment="CENTER_LEFT" spacing="20.0">
+        <Label prefWidth="130.0" text="Immediate Needs:" />
+        <HBox spacing="15.0">
+            <CheckBox fx:id="chkMedical" text="Medical" />
+            <CheckBox fx:id="chkFire" text="Fire" />
+            <CheckBox fx:id="chkRescue" text="Rescue" />
+            <CheckBox fx:id="chkSecurity" text="Security" />
+            <CheckBox fx:id="chkWaterFood" text="Water/Food" />
+        </HBox>
+    </HBox>
+
+    <!-- Exact Location Section - Styled like "Home Address" -->
+    <HBox alignment="CENTER_LEFT" spacing="20.0">
+        <Label prefWidth="130.0" text="Exact Location:" />
+        <TextField fx:id="txtDetail" prefHeight="35.0" promptText="Pin location on map to get address..." HBox.hgrow="ALWAYS" />
+        <!-- Pin on Map button styled with orange background -->
+        <Button onAction="#handlePinOnMap" prefHeight="40.0" prefWidth="140.0" style="-fx-background-color: #d4a017; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;" text="📌 Pin on Map" />
+    </HBox>
+
+    <!-- Priority Section - Styled like "Household Head?" -->
+    <HBox alignment="CENTER_LEFT" spacing="20.0">
+        <Label prefWidth="130.0" text="Priority Level:" />
+        <CheckBox fx:id="chkCritical" style="-fx-font-weight: bold;" text="Mark as Critical Emergency Priority" />
+    </HBox>
+
+    <Label text="Incident Description:" />
+    <TextArea fx:id="txtDescription" prefHeight="100.0" promptText="Provide more details..." wrapText="true" />
+
+    <!-- Action Buttons - Styled like Resident Registration Cancel/Save -->
+    <HBox alignment="BOTTOM_RIGHT" spacing="15.0">
+        <padding>
+            <Insets top="30.0" />
+        </padding>
+        <!-- Red "Cancel" button style -->
+        <Button onAction="#handleCancel" prefHeight="45.0" prefWidth="180.0" style="-fx-background-color: #c0392b; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 6;" text="Cancel" />
+        <!-- Green "Save Incident" button style -->
+        <Button onAction="#handleSave" prefHeight="45.0" prefWidth="180.0" style="-fx-background-color: #20a074; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 6;" text="Save Incident" />
+    </HBox>
+</VBox>

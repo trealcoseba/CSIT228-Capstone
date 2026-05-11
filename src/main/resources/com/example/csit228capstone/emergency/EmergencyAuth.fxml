@@ -6,7 +6,7 @@
 <VBox alignment="CENTER" prefHeight="200" prefWidth="350" spacing="20" style="-fx-background-color: #0d1117; -fx-border-color: #ff4757; -fx-border-width: 2; -fx-padding: 30;" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.emergency.EmergencyAuthController">
 
     <VBox alignment="CENTER" spacing="8">
-        <Label style="-fx-text-fill: #ff4757; -fx-font-weight: bold; -fx-font-size: 14px;" text="高 SECURITY CLEARANCE REQUIRED" />
+        <Label style="-fx-text-fill: #ff4757; -fx-font-weight: bold; -fx-font-size: 14px;" text=" SECURITY CLEARANCE REQUIRED" textAlignment="CENTER" />
         <Label style="-fx-text-fill: #9ca3af; -fx-font-size: 11px;" text="Enter Admin Passkey to activate EOC" />
     </VBox>
 
