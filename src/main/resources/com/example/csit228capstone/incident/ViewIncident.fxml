@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -67,7 +68,13 @@
 
     <HBox alignment="BOTTOM_RIGHT" spacing="15.0">
         <padding><Insets top="15.0" /></padding>
-        <Button onAction="#handleClose" prefHeight="40.0" prefWidth="120.0" style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="Cancel" />
-        <Button fx:id="btnUpdate" onAction="#handleUpdate" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="Save Changes" />
+
+        <Button onAction="#handleDelete" prefHeight="40.0" prefWidth="150.0" style="-fx-background-color: #c0392b; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="Delete Incident" />
+
+        <Region HBox.hgrow="ALWAYS" />
+
+        <Button onAction="#handleClose" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="Cancel" />
+
+        <Button fx:id="btnUpdate" onAction="#handleUpdate" prefHeight="40.0" prefWidth="150.0" style="-fx-background-color: #20a074; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="Save Changes" />
     </HBox>
 </VBox>
