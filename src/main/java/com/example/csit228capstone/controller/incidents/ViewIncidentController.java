@@ -6,11 +6,7 @@ import com.example.csit228capstone.repository.IncidentRepository;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import java.util.UUID;
 
@@ -73,29 +69,44 @@ public class ViewIncidentController {
     private void handleUpdate(ActionEvent event) {
         try {
             IncidentStatus newStatus = cbStatus.getValue();
-
-            if (newStatus != currentIncident.getStatus()) {
-
-                UUID adminId = UUID.randomUUID();
-                String note = "Status updated via Admin Dashboard";
-
-                repository.updateStatus(currentIncident.getId(), newStatus, adminId, note);
-
-                currentIncident.setStatus(newStatus);
-                isUpdated = true;
-
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Incident marked as " + newStatus.getDisplayName() + "!");
-                alert.showAndWait();
-                handleClose(null);
-
-            } else {
-                handleClose(null);
-            }
-
+                if (newStatus != currentIncident.getStatus()) {
+                    UUID adminId = UUID.randomUUID();
+                    String note = "Status updated via Admin Dashboard";
+                    repository.updateStatus(currentIncident.getId(), newStatus, adminId, note);
+                    currentIncident.setStatus(newStatus);
+                    isUpdated = true;
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION, "Incident marked as " + newStatus.getDisplayName() + "!");
+                    alert.showAndWait();
+                    handleClose(null);
+                } else {
+                    handleClose(null);
+                }
         } catch (Exception e) {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "Failed to update incident: " + e.getMessage()).show();
         }
+    }
+
+    @FXML
+    private void handleDelete(ActionEvent event) {
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Confirm Deletion");
+        confirmation.setHeaderText("Are you sure you want to delete this incident?");
+        confirmation.setContentText("This action cannot be undone. All timeline records for this incident will be removed.");
+        confirmation.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    repository.delete(currentIncident.getId());
+                    this.isUpdated = true;
+                    Alert success = new Alert(Alert.AlertType.INFORMATION, "Incident has been deleted.");
+                    success.showAndWait();
+                    handleClose(null);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    new Alert(Alert.AlertType.ERROR, "Delete failed: " + e.getMessage()).show();
+                }
+            }
+        });
     }
 
     @FXML
