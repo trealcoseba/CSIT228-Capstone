@@ -69,21 +69,18 @@ public class IncidentRepository {
         try (Connection c = getConn()) {
             c.setAutoCommit(false);
 
-            // 1. Get old status safely
             IncidentStatus oldStatus = null;
             try (PreparedStatement ps = c.prepareStatement("SELECT status FROM incidents WHERE id=?")) {
                 ps.setObject(1, incidentId);
                 try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) { // <--- THIS WAS THE MISSING SAFETY CHECK
+                    if (rs.next()) {
                         oldStatus = IncidentStatus.valueOf(rs.getString("status").toUpperCase());
                     } else {
-                        // If we get here, the ID doesn't exist in the database
                         throw new SQLException("Incident not found in database: " + incidentId);
                     }
                 }
             }
 
-            // 2. Update the incident status
             String upd = newStatus == IncidentStatus.RESOLVED
                     ? "UPDATE incidents SET status=?::incident_status, resolved_at=now(), updated_at=now() WHERE id=?"
                     : "UPDATE incidents SET status=?::incident_status, updated_at=now() WHERE id=?";
@@ -94,7 +91,6 @@ public class IncidentRepository {
                 ps.executeUpdate();
             }
 
-            // 3. Insert into the timeline
             try (PreparedStatement ps = c.prepareStatement(
                     "INSERT INTO incident_timeline (incident_id, old_status, new_status, changed_by, note) VALUES (?,?::incident_status,?::incident_status,?,?)")) {
                 ps.setObject(1, incidentId);
@@ -153,5 +149,16 @@ public class IncidentRepository {
         }
 
         return i;
+    }
+
+    public void delete(UUID id) {
+        String sql = "DELETE FROM incidents WHERE id = ?";
+        try (Connection c = getConn(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setObject(1, id);
+            ps.executeUpdate();
+            System.out.println("Incident " + id + " deleted from database.");
+        } catch (SQLException e) {
+            throw new RuntimeException("Error deleting incident: " + e.getMessage(), e);
+        }
     }
 }
