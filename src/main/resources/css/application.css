@@ -331,6 +331,17 @@
     -fx-background-color: rgba(29, 158, 117, 0.15);
 }
 
+/* 1. Hide the background and borders of empty rows */
+.incident-table .table-row-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/* 2. Hide the actual cells within those empty rows */
+.incident-table .table-row-cell:empty .table-cell {
+    -fx-border-color: transparent;
+}
+
 .table-cell {
     -fx-alignment: CENTER;
 }
@@ -1349,3 +1360,22 @@
     -fx-background-insets: 0;
 }
 
+/* Base style for the badge */
+.priority-badge {
+    -fx-background-radius: 12;
+    -fx-padding: 3 12 3 12;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 11px;
+}
+
+/* Colors for each priority level */
+.badge-critical { -fx-background-color: #e74c3c; } /* Vibrant Red */
+.badge-high     { -fx-background-color: #e67e22; } /* Deep Orange */
+.badge-medium   { -fx-background-color: #f1c40f; -fx-text-fill: #2c3e50; } /* Yellow */
+.badge-low      { -fx-background-color: #95a5a6; } /* Gray */
+
+/* Optional: Subtle hover effect for table rows */
+.table-row-cell:hover {
+    -fx-background-color: #f5f6f7;
+}

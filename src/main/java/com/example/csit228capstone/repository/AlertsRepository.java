@@ -18,9 +18,10 @@ public class AlertsRepository {
     }
 
     public void save(Alert alert) throws SQLException {
+        // We have 8 columns and 8 question marks here
         String sql = """
                 INSERT INTO alerts
-                    (id, title, body, priority, is_broadcast, issued_by, expires_at, created_at)
+                    (id, title, body, priority, is_broadcast, expires_at, created_at, issued_by_name)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         try (Connection conn = getConn();
@@ -31,20 +32,22 @@ public class AlertsRepository {
             ps.setString(3, alert.getBody());
             ps.setObject(4, toPGEnum(alert.getPriority()));
             ps.setBoolean(5, alert.isBroadcast());
-            ps.setObject(6, alert.getIssuedBy());
-            ps.setTimestamp(7, alert.getExpiresAt() != null
+            ps.setTimestamp(6, alert.getExpiresAt() != null
                     ? Timestamp.valueOf(alert.getExpiresAt()) : null);
-            ps.setTimestamp(8, Timestamp.valueOf(
+            ps.setTimestamp(7, Timestamp.valueOf(
                     alert.getCreatedAt() != null ? alert.getCreatedAt() : LocalDateTime.now()));
+            // Slot 8 matches 'issued_by_name'
+            ps.setString(8, alert.getSentByName());
 
             ps.executeUpdate();
         }
     }
 
     public void update(Alert alert) throws SQLException {
+        // 6 parameters needed (title, body, priority, expires_at, issued_by_name, and id)
         String sql = """
                 UPDATE alerts
-                SET title = ?, body = ?, priority = ?, expires_at = ?
+                SET title = ?, body = ?, priority = ?, expires_at = ?, issued_by_name = ?
                 WHERE id = ?
                 """;
         try (Connection conn = getConn();
@@ -55,7 +58,8 @@ public class AlertsRepository {
             ps.setObject(3, toPGEnum(alert.getPriority()));
             ps.setTimestamp(4, alert.getExpiresAt() != null
                     ? Timestamp.valueOf(alert.getExpiresAt()) : null);
-            ps.setObject(5, alert.getId());
+            ps.setString(5, alert.getSentByName());
+            ps.setObject(6, alert.getId()); // This matches the WHERE id = ?
 
             ps.executeUpdate();
         }
@@ -72,6 +76,7 @@ public class AlertsRepository {
 
     public List<Alert> findAll() throws SQLException {
         List<Alert> results = new ArrayList<>();
+        // Make sure issued_by_name is included in the SELECT
         String sql = "SELECT * FROM alerts ORDER BY created_at DESC";
         try (Connection conn = getConn();
              Statement stmt = conn.createStatement();
@@ -89,17 +94,9 @@ public class AlertsRepository {
         return queryCount("SELECT COUNT(*) FROM alerts WHERE expires_at > now()");
     }
 
-    // ── CHANGES HERE ──────────────────────────────────────────────────────────
-
-    /**
-     * Java: AlertPriority.CRITICAL -> "CRITICAL"
-     * Postgres: 'critical'
-     * Conversion: .toLowerCase()
-     */
     private PGobject toPGEnum(AlertPriority priority) throws SQLException {
         PGobject pg = new PGobject();
         pg.setType("alert_priority");
-        // Convert to lowercase so Postgres accepts it
         pg.setValue(priority != null ? priority.name().toLowerCase() : "medium");
         return pg;
     }
@@ -110,21 +107,19 @@ public class AlertsRepository {
         a.setTitle(rs.getString("title"));
         a.setBody(rs.getString("body"));
 
-        // Database: "critical" (lowercase) -> Java: AlertPriority.CRITICAL
-        // Conversion: .toUpperCase()
         String dbPriority = rs.getString("priority");
         if (dbPriority != null) {
             try {
                 a.setPriority(AlertPriority.valueOf(dbPriority.toUpperCase()));
             } catch (IllegalArgumentException e) {
-                a.setPriority(AlertPriority.MEDIUM); // safe fallback
+                a.setPriority(AlertPriority.MEDIUM);
             }
         }
 
         a.setBroadcast(rs.getBoolean("is_broadcast"));
 
-        String issuedBy = rs.getString("issued_by");
-        if (issuedBy != null) a.setIssuedBy(UUID.fromString(issuedBy));
+        // Map the name from the database column 'issued_by_name'
+        a.setSentByName(rs.getString("issued_by_name"));
 
         Timestamp expiresAt = rs.getTimestamp("expires_at");
         if (expiresAt != null) a.setExpiresAt(expiresAt.toLocalDateTime());

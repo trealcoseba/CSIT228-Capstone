@@ -7,6 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -27,18 +28,15 @@ import java.util.ResourceBundle;
 
 public class AlertsController implements Initializable {
 
-    // KPI
     @FXML private Label lblBroadcasts;
     @FXML private Label lblScheduled;
-
-    // Table
-    @FXML private TableView<Alert>           alertsTable;
+    @FXML private TableView<Alert> alertsTable;
     @FXML private TableColumn<Alert, String> colType;
-    @FXML private TableColumn<Alert, String> colPriority;
+    @FXML private TableColumn<Alert, com.example.csit228capstone.model.alert.AlertPriority> colPriority;
     @FXML private TableColumn<Alert, String> colMessage;
     @FXML private TableColumn<Alert, String> colSentBy;
-    @FXML private TableColumn<Alert, LocalDateTime> colSentDate; // Changed type to LocalDateTime
-    @FXML private TableColumn<Alert, Void>   colAction;
+    @FXML private TableColumn<Alert, LocalDateTime> colSentDate;
+    @FXML private TableColumn<Alert, Void> colAction;
 
     private final AlertsRepository repo = new AlertsRepository();
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
@@ -50,14 +48,53 @@ public class AlertsController implements Initializable {
     }
 
     private void setupTable() {
-        // 1. Basic Value Factories
+        // 1. Value Factories
         colType.setCellValueFactory(new PropertyValueFactory<>("title"));
         colPriority.setCellValueFactory(new PropertyValueFactory<>("priority"));
         colMessage.setCellValueFactory(new PropertyValueFactory<>("body"));
         colSentBy.setCellValueFactory(new PropertyValueFactory<>("sentByName"));
-
-        // 2. Custom Date Formatting for colSentDate
         colSentDate.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
+
+        // 2. SAFE Priority Badge Factory
+        colPriority.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(com.example.csit228capstone.model.alert.AlertPriority item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setGraphic(null);
+                    setText(null);
+                } else {
+                    try {
+                        // 'item' is the Enum, so we use item.name() to get the text
+                        String priorityName = item.name().toUpperCase();
+                        Label badge = new Label(priorityName);
+                        badge.getStyleClass().add("priority-badge");
+
+                        // Assign style classes based on the Enum name
+                        if (priorityName.equals("CRITICAL")) {
+                            badge.getStyleClass().add("badge-critical");
+                        } else if (priorityName.equals("HIGH")) {
+                            badge.getStyleClass().add("badge-high");
+                        } else if (priorityName.equals("MEDIUM")) {
+                            badge.getStyleClass().add("badge-medium");
+                        } else {
+                            badge.getStyleClass().add("badge-low");
+                        }
+
+                        setGraphic(badge);
+                        setText(null);
+                        setAlignment(Pos.CENTER);
+                    } catch (Exception e) {
+                        // If something goes wrong, just show the enum name as text
+                        setText(item.toString());
+                        setGraphic(null);
+                    }
+                }
+            }
+        });
+
+        // 3. SAFE Date Factory
         colSentDate.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(LocalDateTime item, boolean empty) {
@@ -70,77 +107,55 @@ public class AlertsController implements Initializable {
             }
         });
 
-        // 3. Horizontal Scroll & Fixed Width Logic
         formatTableColumns();
-
         setupActionColumn();
     }
 
     private void formatTableColumns() {
-        // Disable constrained resize to allow horizontal scrolling
-        alertsTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        // Force the table to have height so it doesn't disappear
+        alertsTable.setMinHeight(400);
+        alertsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        // Set Fixed Widths (adjust values as needed)
-        colType.setMinWidth(180);
-        colPriority.setMinWidth(100);
-        colMessage.setMinWidth(350);  // Longer for messages
-        colSentBy.setMinWidth(150);
-        colSentDate.setMinWidth(180);
-        colAction.setMinWidth(160);
+        colType.setPrefWidth(120);
+        colPriority.setPrefWidth(100);
+        colMessage.setPrefWidth(250);
+        colSentBy.setPrefWidth(140);
+        colSentDate.setPrefWidth(170);
 
-        // Optional: Prevent users from messing up the layout
-        List<TableColumn<Alert, ?>> cols = List.of(colType, colPriority, colMessage, colSentBy, colSentDate, colAction);
-        for (TableColumn<Alert, ?> c : cols) {
-            c.setResizable(false);
-            c.setReorderable(false);
-        }
+        colAction.setMinWidth(190);
+        colAction.setMaxWidth(190);
     }
 
     private void setupActionColumn() {
-        Callback<TableColumn<Alert, Void>, TableCell<Alert, Void>> factory =
-                col -> new TableCell<>() {
-                    private final Button btnEdit   = new Button("Edit");
-                    private final Button btnDelete = new Button("Delete");
-                    private final HBox   box       = new HBox(6, btnEdit, btnDelete);
+        colAction.setCellFactory(param -> new TableCell<>() {
+            private final Button btnEdit = new Button("Edit");
+            private final Button btnDelete = new Button("Delete");
+            private final HBox box = new HBox(8, btnEdit, btnDelete);
 
-                    {
-                        btnEdit.getStyleClass().addAll("quick-action-btn", "qa-info");
-                        btnDelete.getStyleClass().addAll("quick-action-btn", "qa-danger");
-                        box.setAlignment(javafx.geometry.Pos.CENTER);
+            {
+                btnEdit.getStyleClass().addAll("quick-action-btn", "qa-info");
+                btnDelete.getStyleClass().addAll("quick-action-btn", "qa-danger");
+                box.setAlignment(Pos.CENTER);
 
-                        btnEdit.setOnAction(e -> {
-                            Alert alert = getTableView().getItems().get(getIndex());
-                            openDialog(alert);
-                        });
+                btnEdit.setOnAction(e -> openDialog(getTableView().getItems().get(getIndex())));
+                btnDelete.setOnAction(e -> confirmAndDelete(getTableView().getItems().get(getIndex())));
+            }
 
-                        btnDelete.setOnAction(e -> {
-                            Alert alert = getTableView().getItems().get(getIndex());
-                            confirmAndDelete(alert);
-                        });
-                    }
-
-                    @Override
-                    protected void updateItem(Void item, boolean empty) {
-                        super.updateItem(item, empty);
-                        setGraphic(empty ? null : box);
-                    }
-                };
-        colAction.setCellFactory(factory);
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : box);
+            }
+        });
     }
 
-    // ── FXML handlers & Dialog Logic ──────────────────────────────────────────
-
+    // Logic Methods
     @FXML public void openCreateBroadcast(ActionEvent event) { openDialog(null); }
-    @FXML public void sendBroadcast(ActionEvent e) { openCreateBroadcast(e); }
-    @FXML public void sendAlert(ActionEvent e)     { openCreateBroadcast(e); }
-    @FXML public void sendNow(ActionEvent e)       { openCreateBroadcast(e); }
 
     private void openDialog(Alert alert) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(
-                    "/com/example/csit228capstone/alerts/AlertsForm.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/csit228capstone/alerts/AlertsForm.fxml"));
             Parent root = loader.load();
-
             AlertsFormController ctrl = loader.getController();
             ctrl.setOnSaveCallback(this::refresh);
             if (alert != null) ctrl.loadAlert(alert);
@@ -149,28 +164,21 @@ public class AlertsController implements Initializable {
             dialog.setTitle(alert == null ? "Create Broadcast" : "Edit Broadcast");
             dialog.initModality(Modality.APPLICATION_MODAL);
             dialog.setScene(new Scene(root));
-            dialog.setResizable(false);
             dialog.showAndWait();
         } catch (IOException e) {
-            showError("Could not open the broadcast dialog.", e);
+            showError("Error opening dialog", e);
         }
     }
 
     private void confirmAndDelete(Alert alert) {
-        javafx.scene.control.Alert confirm = new javafx.scene.control.Alert(
-                javafx.scene.control.Alert.AlertType.CONFIRMATION);
-        confirm.setTitle("Delete Broadcast");
-        confirm.setHeaderText(null);
-        confirm.setContentText("Delete \"" + alert.getTitle() + "\"? This cannot be undone.");
-
+        javafx.scene.control.Alert confirm = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION);
+        confirm.setContentText("Delete \"" + alert.getTitle() + "\"?");
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 repo.delete(alert.getId());
                 refresh();
-            } catch (SQLException e) {
-                showError("Failed to delete the alert.", e);
-            }
+            } catch (SQLException e) { showError("Delete failed", e); }
         }
     }
 
@@ -182,9 +190,11 @@ public class AlertsController implements Initializable {
     private void loadTableData() {
         try {
             List<Alert> alerts = repo.findAll();
+            // DEBUG: Check if data is actually coming from the DB
+            System.out.println("Loaded alerts: " + alerts.size());
             alertsTable.setItems(FXCollections.observableArrayList(alerts));
         } catch (SQLException e) {
-            showError("Failed to load alerts.", e);
+            showError("Load failed", e);
         }
     }
 
@@ -192,17 +202,13 @@ public class AlertsController implements Initializable {
         try {
             lblBroadcasts.setText(String.valueOf(repo.countBroadcasts()));
             lblScheduled.setText(String.valueOf(repo.countScheduled()));
-        } catch (SQLException e) {
-            System.err.println("KPI update failed: " + e.getMessage());
-        }
+        } catch (SQLException e) { e.printStackTrace(); }
     }
 
     private void showError(String message, Exception e) {
         e.printStackTrace();
         javafx.scene.control.Alert err = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
-        err.setTitle("Error");
-        err.setHeaderText(null);
-        err.setContentText(message + "\n" + e.getMessage());
+        err.setContentText(message + ": " + e.getMessage());
         err.showAndWait();
     }
 }

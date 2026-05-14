@@ -4,7 +4,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<ScrollPane fitToWidth="true" prefHeight="1000" prefWidth="1200"
+<ScrollPane fitToWidth="true"
+            prefHeight="1000"
+            prefWidth="1200"
             styleClass="dashboard-scroll"
             stylesheets="@../../../../css/application.css"
             xmlns="http://javafx.com/javafx/17.0.2-ea"
@@ -44,15 +46,15 @@
                 <VBox spacing="12" styleClass="panel-card" HBox.hgrow="ALWAYS">
                     <Label styleClass="panel-title" text="Recent Alerts &amp; Broadcasts"/>
 
-                    <TableView fx:id="alertsTable" prefHeight="400"
+                    <TableView fx:id="alertsTable" prefHeight="400" minWidth="0"
                                styleClass="incident-table" VBox.vgrow="ALWAYS">
                         <columns>
-                            <TableColumn fx:id="colType"     text="Type"      prefWidth="140"/>
-                            <TableColumn fx:id="colPriority" text="Priority"  prefWidth="90"/>
-                            <TableColumn fx:id="colMessage"  text="Message"   prefWidth="260"/>
-                            <TableColumn fx:id="colSentBy"   text="Sent By"   prefWidth="120"/>
-                            <TableColumn fx:id="colSentDate" text="Date Sent" prefWidth="140"/>
-                            <TableColumn fx:id="colAction"   text="Actions"   prefWidth="140"
+                            <TableColumn fx:id="colType"     text="Type"      prefWidth="120" minWidth="120"/>
+                            <TableColumn fx:id="colPriority" text="Priority"  prefWidth="100" minWidth="100"/>
+                            <TableColumn fx:id="colMessage"  text="Message"   prefWidth="300"/>
+                            <TableColumn fx:id="colSentBy"   text="Sent By"   prefWidth="120" minWidth="120"/>
+                            <TableColumn fx:id="colSentDate" text="Date Sent" prefWidth="160" minWidth="160"/>
+                            <TableColumn fx:id="colAction"   text="Actions"   prefWidth="200" minWidth="200" maxWidth="200"
                                          sortable="false"/>
                         </columns>
                         <columnResizePolicy>
