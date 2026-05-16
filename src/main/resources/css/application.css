@@ -1379,3 +1379,84 @@
 .table-row-cell:hover {
     -fx-background-color: #f5f6f7;
 }
+
+/* KPI Icons - Solid Colors */
+.kpi-icon {
+    -fx-stroke: transparent;
+    -fx-opacity: 1.0; /* Full visibility, no fade */
+}
+
+/* Specifically color the megaphone blue */
+.icon-broadcast {
+    -fx-fill: #2980b9;
+}
+
+/* Specifically color the clock orange */
+.icon-scheduled {
+    -fx-fill: #e67e22;
+}
+
+/* Make the numbers pop even more */
+.kpi-info .kpi-value {
+    -fx-text-fill: #2980b9;
+    -fx-font-size: 40px; /* Slightly larger */
+}
+
+.kpi-warning .kpi-value {
+    -fx-text-fill: #e67e22;
+    -fx-font-size: 40px;
+}
+
+/* Style the labels for better hierarchy */
+.kpi-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #95a5a6; /* Subtle grey for the text part */
+    -fx-text-transform: uppercase;
+}
+
+/* Styling the Tooltip popup */
+.message-tooltip {
+    -fx-background-color: #2c3e50;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-padding: 10px;
+    -fx-background-radius: 5px;
+}
+
+/* Styling the View button */
+.qa-view {
+    -fx-background-color: #34495e;
+    -fx-text-fill: white;
+}
+.qa-view:hover {
+    -fx-background-color: #2c3e50;
+}
+
+/* Ensure the message column text doesn't wrap
+   (Ellipsis only works on single lines) */
+.incident-table .table-cell {
+    -fx-alignment: CENTER-LEFT;
+}
+
+/* Center the text in the column headers */
+.table-view .column-header .label {
+    -fx-alignment: CENTER;
+    -fx-text-alignment: CENTER;
+}
+
+/* Ensure tooltips are readable */
+.tooltip {
+    -fx-show-delay: 200ms; /* Makes the tooltip appear faster (0.2 seconds) */
+    -fx-background-color: #2c3e50;
+    -fx-text-fill: white;
+    -fx-padding: 10;
+}
+
+.dialog-pane {
+    -fx-background-color: white;
+}
+.dialog-pane .label {
+    -fx-text-fill: #2c3e50;
+    -fx-font-size: 14px;
+}
+

@@ -26,6 +26,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+// Added for Truncation & Tooltips
+import javafx.scene.control.OverrunStyle;
+import javafx.scene.control.Tooltip;
+
 public class AlertsController implements Initializable {
 
     @FXML private Label lblBroadcasts;
@@ -55,46 +59,91 @@ public class AlertsController implements Initializable {
         colSentBy.setCellValueFactory(new PropertyValueFactory<>("sentByName"));
         colSentDate.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
 
-        // 2. SAFE Priority Badge Factory
+        // Center align "Type" and "Sent By" (Plain Text Columns)
+        colType.setCellFactory(tc -> new TableCell<>() {
+            @Override protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : item);
+                setAlignment(Pos.CENTER);
+            }
+        });
+
+        colSentBy.setCellFactory(tc -> new TableCell<>() {
+            @Override protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : item);
+                setAlignment(Pos.CENTER);
+            }
+        });
+
+        // 2. Priority Badge Factory (Already centered)
         colPriority.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(com.example.csit228capstone.model.alert.AlertPriority item, boolean empty) {
                 super.updateItem(item, empty);
-
                 if (empty || item == null) {
                     setGraphic(null);
                     setText(null);
                 } else {
-                    try {
-                        // 'item' is the Enum, so we use item.name() to get the text
-                        String priorityName = item.name().toUpperCase();
-                        Label badge = new Label(priorityName);
-                        badge.getStyleClass().add("priority-badge");
+                    String priorityName = item.name().toUpperCase();
+                    Label badge = new Label(priorityName);
+                    badge.getStyleClass().add("priority-badge");
+                    if (priorityName.equals("CRITICAL")) badge.getStyleClass().add("badge-critical");
+                    else if (priorityName.equals("HIGH")) badge.getStyleClass().add("badge-high");
+                    else if (priorityName.equals("MEDIUM")) badge.getStyleClass().add("badge-medium");
+                    else badge.getStyleClass().add("badge-low");
 
-                        // Assign style classes based on the Enum name
-                        if (priorityName.equals("CRITICAL")) {
-                            badge.getStyleClass().add("badge-critical");
-                        } else if (priorityName.equals("HIGH")) {
-                            badge.getStyleClass().add("badge-high");
-                        } else if (priorityName.equals("MEDIUM")) {
-                            badge.getStyleClass().add("badge-medium");
-                        } else {
-                            badge.getStyleClass().add("badge-low");
-                        }
-
-                        setGraphic(badge);
-                        setText(null);
-                        setAlignment(Pos.CENTER);
-                    } catch (Exception e) {
-                        // If something goes wrong, just show the enum name as text
-                        setText(item.toString());
-                        setGraphic(null);
-                    }
+                    setGraphic(badge);
+                    setText(null);
+                    setAlignment(Pos.CENTER);
                 }
             }
         });
 
-        // 3. SAFE Date Factory
+        // 3. Message Truncation & Tooltip (Centered + Double Click to open)
+        colMessage.setCellFactory(column -> new TableCell<>() {
+            private final Tooltip tooltip = new Tooltip();
+            {
+                tooltip.setWrapText(true);
+                tooltip.setPrefWidth(400);
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setTooltip(null);
+                    setOnMouseClicked(null); // Clear the click event for empty rows
+                } else {
+                    setText(item);
+                    setTextOverrun(OverrunStyle.ELLIPSIS);
+                    setAlignment(Pos.CENTER);
+
+                    // Tooltip logic
+                    tooltip.setText(item);
+                    setTooltip(tooltip);
+
+                    // --- NUMBER 2: Double Click Logic ---
+                    setOnMouseClicked(e -> {
+                        if (e.getClickCount() == 2) { // Detects double-click
+                            javafx.scene.control.Alert alertPopup = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+                            alertPopup.setTitle("Full Message");
+                            alertPopup.setHeaderText(null);
+                            alertPopup.setContentText(item);
+
+                            // Optional: This makes the popup wider for long messages
+                            alertPopup.getDialogPane().setPrefWidth(500);
+
+                            alertPopup.showAndWait();
+                        }
+                    });
+                    // ------------------------------------
+                }
+            }
+        });
+
+        // 4. Date Factory (Centered)
         colSentDate.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(LocalDateTime item, boolean empty) {
@@ -103,6 +152,7 @@ public class AlertsController implements Initializable {
                     setText(null);
                 } else {
                     setText(dateFormatter.format(item));
+                    setAlignment(Pos.CENTER);
                 }
             }
         });
@@ -112,16 +162,20 @@ public class AlertsController implements Initializable {
     }
 
     private void formatTableColumns() {
-        // Force the table to have height so it doesn't disappear
-        alertsTable.setMinHeight(400);
         alertsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        // UI Tip: To center the Header Text as well as the cells:
+        alertsTable.getColumns().forEach(column -> {
+            column.setReorderable(false);
+            // This CSS trick centers the header labels
+            column.setStyle("-fx-alignment: CENTER;");
+        });
 
         colType.setPrefWidth(120);
         colPriority.setPrefWidth(100);
         colMessage.setPrefWidth(250);
         colSentBy.setPrefWidth(140);
         colSentDate.setPrefWidth(170);
-
         colAction.setMinWidth(190);
         colAction.setMaxWidth(190);
     }
@@ -149,7 +203,6 @@ public class AlertsController implements Initializable {
         });
     }
 
-    // Logic Methods
     @FXML public void openCreateBroadcast(ActionEvent event) { openDialog(null); }
 
     private void openDialog(Alert alert) {
@@ -164,6 +217,7 @@ public class AlertsController implements Initializable {
             dialog.setTitle(alert == null ? "Create Broadcast" : "Edit Broadcast");
             dialog.initModality(Modality.APPLICATION_MODAL);
             dialog.setScene(new Scene(root));
+            dialog.setResizable(false);
             dialog.showAndWait();
         } catch (IOException e) {
             showError("Error opening dialog", e);
@@ -190,7 +244,6 @@ public class AlertsController implements Initializable {
     private void loadTableData() {
         try {
             List<Alert> alerts = repo.findAll();
-            // DEBUG: Check if data is actually coming from the DB
             System.out.println("Loaded alerts: " + alerts.size());
             alertsTable.setItems(FXCollections.observableArrayList(alerts));
         } catch (SQLException e) {
