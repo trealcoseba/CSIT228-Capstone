@@ -1,39 +1,32 @@
 package com.example.csit228capstone.service.report;
 
 import com.example.csit228capstone.model.report.ReportData;
-
 import java.io.File;
 
 /**
- * Strategy interface for all report export formats.
+ * Generic exporter contract.
  *
- * Each format (PDF, Excel, CSV) implements this interface.
- * To add a new format:
- *   1. Create a new class implementing ReportExporter.
- *   2. Register it in ReportService.
- *   Done — no other files need to change.
+ * <p>{@code T} is the payload type stored inside {@link ReportData}:</p>
+ * <ul>
+ *   <li>{@code List<List<String>>} — tabular reports (Residents, Resources, etc.)</li>
+ *   <li>{@code ReportFormData}     — Natural Disaster Incident Report</li>
+ * </ul>
+ *
+ * <p>{@link com.example.csit228capstone.service.ReportService} stores exporters
+ * as {@code ReportExporter<?>} (wildcard) and routes each call to the correct
+ * concrete exporter without unchecked casts at the call site.</p>
  */
-public interface ReportExporter {
+public interface ReportExporter<T> {
 
     /**
-     * Export {@code data} to {@code destination} file.
+     * Writes the report described by {@code data} to {@code destination}.
      *
-     * @param data        the report content to export
-     * @param destination the target file path chosen by the user
-     * @throws Exception if anything goes wrong during export
+     * @param data        fully-populated report data container
+     * @param destination target file (PDF, DOCX, etc.)
+     * @throws Exception  any I/O or rendering error
      */
-    void export(ReportData data, File destination) throws Exception;
+    void export(ReportData<T> data, File destination) throws Exception;
 
-    /**
-     * The file extension this exporter produces (without the dot).
-     * Used to filter file chooser dialogs.
-     * Example: "pdf", "xlsx", "csv"
-     */
-    String getExtension();
-
-    /**
-     * Human-readable description for file chooser dialogs.
-     * Example: "PDF Files (*.pdf)"
-     */
-    String getDescription();
+    /** Human-readable format label, e.g. {@code "PDF"} or {@code "DOCX"}. */
+    String getFormatName();
 }

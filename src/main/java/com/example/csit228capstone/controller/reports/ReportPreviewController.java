@@ -1,162 +1,585 @@
 package com.example.csit228capstone.controller.reports;
 
-import com.example.csit228capstone.model.report.Report;
-import com.example.csit228capstone.model.report.ReportData;
+import com.example.csit228capstone.model.report.*;
+import com.example.csit228capstone.repository.ReportRepository;
 import com.example.csit228capstone.service.ReportService;
-import com.example.csit228capstone.service.report.ReportExporter;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Controller for ReportPreview.fxml.
- * Shows a TableView preview of the report data and lets the user
- * pick a format and export/download.
+ *
+ * FIX SUMMARY:
+ * - Isolated the "Other" incident type rendering logic out of the checkbox null-check block.
+ * - Damages/injuries tables now correctly read from ReportFormData.
+ * - Generic reports fetch live data from ResidentRepository, ResourceRepository,
+ * IncidentRepository via ReportService.createFetchTask().
+ * - Saved reports reload their stored header fields from the Report model.
  */
 public class ReportPreviewController {
 
-    @FXML private Label  lblTitle;
-    @FXML private Label  lblMeta;
-    @FXML private Label  lblSummary;
-    @FXML private TableView<ObservableList<String>> previewTable;
-    @FXML private ComboBox<String> cbFormat;
-    @FXML private Button btnExport;
-    @FXML private Button btnClose;
-    @FXML private VBox   rootVBox;
+    @FXML private VBox   vboxDocument;
+    @FXML private Button btnPdf, btnWord, btnClose;
+    @FXML private Label  lblStatus;
 
-    private final ReportService service = new ReportService();
-    private Report      currentReport;
-    private ReportData  currentData;
+    private Report         currentReport;
+    private ReportFormData currentFormData;
+    private ReportData<List<List<String>>> currentGenericData;
 
+    private final ReportService reportService = new ReportService();
+    private final ReportRepository repository = new ReportRepository();
+
+    private static final DateTimeFormatter DATE_FMT =
+            DateTimeFormatter.ofPattern("MMMM dd, yyyy");
     private static final DateTimeFormatter DT_FMT =
             DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
 
-    // ── Initialization ────────────────────────────────────────────────────────
+    // ── Load paths ────────────────────────────────────────────────────────────
 
-    @FXML
-    public void initialize() {
-        // Populate format ComboBox from the service registry
-        Map<String, ReportExporter> exporters = service.getExporters();
-        cbFormat.setItems(FXCollections.observableArrayList(exporters.keySet()));
-        cbFormat.getSelectionModel().selectFirst();
+    /** Called from ReportFormController right after the form is submitted. */
+    public void loadReport(Report report, ReportFormData fd) {
+        this.currentReport   = report;
+        this.currentFormData = fd;
+
+        if (isIncident(report)) {
+            renderDocument();
+        } else {
+            fetchGenericDataThenRender(report);
+        }
     }
 
     /**
-     * Called by ReportsController before showing this window.
+     * Called from ReportsController when the user clicks View on a saved report.
+     * Reconstructs header FormData from the stored Report fields.
      */
-    public void loadReport(Report report) {
+    public void loadSavedReport(Report report) {
         this.currentReport = report;
-        this.currentData   = service.buildPreview(report);
-        populateUI();
-    }
+        setStatus("Loading saved incident records...");
+        setBtnsDisabled(true);
 
-    // ── UI population ─────────────────────────────────────────────────────────
+        // Create a database background worker thread
+        Task<ReportFormData> fetchSavedTask = new Task<>() {
+            @Override
+            protected ReportFormData call() throws Exception {
+                ReportFormData fd = new ReportFormData();
+                fd.setReportNo(report.getReportNo());
+                fd.setDate(report.getDateOfReport());
+                fd.setReportedBy(report.getGeneratedBy());
+                fd.setRecordedBy(report.getRecordedBy());
+                fd.setReporterContactInfo(report.getReporterContact());
+                fd.setRecorderContactInfo(report.getRecorderContact());
+                fd.setStartDate(report.getStartDate());
+                fd.setEndDate(report.getEndDate());
 
-    private void populateUI() {
-        // Title & metadata
-        lblTitle.setText(currentData.getTitle());
+                // Bind Core Incident Details fields
+                fd.setDateOfIncident(report.getDateOfIncident());
+                fd.setLocation(report.getLocation());
+                fd.setDescription(report.getDescription());
 
-        String meta = "Generated by: " + nvl(currentData.getGeneratedBy());
-        if (currentReport.getGeneratedDateTime() != null) {
-            meta += "   |   " + currentReport.getGeneratedDateTime().format(DT_FMT);
-        }
-        lblMeta.setText(meta);
+                // Copy Saved Insurance Data into FormData Memory Structure
+                fd.setHasInsurance(report.getHasInsurance());
+                fd.setInsurancePolicy(report.getInsurancePolicy());
+                fd.setInsuranceCoverageAmt(report.getInsuranceCoverageAmt());
+                fd.setIncidentTypeOther(report.getIncidentTypeOther());
 
-        // Summary
-        if (currentData.getSummaryLines() != null && !currentData.getSummaryLines().isEmpty()) {
-            lblSummary.setText(String.join("   |   ", currentData.getSummaryLines()));
-            lblSummary.setVisible(true);
-        } else {
-            lblSummary.setVisible(false);
-        }
+                // Explicitly query the custom relational sub-tables from ReportRepository
+                com.example.csit228capstone.repository.ReportRepository repo =
+                        new com.example.csit228capstone.repository.ReportRepository();
 
-        // Build dynamic TableView columns
-        previewTable.getColumns().clear();
-        previewTable.getItems().clear();
+                fd.setDamages(repo.findDamagesByReportId(report.getId()));
+                fd.setInjuries(repo.findInjuriesByReportId(report.getId()));
+                fd.setIncidentTypes(repo.findIncidentTypesByReportId(report.getId()));
 
-        List<String> headers = currentData.getHeaders();
-        if (headers == null || headers.isEmpty()) return;
-
-        for (int i = 0; i < headers.size(); i++) {
-            final int colIdx = i;
-            TableColumn<ObservableList<String>, String> col = new TableColumn<>(headers.get(i));
-            col.setCellValueFactory(param -> {
-                ObservableList<String> row = param.getValue();
-                return new javafx.beans.property.SimpleStringProperty(
-                        colIdx < row.size() ? nvl(row.get(colIdx)) : "");
-            });
-            col.setPrefWidth(colIdx == 0 ? 50 : 140);
-            previewTable.getColumns().add(col);
-        }
-
-        // Populate rows
-        if (currentData.getRows() != null) {
-            for (List<String> row : currentData.getRows()) {
-                previewTable.getItems().add(FXCollections.observableArrayList(row));
+                return fd;
             }
-        }
+        };
 
-        previewTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        fetchSavedTask.setOnSucceeded(e -> {
+            currentFormData = fetchSavedTask.getValue();
+            setStatus("");
+            setBtnsDisabled(false);
+
+            // Render document only AFTER data is safely loaded into memory
+            if (isIncident(report)) {
+                renderDocument();
+            } else {
+                fetchGenericDataThenRender(report);
+            }
+        });
+
+        fetchSavedTask.setOnFailed(e -> {
+            fetchSavedTask.getException().printStackTrace();
+            setStatus("Failed to load saved report data.");
+            setBtnsDisabled(false);
+            alert("Database Sync Error", fetchSavedTask.getException().getMessage());
+        });
+
+        // Execute background worker task thread pool handler
+        reportService.execute(fetchSavedTask);
     }
 
-    // ── Actions ───────────────────────────────────────────────────────────────
+    private void fetchGenericDataThenRender(Report report) {
+        setStatus("Loading report data…");
+        setBtnsDisabled(true);
 
-    @FXML
-    private void handleExport() {
-        String format = cbFormat.getValue();
-        if (format == null) {
-            showAlert(Alert.AlertType.WARNING, "No Format", "Please select an export format.");
+        Task<ReportData<List<List<String>>>> task = reportService.createFetchTask(report);
+        task.setOnSucceeded(e -> {
+            currentGenericData = task.getValue();
+            setStatus("");
+            setBtnsDisabled(false);
+            renderDocument();
+        });
+        task.setOnFailed(e -> {
+            task.getException().printStackTrace();
+            setStatus("Failed to load: " + task.getException().getMessage());
+            setBtnsDisabled(false);
+        });
+        reportService.execute(task);
+    }
+
+    // ── Render ────────────────────────────────────────────────────────────────
+
+    private void renderDocument() {
+        Platform.runLater(() -> {
+            vboxDocument.getChildren().clear();
+            vboxDocument.setSpacing(8);
+
+            // Government header
+            addCentered("Republic of the Philippines", 9, false, "#888888");
+            addCentered("Barangay Management System — LIGTAS", 9, false, "#888888");
+            addSpacer(4);
+            addCentered(currentReport.getName().toUpperCase(), 18, true, "#1A2E44");
+
+            ReportType rt = ReportType.fromDisplayName(currentReport.getType());
+            addCentered(rt.getDisplayName(), 11, false, "#1D9E75");
+
+            addHRule();
+
+            // COMPACT UNIFIED METADATA GRID CONTAINER CALL
+            addDocumentMetadataSection(currentFormData, currentReport);
+
+            // Append Body tables if incident report type matches
+            if (isIncident(currentReport)) {
+                renderIncidentBodyTables();
+            } else {
+                renderGenericBody();
+            }
+
+            // Signature
+            addSpacer(20);
+            String sigName = (currentFormData != null && currentFormData.getRecordedBy() != null && !currentFormData.getRecordedBy().isBlank())
+                    ? currentFormData.getRecordedBy() : currentReport.getGeneratedBy();
+            addSignature(sigName);
+        });
+    }
+
+    // ── Incident body ─────────────────────────────────────────────────────────
+
+    private void renderIncidentBodyTables() {
+        ReportFormData fd = currentFormData;
+        if (fd == null) return;
+
+        // ── FIXED: ISOLATED INCIDENT TYPES CHIPS ENGINE ──
+        List<String> types = fd.getIncidentTypes();
+        boolean hasStandardTypes = (types != null && !types.isEmpty());
+        boolean hasCustomOther   = (!nvl(fd.getIncidentTypeOther()).isBlank());
+
+        if (hasStandardTypes || hasCustomOther) {
+            addSpacer(6);
+            FlowPane chips = new FlowPane(8, 6);
+
+            // 1. Append standard checkbox tokens if present
+            if (hasStandardTypes) {
+                for (String t : types) {
+                    chips.getChildren().add(chip(t));
+                }
+            }
+
+            // 2. Append custom field token safely independent of standard tags
+            if (hasCustomOther) {
+                chips.getChildren().add(chip("Other: " + fd.getIncidentTypeOther().trim()));
+            }
+
+            vboxDocument.getChildren().add(chips);
+        }
+
+        // ── Damages table ─────────────────────────────────────────────────────
+        addSectionHeader("Property Damages");
+        List<List<String>> damageRows = fd.getDamages() == null ? List.of() :
+                fd.getDamages().stream()
+                        .map(r -> List.of(nvl(r.damage), nvl(r.value), nvl(r.repairPlan), nvl(r.repairCost)))
+                        .toList();
+        addDocTable(List.of("Damage Item", "Estimated Value", "Repair Plan", "Repair Cost"), damageRows);
+
+        // ── Injuries table ────────────────────────────────────────────────────
+        addSectionHeader("Casualties / Injuries");
+        List<List<String>> injuryRows = fd.getInjuries() == null ? List.of() :
+                fd.getInjuries().stream()
+                        .map(r -> List.of(nvl(r.injuredPerson), nvl(r.position), nvl(r.medicalCost), nvl(r.insurance)))
+                        .toList();
+        addDocTable(List.of("Injured Person", "Position", "Medical Cost", "Insurance"), injuryRows);
+    }
+
+    // ── Generic body ──────────────────────────────────────────────────────────
+
+    private void renderGenericBody() {
+        ReportData<List<List<String>>> data = currentGenericData;
+        if (data == null) {
+            addCentered("Report data could not be loaded.", 11, false, "#888");
             return;
         }
-
-        ReportExporter exporter = service.getExporters().get(format);
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("Save Report As");
-        chooser.setInitialFileName(sanitizeFileName(currentData.getTitle()) + "." + exporter.getExtension());
-        chooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter(exporter.getDescription(), "*." + exporter.getExtension()));
-
-        File dest = chooser.showSaveDialog(btnExport.getScene().getWindow());
-        if (dest == null) return;  // user cancelled
-
-        try {
-            service.export(currentReport, format, dest);
-            showAlert(Alert.AlertType.INFORMATION, "Export Successful",
-                    "Report saved to:\n" + dest.getAbsolutePath());
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Export Failed", e.getMessage());
+        if (data.getSummaryLines() != null && !data.getSummaryLines().isEmpty()) {
+            addSectionHeader("Summary");
+            for (String line : data.getSummaryLines()) {
+                Label l = new Label("• " + line);
+                l.setStyle("-fx-font-size:11;-fx-text-fill:#1A2E44;-fx-padding:2 0 2 10;");
+                vboxDocument.getChildren().add(l);
+            }
+        }
+        if (data.getHeaders() != null && !data.getHeaders().isEmpty()) {
+            addSectionHeader("Data");
+            List<List<String>> rows = data.getPayload() != null ? data.getPayload() : List.of();
+            addDocTable(data.getHeaders(), rows);
         }
     }
 
-    @FXML
-    private void handleClose() {
+    // ── Export ────────────────────────────────────────────────────────────────
+
+    @FXML private void handleExportPdf()  { doExport("pdf");  }
+    @FXML private void handleExportWord() { doExport("docx"); }
+
+    private void doExport(String format) {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Save Report");
+        fc.setInitialFileName(sanitize(currentReport.getName()) +
+                ("pdf".equals(format) ? ".pdf" : ".docx"));
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+                "pdf".equals(format) ? "PDF (*.pdf)" : "Word (*.docx)",
+                "pdf".equals(format) ? "*.pdf" : "*.docx"));
+        File dest = fc.showSaveDialog(btnPdf.getScene().getWindow());
+        if (dest == null) return;
+
+        setStatus("Exporting " + format.toUpperCase() + "…");
+        setBtnsDisabled(true);
+
+        Task<File> task = reportService.createExportTask(currentReport, currentFormData, format, dest);
+        task.setOnSucceeded(e -> {
+            setStatus("Saved to: " + dest.getAbsolutePath());
+            setBtnsDisabled(false);
+            alert("Export Complete", "Report saved to:\n" + dest.getAbsolutePath());
+        });
+        task.setOnFailed(e -> {
+            task.getException().printStackTrace();
+            setStatus("Export failed: " + task.getException().getMessage());
+            setBtnsDisabled(false);
+            alert("Export Failed", task.getException().getMessage());
+        });
+        reportService.execute(task);
+    }
+
+    @FXML private void handleClose() {
         ((Stage) btnClose.getScene().getWindow()).close();
+    }
+
+    // ── JavaFX building blocks ────────────────────────────────────────────────
+
+    private void addCentered(String text, double size, boolean bold, String color) {
+        Label l = new Label(text);
+        l.setStyle(String.format("-fx-font-size:%.0f;%s-fx-text-fill:%s;",
+                size, bold ? "-fx-font-weight:bold;" : "", color));
+        l.setMaxWidth(Double.MAX_VALUE);
+        l.setAlignment(Pos.CENTER);
+        l.setWrapText(true);
+        vboxDocument.getChildren().add(l);
+    }
+
+    private void addHRule() {
+        Separator s = new Separator();
+        VBox.setMargin(s, new Insets(4, 0, 6, 0));
+        vboxDocument.getChildren().add(s);
+    }
+
+    private void addSpacer(double h) {
+        Region r = new Region(); r.setPrefHeight(h);
+        vboxDocument.getChildren().add(r);
+    }
+
+    private void addSectionHeader(String title) {
+        addSpacer(6);
+        Label l = new Label(title);
+        l.setMaxWidth(Double.MAX_VALUE);
+        l.setStyle("-fx-font-size:12;-fx-font-weight:bold;-fx-text-fill:#1D9E75;" +
+                "-fx-border-color:#1D9E75;-fx-border-width:0 0 1 0;-fx-padding:0 0 3 0;");
+        vboxDocument.getChildren().add(l);
+        addSpacer(4);
+    }
+
+    private void addDocumentMetadataSection(ReportFormData fd, Report report) {
+        GridPane grid = new GridPane();
+        grid.setMaxWidth(Double.MAX_VALUE);
+        grid.setHgap(8);
+        grid.setVgap(6);
+
+        // DEFINE EXPLICIT TAB STOPS VIA FIX WIDTH CONSTRAINTS
+        ColumnConstraints c0_lbl = new ColumnConstraints(); c0_lbl.setMinWidth(115); c0_lbl.setPrefWidth(115);
+        ColumnConstraints c1_val = new ColumnConstraints(); c1_val.setHgrow(Priority.ALWAYS);
+        ColumnConstraints c2_lbl = new ColumnConstraints(); c2_lbl.setMinWidth(100); c2_lbl.setPrefWidth(100);
+        ColumnConstraints c3_val = new ColumnConstraints(); c3_val.setHgrow(Priority.ALWAYS);
+        ColumnConstraints c4_lbl = new ColumnConstraints(); c4_lbl.setMinWidth(75);  c4_lbl.setPrefWidth(75);
+        ColumnConstraints c5_val = new ColumnConstraints(); c5_val.setHgrow(Priority.ALWAYS);
+
+        grid.getColumnConstraints().addAll(c0_lbl, c1_val, c2_lbl, c3_val, c4_lbl, c5_val);
+
+        int currentRow = 0;
+
+        // Row 1: Date & Report No.
+        if (fd != null) {
+            grid.add(lbl("Date:"), 0, currentRow);
+            grid.add(val(fd.getDate() != null ? fd.getDate().format(DATE_FMT) : "—"), 1, currentRow);
+
+            grid.add(lbl("Report No.:"), 2, currentRow);
+            grid.add(val(nvl(fd.getReportNo())), 3, currentRow, 3, 1);
+            currentRow++;
+
+            // Row 2: Reported By & Recorded By
+            grid.add(lbl("Reported by:"), 0, currentRow);
+            grid.add(val(nvl(fd.getReportedBy())), 1, currentRow, 1, 1);
+
+            grid.add(lbl("Recorded by:"), 2, currentRow);
+            grid.add(val(nvl(fd.getRecordedBy())), 3, currentRow, 3, 1);
+            currentRow++;
+
+            // Row 3: Contacts
+            grid.add(lbl("Reporter Contact:"), 0, currentRow);
+            grid.add(val(nvl(fd.getReporterContactInfo())), 1, currentRow, 1, 1);
+
+            grid.add(lbl("Recorder Contact:"), 2, currentRow);
+            grid.add(val(nvl(fd.getRecorderContactInfo())), 3, currentRow, 3, 1);
+            currentRow++;
+        }
+
+        // Row 4: Timestamps & Period Covered
+        if (report.getGeneratedDateTime() != null) {
+            grid.add(lbl("Generated on:"), 0, currentRow);
+            grid.add(val(report.getGeneratedDateTime().format(DT_FMT)), 1, currentRow, 5, 1);
+            currentRow++;
+        }
+        if (report.getStartDate() != null || report.getEndDate() != null) {
+            grid.add(lbl("Period Covered:"), 0, currentRow);
+            grid.add(val(period()), 1, currentRow, 5, 1);
+            currentRow++;
+        }
+
+        // Row 5: Incident Core Details
+        if (isIncident(report) && fd != null) {
+            Region separatorSpace = new Region(); separatorSpace.setPrefHeight(8);
+            grid.add(separatorSpace, 0, currentRow++, 6, 1);
+
+            Label subHeader = new Label("Incident Details");
+            subHeader.setStyle("-fx-font-size:11; -fx-font-weight:bold; -fx-text-fill:#1D9E75;");
+            grid.add(subHeader, 0, currentRow++, 6, 1);
+
+            // Date of Incident & Location
+            grid.add(lbl("Date of Incident:"), 0, currentRow);
+            grid.add(val(fd.getDateOfIncident() != null ? fd.getDateOfIncident().format(DATE_FMT) : "—"), 1, currentRow, 1, 1);
+
+            grid.add(lbl("Location:"), 2, currentRow);
+            grid.add(val(nvl(fd.getLocation())), 3, currentRow, 3, 1);
+            currentRow++;
+
+            // Description
+            grid.add(lbl("Description:"), 0, currentRow);
+            grid.add(val(nvl(fd.getDescription())), 1, currentRow, 5, 1);
+            currentRow++;
+
+            // THE INSURANCE TRIPLE LINE
+            String ins = fd.getHasInsurance() == null ? "N/A" : fd.getHasInsurance() ? "Yes" : "No";
+
+            grid.add(lbl("Insurance:"), 0, currentRow);
+            grid.add(val(ins), 1, currentRow);
+
+            grid.add(lbl("Policy:"), 2, currentRow);
+            grid.add(val(nvl(fd.getInsurancePolicy())), 3, currentRow);
+
+            grid.add(lbl("Coverage:"), 4, currentRow);
+            grid.add(val(nvl(fd.getInsuranceCoverageAmt())), 5, currentRow);
+            currentRow++;
+        }
+
+        vboxDocument.getChildren().add(grid);
+    }
+
+    private void addDocTable(List<String> headers, List<List<String>> rows) {
+        GridPane grid = new GridPane();
+        grid.setMaxWidth(Double.MAX_VALUE);
+        grid.setHgap(0); grid.setVgap(0);
+
+        for (int c = 0; c < headers.size(); c++) {
+            ColumnConstraints cc = new ColumnConstraints();
+            cc.setHgrow(Priority.ALWAYS);
+            cc.setPercentWidth(100.0 / headers.size());
+            grid.getColumnConstraints().add(cc);
+        }
+
+        // Header row
+        for (int c = 0; c < headers.size(); c++) {
+            Label h = new Label(headers.get(c));
+            h.setMaxWidth(Double.MAX_VALUE);
+            h.setMaxHeight(Double.MAX_VALUE);
+            h.setWrapText(true);
+            h.setAlignment(Pos.TOP_LEFT);
+            h.setStyle("-fx-font-weight:bold;-fx-font-size:10;" +
+                    "-fx-background-color:#1D9E75;-fx-text-fill:white;" +
+                    "-fx-padding:6 8;-fx-border-color:#bbb;-fx-border-width:0.5;");
+            grid.add(h, c, 0);
+            GridPane.setValignment(h, javafx.geometry.VPos.TOP);
+        }
+
+        int visualRowIndex = 1;
+
+        for (int r = 0; r < rows.size(); r++) {
+            List<String> row = rows.get(r);
+
+            boolean isRowBlank = row.stream().allMatch(cellText ->
+                    cellText == null || cellText.trim().isBlank() || "-".equals(cellText.trim())
+            );
+            if (isRowBlank) {
+                continue;
+            }
+
+            // Explicitly configure dynamic row constraints
+            RowConstraints rc = new RowConstraints();
+            rc.setVgrow(Priority.ALWAYS);
+            grid.getRowConstraints().add(rc);
+
+            String bg = visualRowIndex % 2 == 0 ? "white" : "#F4FAF8";
+
+            for (int c = 0; c < headers.size(); c++) {
+                String v = c < row.size() ? nvl(row.get(c)) : "";
+
+                if (c == 0 && headers.get(0).equals("#")) {
+                    v = String.valueOf(visualRowIndex);
+                }
+
+                Label cell = new Label(v);
+                cell.setMaxWidth(Double.MAX_VALUE);
+                cell.setMaxHeight(Double.MAX_VALUE);
+                cell.setWrapText(true);
+                cell.setAlignment(Pos.TOP_LEFT);
+
+                cell.setStyle(String.format(
+                        "-fx-font-size:10;-fx-padding:6 8;-fx-text-fill:#1A2E44;" +
+                                "-fx-background-color:%s;-fx-border-color:#ddd;-fx-border-width:0.5 0.5 0.5 0.5;", bg));
+
+                grid.add(cell, c, visualRowIndex);
+
+                GridPane.setValignment(cell, javafx.geometry.VPos.TOP);
+                GridPane.setVgrow(cell, Priority.ALWAYS);
+            }
+            visualRowIndex++;
+        }
+
+        VBox.setMargin(grid, new Insets(4, 0, 4, 0));
+        vboxDocument.getChildren().add(grid);
+
+        if (visualRowIndex == 1) {
+            Label empty = new Label("No data recorded.");
+            empty.setStyle("-fx-font-size:10;-fx-text-fill:#888;-fx-padding:4 8;");
+            vboxDocument.getChildren().add(empty);
+        }
+    }
+
+    private void addSignature(String name) {
+        HBox outer = new HBox();
+        outer.setAlignment(Pos.CENTER_RIGHT);
+        VBox block = new VBox(4);
+        block.setAlignment(Pos.CENTER);
+        Separator line = new Separator(); line.setPrefWidth(220);
+        Label nameLbl = new Label(nvl(name).isBlank() ? "___________________________" : name);
+        nameLbl.setStyle("-fx-font-size:11;");
+        Label titleLbl = new Label("Authorized Signatory");
+        titleLbl.setStyle("-fx-font-size:10;-fx-text-fill:#888;");
+        block.getChildren().addAll(line, nameLbl, titleLbl);
+        outer.getChildren().add(block);
+        vboxDocument.getChildren().add(outer);
+    }
+
+    private Label chip(String text) {
+        Label l = new Label("☑ " + text);
+        l.setStyle("-fx-background-color:#E6F7F2;-fx-text-fill:#1D9E75;" +
+                "-fx-border-color:#1D9E75;-fx-border-radius:4;" +
+                "-fx-background-radius:4;-fx-padding:2 8;-fx-font-size:10;");
+        return l;
+    }
+
+    private Label lbl(String t) {
+        Label l = new Label(t);
+        l.setStyle("-fx-font-size:10;-fx-font-weight:bold;-fx-text-fill:#444;");
+        l.setMinWidth(Label.USE_PREF_SIZE);
+        return l;
+    }
+
+    private Label val(String t) {
+        Label l = new Label(nvl(t).isBlank() ? "—" : t);
+        l.setStyle("-fx-font-size:10;-fx-text-fill:#111;" +
+                "-fx-border-color:transparent transparent #bbb transparent;" +
+                "-fx-padding:0 4 1 0;");
+        l.setWrapText(true);
+        return l;
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
-    private String sanitizeFileName(String name) {
-        if (name == null) return "report";
-        return name.replaceAll("[^a-zA-Z0-9_\\-]", "_");
+    private boolean isIncident(Report r) {
+        if (r == null || r.getType() == null) return false;
+        ReportType rt = ReportType.fromDisplayName(r.getType());
+        return rt == ReportType.INCIDENT_REPORT;
+    }
+
+    private String period() {
+        String s = currentReport.getStartDate() != null
+                ? currentReport.getStartDate().format(DATE_FMT) : "";
+        String e = currentReport.getEndDate() != null
+                ? currentReport.getEndDate().format(DATE_FMT) : "";
+        return s.isEmpty() ? e : e.isEmpty() ? s : s + " — " + e;
+    }
+
+    private void setStatus(String msg) {
+        Platform.runLater(() -> {
+            if (lblStatus != null) {
+                lblStatus.setText(msg);
+                lblStatus.setVisible(!msg.isBlank());
+                lblStatus.setManaged(!msg.isBlank());
+            }
+        });
+    }
+
+    private void setBtnsDisabled(boolean d) {
+        Platform.runLater(() -> { btnPdf.setDisable(d); btnWord.setDisable(d); });
+    }
+
+    private String sanitize(String n) {
+        return n == null ? "report" : n.replaceAll("[^a-zA-Z0-9_\\-]", "_");
     }
 
     private String nvl(String s) { return s != null ? s : ""; }
 
-    private void showAlert(Alert.AlertType type, String title, String msg) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(msg);
-        alert.showAndWait();
+    private void alert(String title, String msg) {
+        Platform.runLater(() -> {
+            Alert a = new Alert(Alert.AlertType.INFORMATION);
+            a.setTitle(title); a.setHeaderText(null); a.setContentText(msg);
+            a.showAndWait();
+        });
     }
 }

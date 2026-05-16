@@ -1,20 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="800.0" prefWidth="1000.0" styleClass="dashboard-scroll" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.reports.ReportsController">
+<ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="800.0" prefWidth="1000.0" styleClass="dashboard-scroll" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.reports.ReportsController">
 
     <content>
         <VBox fillWidth="true" spacing="16">
@@ -38,8 +29,6 @@
             <HBox alignment="CENTER_LEFT" spacing="12.0">
                 <ComboBox fx:id="filterAscOrDesc" prefWidth="200" promptText="Filter by..." />
                 <Region HBox.hgrow="ALWAYS" />
-                <!-- Export to CSV button: placed LEFT of Download Reports -->
-                <Button fx:id="btnExportCsv" disable="true" onAction="#exportToCsv" styleClass="quick-action-btn" text="Export to CSV" />
                 <Button fx:id="btnDownload" disable="true" onAction="#downloadReports" text="Download Reports">
                <styleClass>
                   <String fx:value="quick-action-btn" />

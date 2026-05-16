@@ -4,57 +4,85 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * A format-agnostic data container that holds all content needed
- * to render a report in any export format (PDF, Excel, CSV).
+ * Generic, format-agnostic data container for any report type.
  *
- * The exporters (PdfReportExporter, ExcelReportExporter, CsvReportExporter)
- * consume this object — they never touch repositories directly.
+ * <T> is the typed payload:
+ *   - {@code List<List<String>>} for tabular reports (Residents, Resources, etc.)
+ *   - {@code ReportFormData}     for Natural Disaster Incident Report
+ *
+ * All exporters receive a {@code ReportData<T>} and extract the payload
+ * via {@link #getPayload()} according to their concrete T.
+ *
+ * Usage examples:
+ * <pre>
+ *   // Tabular report
+ *   ReportData&lt;List&lt;List&lt;String&gt;&gt;&gt; tabular = new ReportData&lt;&gt;();
+ *   tabular.setPayload(rows);
+ *
+ *   // Incident report
+ *   ReportData&lt;ReportFormData&gt; incident = new ReportData&lt;&gt;();
+ *   incident.setPayload(formData);
+ * </pre>
  */
-public class ReportData {
+public class ReportData<T> {
 
-    private String title;
-    private String generatedBy;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private String     title;
+    private String     generatedBy;
+    private LocalDate  startDate;
+    private LocalDate  endDate;
     private ReportType reportType;
 
-    /** Column headers for the data table. */
+    /** Column headers — used for tabular-type reports. */
     private List<String> headers;
 
-    /**
-     * Each inner list is one row. Values are plain strings so
-     * all exporters can handle them uniformly.
-     */
-    private List<List<String>> rows;
-
-    /** Optional summary stats shown at the top of the report. */
+    /** One-line summary stats shown above the data table. */
     private List<String> summaryLines;
+
+    /**
+     * The strongly-typed payload.
+     * For tabular reports : {@code List<List<String>>} (rows × columns of strings)
+     * For incident reports: {@code ReportFormData}
+     */
+    private T payload;
 
     public ReportData() {}
 
     // ── Getters & setters ─────────────────────────────────────────────────────
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public String getTitle()                         { return title; }
+    public void   setTitle(String v)                 { this.title = v; }
 
-    public String getGeneratedBy() { return generatedBy; }
-    public void setGeneratedBy(String generatedBy) { this.generatedBy = generatedBy; }
+    public String getGeneratedBy()                   { return generatedBy; }
+    public void   setGeneratedBy(String v)           { this.generatedBy = v; }
 
-    public LocalDate getStartDate() { return startDate; }
-    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
+    public LocalDate getStartDate()                  { return startDate; }
+    public void      setStartDate(LocalDate v)       { this.startDate = v; }
 
-    public LocalDate getEndDate() { return endDate; }
-    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
+    public LocalDate getEndDate()                    { return endDate; }
+    public void      setEndDate(LocalDate v)         { this.endDate = v; }
 
-    public ReportType getReportType() { return reportType; }
-    public void setReportType(ReportType reportType) { this.reportType = reportType; }
+    public ReportType getReportType()                { return reportType; }
+    public void       setReportType(ReportType v)    { this.reportType = v; }
 
-    public List<String> getHeaders() { return headers; }
-    public void setHeaders(List<String> headers) { this.headers = headers; }
+    public List<String> getHeaders()                 { return headers; }
+    public void         setHeaders(List<String> v)   { this.headers = v; }
 
-    public List<List<String>> getRows() { return rows; }
-    public void setRows(List<List<String>> rows) { this.rows = rows; }
+    public List<String> getSummaryLines()                { return summaryLines; }
+    public void         setSummaryLines(List<String> v)  { this.summaryLines = v; }
 
-    public List<String> getSummaryLines() { return summaryLines; }
-    public void setSummaryLines(List<String> summaryLines) { this.summaryLines = summaryLines; }
+    public T    getPayload()           { return payload; }
+    public void setPayload(T payload)  { this.payload = payload; }
+
+    // ── Convenience — only valid when T = List<List<String>> ─────────────────
+
+    /**
+     * Returns the payload cast to {@code List<List<String>>}.
+     * Only call this when you know the payload is tabular.
+     *
+     * @throws ClassCastException if the payload is not a List
+     */
+    @SuppressWarnings("unchecked")
+    public List<List<String>> getRows() {
+        return (List<List<String>>) payload;
+    }
 }
