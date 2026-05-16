@@ -13,7 +13,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -26,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 
 public class ReportFormController {
 
@@ -112,6 +114,7 @@ public class ReportFormController {
         rbInsYes.setToggleGroup(insGroup);
         rbInsNo.setToggleGroup(insGroup);
 
+        // Setup custom tables that preserve data entry and consume keys cleanly
         setupDamageTable();
         setupInjuryTable();
 
@@ -152,27 +155,23 @@ public class ReportFormController {
         }
     }
 
-    // ── Table setup ───────────────────────────────────────────────────────────
+    // ── FIXED: Seamless, focus-stable editable tables ───────────────────────────
 
     private void setupDamageTable() {
         tblDamages.setEditable(true);
         tblDamages.setItems(damageRows);
 
         colDamage.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().damage));
-        colDamage.setCellFactory(TextFieldTableCell.forTableColumn());
-        colDamage.setOnEditCommit(e -> e.getRowValue().damage = e.getNewValue());
+        colDamage.setCellFactory(col -> new EditableBlockCell<>((row, val) -> row.damage = val));
 
         colValue.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().value));
-        colValue.setCellFactory(TextFieldTableCell.forTableColumn());
-        colValue.setOnEditCommit(e -> e.getRowValue().value = e.getNewValue());
+        colValue.setCellFactory(col -> new EditableBlockCell<>((row, val) -> row.value = val));
 
         colRepairPlan.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().repairPlan));
-        colRepairPlan.setCellFactory(TextFieldTableCell.forTableColumn());
-        colRepairPlan.setOnEditCommit(e -> e.getRowValue().repairPlan = e.getNewValue());
+        colRepairPlan.setCellFactory(col -> new EditableBlockCell<>((row, val) -> row.repairPlan = val));
 
         colRepairCost.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().repairCost));
-        colRepairCost.setCellFactory(TextFieldTableCell.forTableColumn());
-        colRepairCost.setOnEditCommit(e -> e.getRowValue().repairCost = e.getNewValue());
+        colRepairCost.setCellFactory(col -> new EditableBlockCell<>((row, val) -> row.repairCost = val));
 
         for (int i = 0; i < 6; i++) damageRows.add(new DamageRow());
     }
@@ -182,22 +181,69 @@ public class ReportFormController {
         tblInjuries.setItems(injuryRows);
 
         colInjuredPerson.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().injuredPerson));
-        colInjuredPerson.setCellFactory(TextFieldTableCell.forTableColumn());
-        colInjuredPerson.setOnEditCommit(e -> e.getRowValue().injuredPerson = e.getNewValue());
+        colInjuredPerson.setCellFactory(col -> new EditableBlockCell<>((row, val) -> row.injuredPerson = val));
 
         colPosition.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().position));
-        colPosition.setCellFactory(TextFieldTableCell.forTableColumn());
-        colPosition.setOnEditCommit(e -> e.getRowValue().position = e.getNewValue());
+        colPosition.setCellFactory(col -> new EditableBlockCell<>((row, val) -> row.position = val));
 
         colMedCost.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().medicalCost));
-        colMedCost.setCellFactory(TextFieldTableCell.forTableColumn());
-        colMedCost.setOnEditCommit(e -> e.getRowValue().medicalCost = e.getNewValue());
+        colMedCost.setCellFactory(col -> new EditableBlockCell<>((row, val) -> row.medicalCost = val));
 
         colInjInsurance.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().insurance));
-        colInjInsurance.setCellFactory(TextFieldTableCell.forTableColumn());
-        colInjInsurance.setOnEditCommit(e -> e.getRowValue().insurance = e.getNewValue());
+        colInjInsurance.setCellFactory(col -> new EditableBlockCell<>((row, val) -> row.insurance = val));
 
         for (int i = 0; i < 5; i++) injuryRows.add(new InjuryRow());
+    }
+
+    /**
+     * Helper Cell class that creates a responsive TextField inside cells.
+     * It saves typing automatically on loss of focus or when hitting Enter,
+     * while safely trapping the Enter key event to prevent parent UI jumps.
+     */
+    private static class EditableBlockCell<S> extends TableCell<S, String> {
+        private final TextField textField = new TextField();
+        private final BiConsumer<S, String> commitHandler;
+
+        public EditableBlockCell(BiConsumer<S, String> commitHandler) {
+            this.commitHandler = commitHandler;
+
+            // Handle typing submission when user hits enter inside a table cell field
+            textField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+                if (event.getCode() == KeyCode.ENTER) {
+                    commitChange();
+                    event.consume(); // Prevents layout scroll jumping to top
+                }
+            });
+
+            // Automatically preserve and update properties if user clicks out of cell bounds
+            textField.focusedProperty().addListener((obs, oldVal, newVal) -> {
+                if (!newVal) {
+                    commitChange();
+                }
+            });
+
+            textField.setStyle("-fx-background-color: transparent; -fx-padding: 2;");
+        }
+
+        private void commitChange() {
+            if (getTableView() != null && getIndex() < getTableView().getItems().size()) {
+                S rowItem = getTableView().getItems().get(getIndex());
+                if (rowItem != null) {
+                    commitHandler.accept(rowItem, textField.getText());
+                }
+            }
+        }
+
+        @Override
+        protected void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty) {
+                setGraphic(null);
+            } else {
+                textField.setText(item != null ? item : "");
+                setGraphic(textField);
+            }
+        }
     }
 
     @FXML private void addDamageRow() { damageRows.add(new DamageRow()); }
@@ -233,14 +279,11 @@ public class ReportFormController {
         if (fd.getLocation()  != null)      report.setLocation(fd.getLocation());
         if (fd.getDescription() != null)    report.setDescription(fd.getDescription());
 
-        // ── FIXED: BIND ALL INCIDENT DATA (INCLUDING "OTHER") TO DOMAIN ENTITY BEFORE PERSISTENCE ──
         ReportType rt = ReportType.fromDisplayName(report.getType());
         if (rt == ReportType.INCIDENT_REPORT) {
             report.setHasInsurance(fd.getHasInsurance());
             report.setInsurancePolicy(fd.getInsurancePolicy());
             report.setInsuranceCoverageAmt(fd.getInsuranceCoverageAmt());
-
-            // ADD THIS LINE: Pass the "Other" text value to your report model instance!
             report.setIncidentTypeOther(fd.getIncidentTypeOther());
         }
 

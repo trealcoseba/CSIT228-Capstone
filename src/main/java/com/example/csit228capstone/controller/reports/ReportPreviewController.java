@@ -3,6 +3,8 @@ package com.example.csit228capstone.controller.reports;
 import com.example.csit228capstone.model.report.*;
 import com.example.csit228capstone.repository.ReportRepository;
 import com.example.csit228capstone.service.ReportService;
+import com.example.csit228capstone.service.report.DocxReportExporter; // Added explicit import
+
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -21,11 +23,9 @@ import java.util.List;
  * Controller for ReportPreview.fxml.
  *
  * FIX SUMMARY:
- * - Isolated the "Other" incident type rendering logic out of the checkbox null-check block.
- * - Damages/injuries tables now correctly read from ReportFormData.
- * - Generic reports fetch live data from ResidentRepository, ResourceRepository,
- * IncidentRepository via ReportService.createFetchTask().
- * - Saved reports reload their stored header fields from the Report model.
+ * - Bypassed reportService.createExportTask to directly use currentFormData or currentGenericData
+ * preventing loss of fields (Reporter/Recorder data, sub-tables) during generation.
+ * - Restored structural integrity of incident form outputs.
  */
 public class ReportPreviewController {
 
@@ -94,8 +94,7 @@ public class ReportPreviewController {
                 fd.setIncidentTypeOther(report.getIncidentTypeOther());
 
                 // Explicitly query the custom relational sub-tables from ReportRepository
-                com.example.csit228capstone.repository.ReportRepository repo =
-                        new com.example.csit228capstone.repository.ReportRepository();
+                ReportRepository repo = new ReportRepository();
 
                 fd.setDamages(repo.findDamagesByReportId(report.getId()));
                 fd.setInjuries(repo.findInjuriesByReportId(report.getId()));
@@ -190,7 +189,6 @@ public class ReportPreviewController {
         ReportFormData fd = currentFormData;
         if (fd == null) return;
 
-        // ── FIXED: ISOLATED INCIDENT TYPES CHIPS ENGINE ──
         List<String> types = fd.getIncidentTypes();
         boolean hasStandardTypes = (types != null && !types.isEmpty());
         boolean hasCustomOther   = (!nvl(fd.getIncidentTypeOther()).isBlank());
@@ -199,14 +197,12 @@ public class ReportPreviewController {
             addSpacer(6);
             FlowPane chips = new FlowPane(8, 6);
 
-            // 1. Append standard checkbox tokens if present
             if (hasStandardTypes) {
                 for (String t : types) {
                     chips.getChildren().add(chip(t));
                 }
             }
 
-            // 2. Append custom field token safely independent of standard tags
             if (hasCustomOther) {
                 chips.getChildren().add(chip("Other: " + fd.getIncidentTypeOther().trim()));
             }
@@ -214,7 +210,6 @@ public class ReportPreviewController {
             vboxDocument.getChildren().add(chips);
         }
 
-        // ── Damages table ─────────────────────────────────────────────────────
         addSectionHeader("Property Damages");
         List<List<String>> damageRows = fd.getDamages() == null ? List.of() :
                 fd.getDamages().stream()
@@ -222,7 +217,6 @@ public class ReportPreviewController {
                         .toList();
         addDocTable(List.of("Damage Item", "Estimated Value", "Repair Plan", "Repair Cost"), damageRows);
 
-        // ── Injuries table ────────────────────────────────────────────────────
         addSectionHeader("Casualties / Injuries");
         List<List<String>> injuryRows = fd.getInjuries() == null ? List.of() :
                 fd.getInjuries().stream()
@@ -254,7 +248,7 @@ public class ReportPreviewController {
         }
     }
 
-    // ── Export ────────────────────────────────────────────────────────────────
+    // ── Export (FIXED: Bypasses Service to Preserve UI Input State Structures) ─
 
     @FXML private void handleExportPdf()  { doExport("pdf");  }
     @FXML private void handleExportWord() { doExport("docx"); }
@@ -273,19 +267,69 @@ public class ReportPreviewController {
         setStatus("Exporting " + format.toUpperCase() + "…");
         setBtnsDisabled(true);
 
-        Task<File> task = reportService.createExportTask(currentReport, currentFormData, format, dest);
-        task.setOnSucceeded(e -> {
+        // Run the generation logic on a background worker to keep the UI perfectly responsive
+        Task<Void> exportTask = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                if (isIncident(currentReport)) {
+                    // Create wrapper with exactly what is visual on screen
+                    ReportData<ReportFormData> incidentWrapper = new ReportData<>();
+                    incidentWrapper.setTitle(currentReport.getName());
+                    incidentWrapper.setReportType(ReportType.fromDisplayName(currentReport.getType()));
+                    incidentWrapper.setStartDate(currentReport.getStartDate());
+                    incidentWrapper.setEndDate(currentReport.getEndDate());
+                    incidentWrapper.setPayload(currentFormData); // Directly pass live data
+
+                    if ("docx".equalsIgnoreCase(format)) {
+                        DocxReportExporter exporter = new DocxReportExporter();
+                        exporter.exportIncident(incidentWrapper, dest);
+                    } else {
+                        // Assuming you have a similar setup for your Pdf exporter
+                        com.example.csit228capstone.service.report.PDFReportExporter exporter =
+                                new com.example.csit228capstone.service.report.PDFReportExporter();
+                        exporter.exportIncident(incidentWrapper, dest);
+                    }
+                } else {
+                    // Build layout payload safely for standard generic templates
+                    ReportData<List<List<String>>> genericWrapper = new ReportData<>();
+                    genericWrapper.setTitle(currentReport.getName());
+                    genericWrapper.setReportType(ReportType.fromDisplayName(currentReport.getType()));
+                    genericWrapper.setStartDate(currentReport.getStartDate());
+                    genericWrapper.setEndDate(currentReport.getEndDate());
+                    genericWrapper.setHeaders(currentGenericData != null ? currentGenericData.getHeaders() : List.of());
+                    genericWrapper.setPayload(currentGenericData != null ? currentGenericData.getPayload() : List.of());
+                    genericWrapper.setSummaryLines(currentGenericData != null ? currentGenericData.getSummaryLines() : List.of());
+                    genericWrapper.setGeneratedBy(currentReport.getGeneratedBy());
+
+                    genericWrapper.setFormData(currentFormData);
+
+                    if ("docx".equalsIgnoreCase(format)) {
+                        DocxReportExporter exporter = new DocxReportExporter();
+                        exporter.export(genericWrapper, dest);
+                    } else {
+                        com.example.csit228capstone.service.report.PDFReportExporter exporter =
+                                new com.example.csit228capstone.service.report.PDFReportExporter();
+                        exporter.export(genericWrapper, dest);
+                    }
+                }
+                return null;
+            }
+        };
+
+        exportTask.setOnSucceeded(e -> {
             setStatus("Saved to: " + dest.getAbsolutePath());
             setBtnsDisabled(false);
             alert("Export Complete", "Report saved to:\n" + dest.getAbsolutePath());
         });
-        task.setOnFailed(e -> {
-            task.getException().printStackTrace();
-            setStatus("Export failed: " + task.getException().getMessage());
+
+        exportTask.setOnFailed(e -> {
+            exportTask.getException().printStackTrace();
+            setStatus("Export failed: " + exportTask.getException().getMessage());
             setBtnsDisabled(false);
-            alert("Export Failed", task.getException().getMessage());
+            alert("Export Failed", exportTask.getException().getMessage());
         });
-        reportService.execute(task);
+
+        reportService.execute(exportTask);
     }
 
     @FXML private void handleClose() {
@@ -328,92 +372,109 @@ public class ReportPreviewController {
     private void addDocumentMetadataSection(ReportFormData fd, Report report) {
         GridPane grid = new GridPane();
         grid.setMaxWidth(Double.MAX_VALUE);
-        grid.setHgap(8);
-        grid.setVgap(6);
+        grid.setHgap(12); // Elegant horizontal spacing between columns
+        grid.setVgap(8);  // Balanced vertical padding matching layout parameters
+        grid.setPadding(new Insets(10, 0, 10, 0));
 
-        // DEFINE EXPLICIT TAB STOPS VIA FIX WIDTH CONSTRAINTS
-        ColumnConstraints c0_lbl = new ColumnConstraints(); c0_lbl.setMinWidth(115); c0_lbl.setPrefWidth(115);
-        ColumnConstraints c1_val = new ColumnConstraints(); c1_val.setHgrow(Priority.ALWAYS);
-        ColumnConstraints c2_lbl = new ColumnConstraints(); c2_lbl.setMinWidth(100); c2_lbl.setPrefWidth(100);
-        ColumnConstraints c3_val = new ColumnConstraints(); c3_val.setHgrow(Priority.ALWAYS);
-        ColumnConstraints c4_lbl = new ColumnConstraints(); c4_lbl.setMinWidth(75);  c4_lbl.setPrefWidth(75);
-        ColumnConstraints c5_val = new ColumnConstraints(); c5_val.setHgrow(Priority.ALWAYS);
+        // ── STRICT 4-COLUMN MATRIX GRID STRUCTURE (Matches Export Layout Split) ──
+        // Col 0: Label (18%), Col 1: Value (32%), Col 2: Label (18%), Col 3: Value (32%)
+        ColumnConstraints c0_lbl = new ColumnConstraints(); c0_lbl.setPercentWidth(18);
+        ColumnConstraints c1_val = new ColumnConstraints(); c1_val.setPercentWidth(32); c1_val.setHgrow(Priority.ALWAYS);
+        ColumnConstraints c2_lbl = new ColumnConstraints(); c2_lbl.setPercentWidth(18);
+        ColumnConstraints c3_val = new ColumnConstraints(); c3_val.setPercentWidth(32); c3_val.setHgrow(Priority.ALWAYS);
 
-        grid.getColumnConstraints().addAll(c0_lbl, c1_val, c2_lbl, c3_val, c4_lbl, c5_val);
+        grid.getColumnConstraints().addAll(c0_lbl, c1_val, c2_lbl, c3_val);
 
         int currentRow = 0;
 
-        // Row 1: Date & Report No.
-        if (fd != null) {
-            grid.add(lbl("Date:"), 0, currentRow);
-            grid.add(val(fd.getDate() != null ? fd.getDate().format(DATE_FMT) : "—"), 1, currentRow);
+        // Resolve Core String Displays
+        String formDate = (fd != null && fd.getDate() != null) ? fd.getDate().format(DATE_FMT)
+                : (report.getGeneratedDateTime() != null ? report.getGeneratedDateTime().toLocalDate().format(DATE_FMT) : "—");
+        String genOn = report.getGeneratedDateTime() != null ? report.getGeneratedDateTime().format(DT_FMT) : formDate;
+        String coveragePeriod = (report.getStartDate() != null || report.getEndDate() != null) ? period() : formDate;
 
-            grid.add(lbl("Report No.:"), 2, currentRow);
-            grid.add(val(nvl(fd.getReportNo())), 3, currentRow, 3, 1);
-            currentRow++;
+        String reportedBy = (fd != null && !nvl(fd.getReportedBy()).isBlank()) ? fd.getReportedBy()
+                : (!nvl(report.getGeneratedBy()).isBlank() ? report.getGeneratedBy() : "—");
+        String reportNo   = (fd != null && !nvl(fd.getReportNo()).isBlank()) ? fd.getReportNo() : "—";
+        String recordedBy = (fd != null && !nvl(fd.getRecordedBy()).isBlank()) ? fd.getRecordedBy() : "—";
+        String repContact = (fd != null && !nvl(fd.getReporterContactInfo()).isBlank()) ? fd.getReporterContactInfo() : "—";
+        String recContact = (fd != null && !nvl(fd.getRecorderContactInfo()).isBlank()) ? fd.getRecorderContactInfo() : "—";
 
-            // Row 2: Reported By & Recorded By
-            grid.add(lbl("Reported by:"), 0, currentRow);
-            grid.add(val(nvl(fd.getReportedBy())), 1, currentRow, 1, 1);
+        String computedType = report.getType() != null ? report.getType() : "—";
 
-            grid.add(lbl("Recorded by:"), 2, currentRow);
-            grid.add(val(nvl(fd.getRecordedBy())), 3, currentRow, 3, 1);
-            currentRow++;
+        // ── POPULATE CORE SYSTEM META ROWS ──
+        grid.add(lbl("Date:"), 0, currentRow);
+        grid.add(val(formDate), 1, currentRow);
+        grid.add(lbl("Report No.:"), 2, currentRow);
+        grid.add(val(reportNo), 3, currentRow);
+        currentRow++;
 
-            // Row 3: Contacts
-            grid.add(lbl("Reporter Contact:"), 0, currentRow);
-            grid.add(val(nvl(fd.getReporterContactInfo())), 1, currentRow, 1, 1);
+        grid.add(lbl("Reported by:"), 0, currentRow);
+        grid.add(val(reportedBy), 1, currentRow);
+        grid.add(lbl("Recorded by:"), 2, currentRow);
+        grid.add(val(recordedBy), 3, currentRow);
+        currentRow++;
 
-            grid.add(lbl("Recorder Contact:"), 2, currentRow);
-            grid.add(val(nvl(fd.getRecorderContactInfo())), 3, currentRow, 3, 1);
-            currentRow++;
-        }
+        grid.add(lbl("Reporter Contact:"), 0, currentRow);
+        grid.add(val(repContact), 1, currentRow);
+        grid.add(lbl("Recorder Contact:"), 2, currentRow);
+        grid.add(val(recContact), 3, currentRow);
+        currentRow++;
 
-        // Row 4: Timestamps & Period Covered
-        if (report.getGeneratedDateTime() != null) {
-            grid.add(lbl("Generated on:"), 0, currentRow);
-            grid.add(val(report.getGeneratedDateTime().format(DT_FMT)), 1, currentRow, 5, 1);
-            currentRow++;
-        }
-        if (report.getStartDate() != null || report.getEndDate() != null) {
-            grid.add(lbl("Period Covered:"), 0, currentRow);
-            grid.add(val(period()), 1, currentRow, 5, 1);
-            currentRow++;
-        }
+        grid.add(lbl("Classification Type:"), 0, currentRow);
+        grid.add(val(computedType), 1, currentRow);
+        grid.add(lbl("Generated on:"), 2, currentRow);
+        grid.add(val(genOn), 3, currentRow);
+        currentRow++;
 
-        // Row 5: Incident Core Details
+        grid.add(lbl("Period Covered:"), 0, currentRow);
+        grid.add(val(coveragePeriod), 1, currentRow);
+        grid.add(lbl(""), 2, currentRow); // Clean empty placeholder cells to maintain strict symmetry
+        grid.add(val(""), 3, currentRow);
+        currentRow++;
+
+        // ── POPULATE EXTENDED INCIDENT DETAILS IF APPLICABLE ──
         if (isIncident(report) && fd != null) {
-            Region separatorSpace = new Region(); separatorSpace.setPrefHeight(8);
-            grid.add(separatorSpace, 0, currentRow++, 6, 1);
+            // Section Divider
+            Region separatorSpace = new Region();
+            separatorSpace.setPrefHeight(12);
+            grid.add(separatorSpace, 0, currentRow++, 4, 1);
 
             Label subHeader = new Label("Incident Details");
-            subHeader.setStyle("-fx-font-size:11; -fx-font-weight:bold; -fx-text-fill:#1D9E75;");
-            grid.add(subHeader, 0, currentRow++, 6, 1);
+            subHeader.setStyle("-fx-font-size:11; -fx-font-weight:bold; -fx-text-fill:#1D9E75; -fx-padding: 0 0 2 0;");
+            grid.add(subHeader, 0, currentRow++, 4, 1);
 
-            // Date of Incident & Location
             grid.add(lbl("Date of Incident:"), 0, currentRow);
-            grid.add(val(fd.getDateOfIncident() != null ? fd.getDateOfIncident().format(DATE_FMT) : "—"), 1, currentRow, 1, 1);
-
+            grid.add(val(fd.getDateOfIncident() != null ? fd.getDateOfIncident().format(DATE_FMT) : "—"), 1, currentRow);
             grid.add(lbl("Location:"), 2, currentRow);
-            grid.add(val(nvl(fd.getLocation())), 3, currentRow, 3, 1);
+            grid.add(val(nvl(fd.getLocation())), 3, currentRow);
             currentRow++;
 
-            // Description
+            // Description spanned completely across the full bottom width
             grid.add(lbl("Description:"), 0, currentRow);
-            grid.add(val(nvl(fd.getDescription())), 1, currentRow, 5, 1);
+            grid.add(val(nvl(fd.getDescription())), 1, currentRow, 3, 1);
             currentRow++;
 
-            // THE INSURANCE TRIPLE LINE
-            String ins = fd.getHasInsurance() == null ? "N/A" : fd.getHasInsurance() ? "Yes" : "No";
+            // Context section divider for insurance data mapping
+            Region insSeparator = new Region();
+            insSeparator.setPrefHeight(6);
+            grid.add(insSeparator, 0, currentRow++, 4, 1);
 
-            grid.add(lbl("Insurance:"), 0, currentRow);
-            grid.add(val(ins), 1, currentRow);
+            Label insHeader = new Label("Insurance Context");
+            insHeader.setStyle("-fx-font-size:11; -fx-font-weight:bold; -fx-text-fill:#1D9E75;");
+            grid.add(insHeader, 0, currentRow++, 4, 1);
 
-            grid.add(lbl("Policy:"), 2, currentRow);
+            String insState = fd.getHasInsurance() == null ? "N/A" : fd.getHasInsurance() ? "Yes" : "No";
+            grid.add(lbl("Insurance State:"), 0, currentRow);
+            grid.add(val(insState), 1, currentRow);
+            grid.add(lbl("Policy Number:"), 2, currentRow);
             grid.add(val(nvl(fd.getInsurancePolicy())), 3, currentRow);
+            currentRow++;
 
-            grid.add(lbl("Coverage:"), 4, currentRow);
-            grid.add(val(nvl(fd.getInsuranceCoverageAmt())), 5, currentRow);
+            grid.add(lbl("Coverage Value:"), 0, currentRow);
+            grid.add(val(nvl(fd.getInsuranceCoverageAmt())), 1, currentRow);
+            grid.add(lbl(""), 2, currentRow);
+            grid.add(val(""), 3, currentRow);
             currentRow++;
         }
 
@@ -432,7 +493,6 @@ public class ReportPreviewController {
             grid.getColumnConstraints().add(cc);
         }
 
-        // Header row
         for (int c = 0; c < headers.size(); c++) {
             Label h = new Label(headers.get(c));
             h.setMaxWidth(Double.MAX_VALUE);
@@ -458,7 +518,6 @@ public class ReportPreviewController {
                 continue;
             }
 
-            // Explicitly configure dynamic row constraints
             RowConstraints rc = new RowConstraints();
             rc.setVgrow(Priority.ALWAYS);
             grid.getRowConstraints().add(rc);
