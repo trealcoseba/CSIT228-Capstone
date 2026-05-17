@@ -30,6 +30,9 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.Tooltip;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 
 public class AlertsController implements Initializable {
 
@@ -43,13 +46,33 @@ public class AlertsController implements Initializable {
     @FXML private TableColumn<Alert, LocalDateTime> colSentDate;
     @FXML private TableColumn<Alert, Void> colAction;
 
+    @FXML private TextField txtSearch;
+    @FXML private ComboBox<String> cmbFilterType;
+    @FXML private ComboBox<String> cmbFilterPriority;
+
+    // Holds the raw data from DB
+    private final ObservableList<Alert> masterData = FXCollections.observableArrayList();
+
     private final AlertsRepository repo = new AlertsRepository();
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
+
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         setupTable();
+        setupFilters(); // New method
         refresh();
+    }
+
+    private void setupFilters() {
+        // 1. Populate Filter Dropdowns
+        cmbFilterType.getItems().addAll("All Types", "Weather Advisory", "Flood Warning", "Evacuation Order", "Security Alert");
+        cmbFilterPriority.getItems().addAll("All Priorities", "CRITICAL", "HIGH", "MEDIUM", "LOW");
+
+        // 2. Add Listeners to trigger filtering when user types or selects
+        txtSearch.textProperty().addListener((obs, old, val) -> applyFilters());
+        cmbFilterType.valueProperty().addListener((obs, old, val) -> applyFilters());
+        cmbFilterPriority.valueProperty().addListener((obs, old, val) -> applyFilters());
     }
 
     private void setupTable() {
@@ -271,8 +294,8 @@ public class AlertsController implements Initializable {
     private void loadTableData() {
         try {
             List<Alert> alerts = repo.findAll();
-            System.out.println("Loaded alerts: " + alerts.size());
-            alertsTable.setItems(FXCollections.observableArrayList(alerts));
+            masterData.setAll(alerts); // Update the master list
+            applyFilters();            // Apply current filters to the new data
         } catch (SQLException e) {
             showError("Load failed", e);
         }
@@ -290,5 +313,39 @@ public class AlertsController implements Initializable {
         javafx.scene.control.Alert err = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
         err.setContentText(message + ": " + e.getMessage());
         err.showAndWait();
+    }
+
+    private void applyFilters() {
+        String searchText = txtSearch.getText() == null ? "" : txtSearch.getText().toLowerCase();
+        String typeFilter = cmbFilterType.getValue();
+        String priorityFilter = cmbFilterPriority.getValue();
+
+        // Make sure <Alert> is included here
+        FilteredList<Alert> filteredData = new FilteredList<>(masterData, alert -> {
+
+            // 1. Search Filter
+            boolean matchesSearch = searchText.isEmpty() ||
+                    alert.getBody().toLowerCase().contains(searchText) ||
+                    (alert.getSentByName() != null && alert.getSentByName().toLowerCase().contains(searchText));
+
+            // 2. Type Filter
+            boolean matchesType = typeFilter == null || typeFilter.equals("All Types") ||
+                    alert.getTitle().equalsIgnoreCase(typeFilter);
+
+            // 3. Priority Filter
+            boolean matchesPriority = priorityFilter == null || priorityFilter.equals("All Priorities") ||
+                    alert.getPriority().name().equalsIgnoreCase(priorityFilter);
+
+            return matchesSearch && matchesType && matchesPriority;
+        });
+
+        alertsTable.setItems(filteredData);
+    }
+
+    @FXML
+    private void handleClearFilters() {
+        txtSearch.clear();
+        cmbFilterType.setValue("All Types");
+        cmbFilterPriority.setValue("All Priorities");
     }
 }

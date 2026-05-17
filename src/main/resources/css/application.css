@@ -1486,3 +1486,25 @@
 .table-view .placeholder {
     -fx-background-color: white;
 }
+
+.search-field {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #dee2e6;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 8 12;
+    -fx-font-size: 13px;
+}
+
+.search-field:focused {
+    -fx-border-color: #3498db;
+    -fx-background-color: white;
+}
+
+/* Style for the filter HBox container */
+.filter-container {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);
+}
+

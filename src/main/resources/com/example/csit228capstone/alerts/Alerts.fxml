@@ -64,6 +64,17 @@
                 <Region prefWidth="200" HBox.hgrow="ALWAYS"/>
             </HBox>
 
+            <!-- Search & Filter Bar -->
+            <HBox spacing="12" alignment="CENTER_LEFT" styleClass="panel-card" style="-fx-padding: 10 16;">
+                <TextField fx:id="txtSearch" prefWidth="300" promptText="Search by message or sender..." styleClass="search-field" />
+
+                <ComboBox fx:id="cmbFilterType" prefWidth="180" promptText="Filter by Type" />
+
+                <ComboBox fx:id="cmbFilterPriority" prefWidth="130" promptText="Priority" />
+
+                <Button onAction="#handleClearFilters" styleClass="quick-action-btn" text="Clear" />
+            </HBox>
+
             <!-- Table -->
             <HBox spacing="16" VBox.vgrow="ALWAYS">
                 <VBox spacing="12" styleClass="panel-card" HBox.hgrow="ALWAYS">
