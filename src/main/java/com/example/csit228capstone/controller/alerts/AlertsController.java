@@ -16,7 +16,10 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-
+import javafx.scene.layout.VBox;           // For VBox
+import javafx.scene.control.Label;         // For Label
+import javafx.scene.shape.SVGPath;         // For SVGPath
+import javafx.geometry.Pos;                // For Pos.CENTER
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -157,6 +160,32 @@ public class AlertsController implements Initializable {
             }
         });
 
+        // --- EMPTY STATE ILLUSTRATION ---
+        // --- REFINED EMPTY STATE ---
+        VBox emptyState = new VBox(20); // Slightly more spacing
+        emptyState.setAlignment(Pos.CENTER);
+
+// 1. Modern Notification Bell Icon
+        javafx.scene.shape.SVGPath emptyIcon = new javafx.scene.shape.SVGPath();
+// Clean, rounded Bell icon path
+        emptyIcon.setContent("M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0");
+        emptyIcon.setScaleX(5.0);
+        emptyIcon.setScaleY(5.0);
+        emptyIcon.getStyleClass().add("empty-state-icon");
+
+// 2. Main Text (Clean and modern)
+        Label emptyTitle = new Label("All Quiet Here");
+        emptyTitle.getStyleClass().add("empty-state-title");
+
+// 3. Sub-text (Helpful instruction)
+        Label emptySubtitle = new Label("There are no broadcasts to display right now.\nSent alerts will appear here.");
+        emptySubtitle.getStyleClass().add("empty-state-subtitle");
+        emptySubtitle.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
+
+        emptyState.getChildren().addAll(emptyIcon, emptyTitle, emptySubtitle);
+
+// Set the placeholder
+        alertsTable.setPlaceholder(emptyState);
         formatTableColumns();
         setupActionColumn();
     }

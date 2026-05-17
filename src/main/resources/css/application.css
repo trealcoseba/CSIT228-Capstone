@@ -1460,3 +1460,29 @@
     -fx-font-size: 14px;
 }
 
+/* Soft, modern gray for the icon */
+.empty-state-icon {
+    -fx-fill: #ecf0f1; /* Very light gray-blue */
+    -fx-stroke: #bdc3c7; /* Subtle outline */
+    -fx-stroke-width: 0.5;
+}
+
+/* Make the title look like a real dashboard title */
+.empty-state-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #7f8c8d; /* Muted slate gray */
+    -fx-padding: 30 0 0 0; /* Space for the scaled icon */
+}
+
+/* Subtitle with better line spacing */
+.empty-state-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #95a5a6;
+    -fx-line-spacing: 5px;
+}
+
+/* Ensure no weird blue background on the placeholder */
+.table-view .placeholder {
+    -fx-background-color: white;
+}
