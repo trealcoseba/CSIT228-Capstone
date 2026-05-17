@@ -22,6 +22,7 @@ public class LigtasApp extends Application {
 
         primaryStage.setTitle("LIGTAS-Brgy — Barangay Command Center");
         primaryStage.setScene(scene);
+        primaryStage.setFullScreenExitHint("");
 
 
         try {

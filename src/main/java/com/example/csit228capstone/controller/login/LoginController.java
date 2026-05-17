@@ -67,6 +67,7 @@ public class LoginController {
             stage.setScene(new Scene(root));
             stage.setTitle("LIGTAS-Brgy");
             stage.setFullScreen(true);
+            stage.setFullScreenExitHint("");
             stage.centerOnScreen();
             stage.show();
         } catch (IOException e) {
