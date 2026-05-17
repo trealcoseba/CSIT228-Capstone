@@ -25,11 +25,14 @@ public class RescueTeamRow {
 
     private String formatStatus(String s) {
         if (s == null) return "Unknown";
-        return switch (s.toLowerCase()) {
-            case "available"   -> "Available";
-            case "dispatched"  -> "Dispatched";
-            case "unavailable" -> "Unavailable";
-            default            -> s;
+
+        String normalized = s.toLowerCase().replace("_", " ");
+
+        return switch (normalized) {
+            case "available"               -> "Available";
+            case "dispatched", "on mission" -> "Dispatched"; // Now handles both!
+            case "unavailable", "off duty" -> "Unavailable";
+            default                        -> s;
         };
     }
 

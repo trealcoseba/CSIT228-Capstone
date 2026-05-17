@@ -16,6 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -123,22 +124,28 @@ public class ResidentFormController {
                 stage.initOwner(txtFirstName.getScene().getWindow());
             }
 
+            stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("Pin Resident Location");
             stage.setScene(new Scene(root));
-            stage.showAndWait();
 
+            // FIX: Move these BEFORE showAndWait()
             stage.setResizable(false);
             stage.setFullScreen(false);
 
-            String pinnedAddress = mapController.getSelectedAddress();
-            double lat = mapController.getSelectedLatitude();   // ← add this
-            double lng = mapController.getSelectedLongitude();  // ← add this
+            stage.showAndWait(); // The code pauses here until the map window is closed
 
-            if (pinnedAddress != null && !pinnedAddress.isEmpty()) {
-                txtAddress.setText(pinnedAddress);
+            String pinnedAddress = mapController.getSelectedAddress();
+            double lat = mapController.getSelectedLatitude();
+            double lng = mapController.getSelectedLongitude();
+
+            // Check for 0.0 specifically to avoid overwriting with bad data
+            // if the user just closed the map without pinning
+            if (lat != 0.0 && lng != 0.0) {
                 this.pendingLatitude = lat;
                 this.pendingLongitude = lng;
-
+                if (pinnedAddress != null && !pinnedAddress.isEmpty()) {
+                    txtAddress.setText(pinnedAddress);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -162,8 +169,9 @@ public class ResidentFormController {
         txtPhone.setText(r.getContactNumber());
         chkIsHead.setSelected(r.isHouseholdHead());
 
-        // ✅ Restore address — comes from the joined resident_locations row
         txtAddress.setText(r.getAddress() != null ? r.getAddress() : "");
+        this.pendingLatitude = r.getLatitude();
+        this.pendingLongitude = r.getLongitude();
 
         // Restore photo
         this.existingPhotoPath = r.getPhotoUrl();

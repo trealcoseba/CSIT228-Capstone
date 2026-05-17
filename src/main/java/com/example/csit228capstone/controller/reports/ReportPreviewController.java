@@ -19,14 +19,7 @@ import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-/**
- * Controller for ReportPreview.fxml.
- *
- * FIX SUMMARY:
- * - Bypassed reportService.createExportTask to directly use currentFormData or currentGenericData
- * preventing loss of fields (Reporter/Recorder data, sub-tables) during generation.
- * - Restored structural integrity of incident form outputs.
- */
+
 public class ReportPreviewController {
 
     @FXML private VBox   vboxDocument;
@@ -47,7 +40,7 @@ public class ReportPreviewController {
 
     // ── Load paths ────────────────────────────────────────────────────────────
 
-    /** Called from ReportFormController right after the form is submitted. */
+
     public void loadReport(Report report, ReportFormData fd) {
         this.currentReport   = report;
         this.currentFormData = fd;
@@ -59,16 +52,12 @@ public class ReportPreviewController {
         }
     }
 
-    /**
-     * Called from ReportsController when the user clicks View on a saved report.
-     * Reconstructs header FormData from the stored Report fields.
-     */
+
     public void loadSavedReport(Report report) {
         this.currentReport = report;
         setStatus("Loading saved incident records...");
         setBtnsDisabled(true);
 
-        // Create a database background worker thread
         Task<ReportFormData> fetchSavedTask = new Task<>() {
             @Override
             protected ReportFormData call() throws Exception {
@@ -82,18 +71,15 @@ public class ReportPreviewController {
                 fd.setStartDate(report.getStartDate());
                 fd.setEndDate(report.getEndDate());
 
-                // Bind Core Incident Details fields
                 fd.setDateOfIncident(report.getDateOfIncident());
                 fd.setLocation(report.getLocation());
                 fd.setDescription(report.getDescription());
 
-                // Copy Saved Insurance Data into FormData Memory Structure
                 fd.setHasInsurance(report.getHasInsurance());
                 fd.setInsurancePolicy(report.getInsurancePolicy());
                 fd.setInsuranceCoverageAmt(report.getInsuranceCoverageAmt());
                 fd.setIncidentTypeOther(report.getIncidentTypeOther());
 
-                // Explicitly query the custom relational sub-tables from ReportRepository
                 ReportRepository repo = new ReportRepository();
 
                 fd.setDamages(repo.findDamagesByReportId(report.getId()));
@@ -109,7 +95,6 @@ public class ReportPreviewController {
             setStatus("");
             setBtnsDisabled(false);
 
-            // Render document only AFTER data is safely loaded into memory
             if (isIncident(report)) {
                 renderDocument();
             } else {
@@ -124,7 +109,6 @@ public class ReportPreviewController {
             alert("Database Sync Error", fetchSavedTask.getException().getMessage());
         });
 
-        // Execute background worker task thread pool handler
         reportService.execute(fetchSavedTask);
     }
 
@@ -154,7 +138,6 @@ public class ReportPreviewController {
             vboxDocument.getChildren().clear();
             vboxDocument.setSpacing(8);
 
-            // Government header
             addCentered("Republic of the Philippines", 9, false, "#888888");
             addCentered("Barangay Management System — LIGTAS", 9, false, "#888888");
             addSpacer(4);
@@ -165,17 +148,15 @@ public class ReportPreviewController {
 
             addHRule();
 
-            // COMPACT UNIFIED METADATA GRID CONTAINER CALL
             addDocumentMetadataSection(currentFormData, currentReport);
 
-            // Append Body tables if incident report type matches
             if (isIncident(currentReport)) {
                 renderIncidentBodyTables();
             } else {
                 renderGenericBody();
             }
 
-            // Signature
+
             addSpacer(20);
             String sigName = (currentFormData != null && currentFormData.getRecordedBy() != null && !currentFormData.getRecordedBy().isBlank())
                     ? currentFormData.getRecordedBy() : currentReport.getGeneratedBy();
@@ -248,7 +229,7 @@ public class ReportPreviewController {
         }
     }
 
-    // ── Export (FIXED: Bypasses Service to Preserve UI Input State Structures) ─
+    // ── Export  ─
 
     @FXML private void handleExportPdf()  { doExport("pdf");  }
     @FXML private void handleExportWord() { doExport("docx"); }
@@ -267,12 +248,11 @@ public class ReportPreviewController {
         setStatus("Exporting " + format.toUpperCase() + "…");
         setBtnsDisabled(true);
 
-        // Run the generation logic on a background worker to keep the UI perfectly responsive
         Task<Void> exportTask = new Task<>() {
             @Override
             protected Void call() throws Exception {
                 if (isIncident(currentReport)) {
-                    // Create wrapper with exactly what is visual on screen
+
                     ReportData<ReportFormData> incidentWrapper = new ReportData<>();
                     incidentWrapper.setTitle(currentReport.getName());
                     incidentWrapper.setReportType(ReportType.fromDisplayName(currentReport.getType()));
@@ -284,13 +264,13 @@ public class ReportPreviewController {
                         DocxReportExporter exporter = new DocxReportExporter();
                         exporter.exportIncident(incidentWrapper, dest);
                     } else {
-                        // Assuming you have a similar setup for your Pdf exporter
+
                         com.example.csit228capstone.service.report.PDFReportExporter exporter =
                                 new com.example.csit228capstone.service.report.PDFReportExporter();
                         exporter.exportIncident(incidentWrapper, dest);
                     }
                 } else {
-                    // Build layout payload safely for standard generic templates
+
                     ReportData<List<List<String>>> genericWrapper = new ReportData<>();
                     genericWrapper.setTitle(currentReport.getName());
                     genericWrapper.setReportType(ReportType.fromDisplayName(currentReport.getType()));
@@ -637,7 +617,14 @@ public class ReportPreviewController {
     private void alert(String title, String msg) {
         Platform.runLater(() -> {
             Alert a = new Alert(Alert.AlertType.INFORMATION);
-            a.setTitle(title); a.setHeaderText(null); a.setContentText(msg);
+
+            if (btnPdf.getScene() != null && btnPdf.getScene().getWindow() != null) {
+                a.initOwner(btnPdf.getScene().getWindow());
+            }
+
+            a.setTitle(title);
+            a.setHeaderText(null);
+            a.setContentText(msg);
             a.showAndWait();
         });
     }

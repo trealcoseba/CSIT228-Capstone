@@ -191,4 +191,19 @@ public class ResponderRepository {
         }
         return r;
     }
+
+    public void markRespondersAvailableByIncident(UUID incidentId) throws SQLException {
+        String sql = """
+        UPDATE responders
+        SET status = 'available'
+        WHERE id IN (
+            SELECT responder_id FROM dispatched_responders WHERE incident_id = ?
+        )
+        """;
+        try (Connection conn = getConn();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setObject(1, incidentId);
+            ps.executeUpdate();
+        }
+    }
 }

@@ -211,8 +211,25 @@ public class ReportsController {
             private final Button btnDelete = new Button("Delete");
             private final HBox   container = new HBox(10, btnView, btnDelete);
             {
-                btnView.setStyle("-fx-background-color: #b6d0e2; -fx-text-fill: #1a4599; -fx-font-size: 10px; -fx-padding: 3 8 3 8; -fx-background-radius: 4; -fx-cursor: hand;");
-                btnDelete.setStyle("-fx-background-color: #fecaca; -fx-text-fill: #991b1b; -fx-font-size: 10px; -fx-padding: 3 8 3 8; -fx-background-radius: 4; -fx-cursor: hand;");
+
+                btnView.setStyle("""
+                    -fx-background-color: #d4a017;
+                    -fx-text-fill: white;
+                    -fx-font-size: 11px;
+                    -fx-padding: 5 12 5 12;
+                    -fx-background-radius: 8;
+                    -fx-cursor: hand;
+                    """);
+
+                btnDelete.setStyle("""
+                    -fx-background-color: #c0392b;
+                    -fx-text-fill: white;
+                    -fx-font-size: 11px;
+                    -fx-padding: 5 12 5 12;
+                    -fx-background-radius: 8;
+                    -fx-cursor: hand;
+                    """);
+
                 container.setStyle("-fx-alignment: CENTER;");
 
                 btnView.setOnAction(event -> {
@@ -267,9 +284,17 @@ public class ReportsController {
             ctrl.setParentController(this);
 
             Stage stage = new Stage();
+
+            if (reportsTable.getScene() != null) {
+                stage.initOwner(reportsTable.getScene().getWindow());
+            }
             stage.setTitle("Generate New Report");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
+
+            stage.setResizable(false);
+            stage.setFullScreen(false);
+
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -285,6 +310,14 @@ public class ReportsController {
             ctrl.loadSavedReport(report);
 
             Stage stage = new Stage();
+
+            if (reportsTable.getScene() != null) {
+                stage.initOwner(reportsTable.getScene().getWindow());
+            }
+
+            stage.setResizable(true);
+            stage.setFullScreen(false);
+
             stage.setTitle("Preview — " + report.getName());
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
@@ -319,6 +352,11 @@ public class ReportsController {
 
     private void handleDeleteReport(Report report) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+
+        if (reportsTable.getScene() != null) {
+            confirm.initOwner(reportsTable.getScene().getWindow());
+        }
+
         confirm.setTitle("Confirm Deletion");
         confirm.setHeaderText("Delete \"" + report.getName() + "\"?");
         confirm.setContentText("This action cannot be undone.");
@@ -340,7 +378,15 @@ public class ReportsController {
 
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert a = new Alert(type);
-        a.setTitle(title); a.setHeaderText(null); a.setContentText(message);
+
+        if (reportsTable.getScene() != null && reportsTable.getScene().getWindow() != null) {
+            a.initOwner(reportsTable.getScene().getWindow());
+        }
+
+        a.setTitle(title);
+        a.setHeaderText(null);
+        a.setContentText(message);
         a.showAndWait();
     }
+
 }

@@ -235,4 +235,16 @@ public class DispatchedResponderRepository {
 
         return dr;
     }
+
+    // ─── UPDATE STATUS BY INCIDENT ────────────────────────────────────────────────
+
+    public void updateStatusByIncidentId(UUID incidentId, String status) throws SQLException {
+        String sql = "UPDATE dispatched_responders SET status = ? WHERE incident_id = ?";
+        try (Connection conn = getConn();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setObject(2, incidentId);
+            ps.executeUpdate();
+        }
+    }
 }

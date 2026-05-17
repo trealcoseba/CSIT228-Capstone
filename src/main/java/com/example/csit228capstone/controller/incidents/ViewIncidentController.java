@@ -2,7 +2,9 @@ package com.example.csit228capstone.controller.incidents;
 
 import com.example.csit228capstone.model.incident.Incident;
 import com.example.csit228capstone.model.incident.IncidentStatus;
+import com.example.csit228capstone.repository.DispatchedResponderRepository;
 import com.example.csit228capstone.repository.IncidentRepository;
+import com.example.csit228capstone.repository.ResponderRepository;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -78,9 +80,21 @@ public class ViewIncidentController {
                         "Updated via Edit Details Window"
                 );
 
+                if (newStatus == IncidentStatus.RESOLVED) {
+                    new DispatchedResponderRepository()
+                            .updateStatusByIncidentId(currentIncident.getId(), "returned");
+
+                    new ResponderRepository()
+                            .markRespondersAvailableByIncident(currentIncident.getId());
+                }
+
                 this.isUpdated = true;
 
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Incident status updated to " + newStatus.getDisplayName());
+                Alert alert = new Alert(Alert.AlertType.INFORMATION,
+                        "Incident status updated to " + newStatus.getDisplayName());
+                if (lblTitle.getScene() != null) {
+                    alert.initOwner(lblTitle.getScene().getWindow());
+                }
                 alert.showAndWait();
                 handleClose(null);
             } else {
@@ -88,7 +102,11 @@ public class ViewIncidentController {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            new Alert(Alert.AlertType.ERROR, "Failed to update database: " + e.getMessage()).show();
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to update database: " + e.getMessage());
+            if (lblTitle.getScene() != null) {
+                alert.initOwner(lblTitle.getScene().getWindow());
+            }
+            alert.show();
         }
     }
 

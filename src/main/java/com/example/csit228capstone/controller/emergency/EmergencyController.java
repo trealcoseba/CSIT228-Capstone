@@ -47,6 +47,8 @@ import java.util.stream.Collectors;
 
 public class EmergencyController implements Initializable {
 
+    private final Map<UUID, String> residentStatusCache = new HashMap<>();
+
     // ── Repositories ─────────────────────────────────────────────────────────
     private final IncidentRepository               incidentRepo  = new IncidentRepository();
     private final ResidentRepository               residentRepo  = new ResidentRepository();
@@ -181,13 +183,25 @@ public class EmergencyController implements Initializable {
             // Pass ourselves so the dialog can call initWithContext() on us
             dlgCtrl.setEmergencyController(this);
 
+
             Stage dlgStage = new Stage();
+
+            if (btnDeclareIncident.getScene() != null) {
+                dlgStage.initOwner(btnDeclareIncident.getScene().getWindow());
+            }
+
             dlgStage.initModality(Modality.APPLICATION_MODAL);
             dlgStage.initOwner(btnDeclareIncident.getScene().getWindow());
             dlgStage.setTitle("Declare Emergency Incident");
             dlgStage.setScene(new Scene(root, 920, 600));
             dlgStage.setResizable(false);
+
+
+            dlgStage.setResizable(false);
+            dlgStage.setFullScreen(false);
+
             dlgStage.showAndWait();
+
             // initWithContext() has already been called by the time we get here,
             // so the dashboard will already be populating in the background.
 
@@ -204,7 +218,6 @@ public class EmergencyController implements Initializable {
     public void initWithContext(EmergencyContext context) {
         this.ctx = context;
 
-        // Disable the declare button while an incident is active
         Platform.runLater(() -> {
             btnDeclareIncident.setDisable(true);
             btnDeclareIncident.setText("Incident Active");
@@ -217,17 +230,22 @@ public class EmergencyController implements Initializable {
                     id = context.getIncidentId();
                 } else {
                     Incident inc = buildIncident(context);
+                    // The repo insert must happen first
                     id = incidentRepo.insert(inc);
                 }
-                this.incidentId = id;
-                addLog("🚨 INCIDENT CREATED — ID: " + id.toString().substring(0, 8).toUpperCase());
-                addLog("   Type: " + ctx.getType().name()
-                        + "  |  Severity: " + ctx.getSeverity().name()
-                        + "  |  Radius: " + (int) ctx.getRadiusMeters() + " m");
 
+                // CRITICAL: Only assign to the class variable AFTER the DB insert is done
+                this.incidentId = id;
+
+                addLog("🚨 INCIDENT CREATED — ID: " + id.toString().substring(0, 8).toUpperCase());
                 Platform.runLater(this::populateDashboard);
             } catch (Exception ex) {
-                addLog("⚠ DB ERROR creating incident: " + ex.getMessage());
+                Platform.runLater(() -> {
+                    btnDeclareIncident.setDisable(false);
+                    btnDeclareIncident.setText("＋ Declare Incident");
+                    showAlert("Database Error", "Failed to create incident record. Check connection.");
+                });
+                addLog("⚠ DB ERROR: " + ex.getMessage());
                 ex.printStackTrace();
             }
         });
@@ -314,36 +332,38 @@ public class EmergencyController implements Initializable {
                 .thenAcceptAsync(residents -> {
                     addLog("🔍 DEBUG: Total residents in DB = " + residents.size());
 
-                    List<PriorityResidentRow> rows       = new ArrayList<>();
-                    List<MissingResidentRow>  missingRows = new ArrayList<>();
+                    List<PriorityResidentRow> rows = new ArrayList<>();
+                    List<MissingResidentRow> missingRows = new ArrayList<>();
 
                     for (Resident r : residents) {
                         double lat = r.getLatitude();
                         double lng = r.getLongitude();
 
-                        // Use a small epsilon instead of == 0, in case coords are
-                        // stored as 0.0 vs null-defaulted double
                         if (Math.abs(lat) < 0.0001 && Math.abs(lng) < 0.0001) {
-                            addLog("⚠ Skipping (no coords): "
-                                    + r.getFirstName() + " " + r.getLastName());
                             continue;
                         }
 
-                        double dist = haversineMeters(
-                                ctx.getLatitude(), ctx.getLongitude(), lat, lng);
-
-                        addLog("📍 " + r.getFirstName() + " " + r.getLastName()
-                                + " | dist=" + (int) dist + " m"
-                                + " | radius=" + (int) ctx.getRadiusMeters() + " m"
-                                + " | lat=" + lat + " lng=" + lng);
+                        double dist = haversineMeters(ctx.getLatitude(), ctx.getLongitude(), lat, lng);
 
                         if (dist > ctx.getRadiusMeters()) continue;
 
-                        boolean vuln = r.getVulnerabilities() != null
-                                && !r.getVulnerabilities().isEmpty();
-                        String name  = r.getFirstName() + " " + r.getLastName();
-                        rows.add(new PriorityResidentRow(r.getId(), name,
-                                vulnSummary(r.getVulnerabilities()), dist, vuln));
+                        boolean vuln = r.getVulnerabilities() != null && !r.getVulnerabilities().isEmpty();
+                        String name = r.getFirstName() + " " + r.getLastName();
+
+                        // 1. Create the row
+                        PriorityResidentRow row = new PriorityResidentRow(r.getId(), name,
+                                vulnSummary(r.getVulnerabilities()), dist, vuln);
+
+                        // 2. CHECK CACHE: Restore the status if it exists
+                        String savedStatus = residentStatusCache.getOrDefault(r.getId(), "Pending");
+                        row.setRescueStatus(savedStatus);
+
+                        // 3. If they were Missing, add them back to the Missing table as well
+                        if ("Missing".equals(savedStatus)) {
+                            missingRows.add(new MissingResidentRow(r.getId(), name, r.getContactNumber(), "Last seen in zone"));
+                        }
+
+                        rows.add(row);
                     }
 
                     rows.sort(Comparator
@@ -355,13 +375,15 @@ public class EmergencyController implements Initializable {
                     Platform.runLater(() -> {
                         tblPriorityResidents.setItems(FXCollections.observableArrayList(rows));
                         lblResidentCount.setText(String.valueOf(rows.size()));
-                        lblMissingCount.setText(String.valueOf(missingRows.size()));
+
+                        // Restore Missing Table
                         tblMissingResidents.setItems(FXCollections.observableArrayList(missingRows));
+                        lblMissingCount.setText(String.valueOf(missingRows.size()));
+
                         updateAnalytics();
-                        addLog("📋 Loaded " + rows.size() + " affected residents within "
-                                + (int) ctx.getRadiusMeters() + " m radius.");
+                        addLog("📋 Dashboard Refreshed: Positions and statuses synchronized.");
                     });
-                }, runnable -> Platform.runLater(runnable));
+                }, Platform::runLater);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -486,6 +508,12 @@ public class EmergencyController implements Initializable {
 
     @FXML
     void assignDispatch(ActionEvent e) {
+
+        if (this.incidentId == null) {
+            showAlert("System Synchronizing", "The incident is still being registered in the database. Please wait a few seconds.");
+            return;
+        }
+
         if (incidentId == null) {
             showAlert("Incident not ready", "Incident is still being created. Please wait.");
             return;
@@ -500,6 +528,11 @@ public class EmergencyController implements Initializable {
         ChoiceDialog<String> dlg = new ChoiceDialog<>(
                 available.get(0).getTeamName(),
                 available.stream().map(RescueTeamRow::getTeamName).collect(Collectors.toList()));
+
+        if (btnActivateDispatch.getScene() != null) {
+            dlg.initOwner(btnActivateDispatch.getScene().getWindow());
+        }
+
         dlg.setTitle("Activate Dispatch");
         dlg.setHeaderText("Select a rescue team to dispatch:");
         dlg.setContentText("Team:");
@@ -519,7 +552,7 @@ public class EmergencyController implements Initializable {
                     dr.setLongitude(java.math.BigDecimal.valueOf(ctx.getLongitude()));
                     dr.setStatus("dispatched");
                     dispatchRepo.save(dr);
-                    responderRepo.updateStatus(row.getResponderId(), "dispatched");
+                    responderRepo.updateStatus(row.getResponderId(), "on_mission");
                     incidentRepo.updateStatus(incidentId, IncidentStatus.RESPONDING,
                             ctx.getReportedBy() != null ? ctx.getReportedBy()
                                     : UUID.fromString("00000000-0000-0000-0000-000000000000"),
@@ -546,12 +579,17 @@ public class EmergencyController implements Initializable {
             return;
         }
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+
+        if (btnNotifyResidents.getScene() != null) {
+            confirm.initOwner(btnNotifyResidents.getScene().getWindow());
+        }
+
         confirm.setTitle("Notify Residents");
         confirm.setHeaderText("Send emergency notification?");
         confirm.setContentText("This will log a notification for " + count + " affected residents.\n\nContinue?");
         confirm.showAndWait().ifPresent(btn -> {
             if (btn == ButtonType.OK) {
-                addLog("📣 NOTIFICATION SENT to " + count + " affected residents.");
+                addLog("NOTIFICATION SENT to " + count + " affected residents.");
                 addLog("   Type: " + prettyType(ctx.getType()) + " | Radius: " + (int) ctx.getRadiusMeters() + " m");
                 showInfo("Notification Sent", "Emergency notification dispatched for " + count + " residents.");
             }
@@ -567,51 +605,43 @@ public class EmergencyController implements Initializable {
 
     @FXML
     void endEmergency(ActionEvent e) {
-        if (incidentId == null) {
-            showAlert("No Active Incident", "No incident is currently active.");
-            return;
-        }
+        if (incidentId == null) return;
+
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        if (btnEndEmergency.getScene() != null) {
+            confirm.initOwner(btnEndEmergency.getScene().getWindow());
+        }
         confirm.setTitle("End Emergency");
         confirm.setHeaderText("Mark this incident as RESOLVED?");
-        confirm.setContentText("This will update the incident status to RESOLVED " +
-                "and release all dispatched responders.\n\nThis action cannot be undone.");
+        confirm.setContentText("This will release all responders and return the dashboard to IDLE.");
+
         confirm.showAndWait().ifPresent(btn -> {
             if (btn != ButtonType.OK) return;
+
             CompletableFuture.runAsync(() -> {
                 try {
                     UUID adminId = ctx.getReportedBy() != null ? ctx.getReportedBy()
                             : UUID.fromString("00000000-0000-0000-0000-000000000000");
-                    incidentRepo.updateStatus(incidentId, IncidentStatus.RESOLVED,
-                            adminId, "Emergency ended by admin. Incident resolved.");
+
+                    incidentRepo.updateStatus(incidentId, IncidentStatus.RESOLVED, adminId, "Emergency ended.");
                     List<DispatchedResponder> dispatched = dispatchRepo.findByIncidentId(incidentId);
                     for (DispatchedResponder dr : dispatched) {
-                        if ("dispatched".equalsIgnoreCase(dr.getStatus())) {
-                            dispatchRepo.updateStatus(dr.getId(), "Resolved");
-                            responderRepo.updateStatus(dr.getResponderId(), "Available");
-                        }
+                        dispatchRepo.updateStatus(dr.getId(), "returned");
+                        responderRepo.updateStatus(dr.getResponderId(), "available");
                     }
+
                     Platform.runLater(() -> {
-                        lblStatus.setText("RESOLVED");
-                        lblStatus.setStyle("-fx-text-fill: #34d399; -fx-font-size: 13px; -fx-font-weight: bold;");
-                        addLog("INCIDENT RESOLVED — ID: " + incidentId.toString().substring(0, 8).toUpperCase());
-                        addLog("   All responders released. Incident logged.");
-                        btnEndEmergency.setDisable(true);
-                        btnActivateDispatch.setDisable(true);
-                        btnNotifyResidents.setDisable(true);
-                        btnDeclareIncident.setDisable(false);
-                        btnDeclareIncident.setText("＋ Declare Incident");
-                        showInfo("Incident Resolved",
-                                "The incident has been marked as RESOLVED.\n" +
-                                        "All responders have been returned to available status.");
-                        closeWindow(); // ← moved here, fires after showInfo is dismissed
+
+                        showInfo("Incident Resolved", "Emergency status set to RESOLVED.");
+
+                        resetDashboard();
+
                     });
                 } catch (Exception ex) {
-                    addLog("Error resolving incident: " + ex.getMessage());
+                    Platform.runLater(() -> addLog("Error: " + ex.getMessage()));
                 }
             });
         });
-        // closeWindow() removed from here
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -699,6 +729,9 @@ public class EmergencyController implements Initializable {
     private void markResident(PriorityResidentRow row, String status) {
         String prev = row.getRescueStatus();
         row.setRescueStatus(status);
+
+        residentStatusCache.put(row.getResidentId(), status);
+
         tblPriorityResidents.refresh();
         recomputeAnalytics(prev, status);
         addLog("✅ " + row.getResidentName() + " marked as " + status.toUpperCase());
@@ -718,6 +751,11 @@ public class EmergencyController implements Initializable {
                 : "No available center found";
 
         Alert dlg = new Alert(Alert.AlertType.CONFIRMATION);
+
+        if (tblPriorityResidents.getScene() != null) {
+            dlg.initOwner(tblPriorityResidents.getScene().getWindow());
+        }
+
         dlg.setTitle("Mark as Evacuated");
         dlg.setHeaderText("Evacuate " + row.getResidentName() + "?");
         dlg.setContentText("Nearest available center:\n📍 " + centerInfo +
@@ -737,28 +775,43 @@ public class EmergencyController implements Initializable {
 
     private void handleMissing(PriorityResidentRow row) {
         TextInputDialog dlg = new TextInputDialog();
+        if (tblPriorityResidents.getScene() != null) {
+            dlg.initOwner(tblPriorityResidents.getScene().getWindow());
+        }
         dlg.setTitle("Report Missing");
         dlg.setHeaderText("Report " + row.getResidentName() + " as missing");
         dlg.setContentText("Last known location:");
 
         dlg.showAndWait().ifPresent(lastSeen -> {
+            String contact = "N/A";
+            try {
+                // FIX: Add .orElse(null) at the end of the findById call
+                Resident r = residentRepo.findById(row.getResidentId()).orElse(null);
+
+                if (r != null && r.getContactNumber() != null && !r.getContactNumber().isBlank()) {
+                    contact = r.getContactNumber();
+                }
+            } catch (Exception e) {
+                System.err.println("Could not fetch contact: " + e.getMessage());
+            }
+
             String prev = row.getRescueStatus();
             row.setRescueStatus("Missing");
+            residentStatusCache.put(row.getResidentId(), "Missing");
             tblPriorityResidents.refresh();
 
-            // Add to the missing residents table
+            // Add to the missing residents table with the contact number found
             MissingResidentRow missingRow = new MissingResidentRow(
                     row.getResidentId(),
                     row.getResidentName(),
-                    "",                                                     // contact (not in priority row)
-                    lastSeen.isBlank() ? "Last location unknown" : lastSeen
+                    contact, // <--- NOW AUTOMATICALLY FILLED
+                    lastSeen.isBlank() ? "Last seen in zone" : lastSeen
             );
             tblMissingResidents.getItems().add(missingRow);
             lblMissingCount.setText(String.valueOf(tblMissingResidents.getItems().size()));
 
             recomputeAnalytics(prev, "Missing");
-            addLog("❓ " + row.getResidentName() + " reported MISSING — last seen: " +
-                    (lastSeen.isBlank() ? "unknown" : lastSeen));
+            addLog("❓ " + row.getResidentName() + " reported MISSING (Contact: " + contact + ")");
         });
     }
 
@@ -804,55 +857,6 @@ public class EmergencyController implements Initializable {
         catch (Exception e) { return Double.MAX_VALUE; }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Table column binding
-    // ─────────────────────────────────────────────────────────────────────────
-
-    @SuppressWarnings("unchecked")
-    private void bindTableColumns() {
-        ((TableColumn<PriorityResidentRow, String>) colResidentName)
-                .setCellValueFactory(c -> c.getValue().residentNameProperty());
-        ((TableColumn<PriorityResidentRow, String>) colVulnerability)
-                .setCellValueFactory(c -> c.getValue().vulnerabilityTypeProperty());
-        ((TableColumn<PriorityResidentRow, String>) colDistance)
-                .setCellValueFactory(c -> c.getValue().distanceFromIncidentProperty());
-        ((TableColumn<PriorityResidentRow, String>) colRescueStatus)
-                .setCellValueFactory(c -> c.getValue().rescueStatusProperty());
-
-        ((TableColumn<MissingResidentRow, String>) colMissingName)
-                .setCellValueFactory(c -> c.getValue().residentNameProperty());
-        ((TableColumn<MissingResidentRow, String>) colMissingContact)
-                .setCellValueFactory(c -> c.getValue().contactNumberProperty());
-        ((TableColumn<MissingResidentRow, String>) colLastKnownLocation)
-                .setCellValueFactory(c -> c.getValue().lastKnownLocationProperty());
-
-        ((TableColumn<EvacuationCenterRow, String>) colEvacName)
-                .setCellValueFactory(c -> c.getValue().centerNameProperty());
-        ((TableColumn<EvacuationCenterRow, String>) colEvacCapacity)
-                .setCellValueFactory(c -> c.getValue().capacityProperty());
-        ((TableColumn<EvacuationCenterRow, String>) colEvacOccupancy)
-                .setCellValueFactory(c -> c.getValue().occupancyProperty());
-        ((TableColumn<EvacuationCenterRow, String>) colEvacDistance)
-                .setCellValueFactory(c -> c.getValue().distanceProperty());
-        ((TableColumn<EvacuationCenterRow, String>) colEvacStatus)
-                .setCellValueFactory(c -> c.getValue().statusProperty());
-
-        ((TableColumn<RescueTeamRow, String>) colTeamName)
-                .setCellValueFactory(c -> c.getValue().teamNameProperty());
-        ((TableColumn<RescueTeamRow, String>) colTeamAvailability)
-                .setCellValueFactory(c -> c.getValue().availabilityProperty());
-        ((TableColumn<RescueTeamRow, String>) colTeamVehicle)
-                .setCellValueFactory(c -> c.getValue().vehicleProperty());
-        ((TableColumn<RescueTeamRow, String>) colTeamETA)
-                .setCellValueFactory(c -> c.getValue().etaProperty());
-
-        ((TableColumn<ResourceRow, String>) colResourceType)
-                .setCellValueFactory(c -> c.getValue().resourceTypeProperty());
-        ((TableColumn<ResourceRow, String>) colResourceQuantity)
-                .setCellValueFactory(c -> c.getValue().quantityProperty());
-        ((TableColumn<ResourceRow, String>) colResourceStatus)
-                .setCellValueFactory(c -> c.getValue().statusProperty());
-    }
 
     // ─────────────────────────────────────────────────────────────────────────
     // Clock
@@ -934,6 +938,11 @@ public class EmergencyController implements Initializable {
     private void showAlert(String title, String msg) {
         Platform.runLater(() -> {
             Alert a = new Alert(Alert.AlertType.WARNING);
+
+            if (btnDeclareIncident.getScene() != null) {
+                a.initOwner(btnDeclareIncident.getScene().getWindow());
+            }
+
             a.setTitle(title); a.setHeaderText(null); a.setContentText(msg);
             a.showAndWait();
         });
@@ -942,6 +951,11 @@ public class EmergencyController implements Initializable {
     private void showInfo(String title, String msg) {
         Platform.runLater(() -> {
             Alert a = new Alert(Alert.AlertType.INFORMATION);
+
+            if (btnDeclareIncident.getScene() != null) {
+                a.initOwner(btnDeclareIncident.getScene().getWindow());
+            }
+
             a.setTitle(title); a.setHeaderText(null); a.setContentText(msg);
             a.showAndWait();
         });
@@ -953,7 +967,122 @@ public class EmergencyController implements Initializable {
     }
 
     private void closeWindow() {
-        Stage stage = (Stage) btnDeclareIncident.getScene().getWindow();
-        stage.close();
+        try {
+            // Use btnDeclareIncident or any node that is definitely on the stage
+            if (btnDeclareIncident.getScene() != null && btnDeclareIncident.getScene().getWindow() != null) {
+                Stage stage = (Stage) btnDeclareIncident.getScene().getWindow();
+                stage.close();
+            }
+        } catch (Exception e) {
+            System.err.println("Error closing emergency window: " + e.getMessage());
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Table column binding
+    // ─────────────────────────────────────────────────────────────────────────
+
+    @SuppressWarnings("unchecked")
+    private void bindTableColumns() {
+        ((TableColumn<PriorityResidentRow, String>) colResidentName)
+                .setCellValueFactory(c -> c.getValue().residentNameProperty());
+        ((TableColumn<PriorityResidentRow, String>) colVulnerability)
+                .setCellValueFactory(c -> c.getValue().vulnerabilityTypeProperty());
+        ((TableColumn<PriorityResidentRow, String>) colDistance)
+                .setCellValueFactory(c -> c.getValue().distanceFromIncidentProperty());
+        ((TableColumn<PriorityResidentRow, String>) colRescueStatus)
+                .setCellValueFactory(c -> c.getValue().rescueStatusProperty());
+
+        ((TableColumn<MissingResidentRow, String>) colMissingName)
+                .setCellValueFactory(c -> c.getValue().residentNameProperty());
+        ((TableColumn<MissingResidentRow, String>) colMissingContact)
+                .setCellValueFactory(c -> c.getValue().contactNumberProperty());
+        ((TableColumn<MissingResidentRow, String>) colLastKnownLocation)
+                .setCellValueFactory(c -> c.getValue().lastKnownLocationProperty());
+
+        ((TableColumn<EvacuationCenterRow, String>) colEvacName)
+                .setCellValueFactory(c -> c.getValue().centerNameProperty());
+        ((TableColumn<EvacuationCenterRow, String>) colEvacCapacity)
+                .setCellValueFactory(c -> c.getValue().capacityProperty());
+        ((TableColumn<EvacuationCenterRow, String>) colEvacOccupancy)
+                .setCellValueFactory(c -> c.getValue().occupancyProperty());
+        ((TableColumn<EvacuationCenterRow, String>) colEvacDistance)
+                .setCellValueFactory(c -> c.getValue().distanceProperty());
+        ((TableColumn<EvacuationCenterRow, String>) colEvacStatus)
+                .setCellValueFactory(c -> c.getValue().statusProperty());
+
+        ((TableColumn<RescueTeamRow, String>) colTeamName)
+                .setCellValueFactory(c -> c.getValue().teamNameProperty());
+        ((TableColumn<RescueTeamRow, String>) colTeamAvailability)
+                .setCellValueFactory(c -> c.getValue().availabilityProperty());
+        ((TableColumn<RescueTeamRow, String>) colTeamVehicle)
+                .setCellValueFactory(c -> c.getValue().vehicleProperty());
+        ((TableColumn<RescueTeamRow, String>) colTeamETA)
+                .setCellValueFactory(c -> c.getValue().etaProperty());
+
+        ((TableColumn<ResourceRow, String>) colResourceType)
+                .setCellValueFactory(c -> c.getValue().resourceTypeProperty());
+        ((TableColumn<ResourceRow, String>) colResourceQuantity)
+                .setCellValueFactory(c -> c.getValue().quantityProperty());
+        ((TableColumn<ResourceRow, String>) colResourceStatus)
+                .setCellValueFactory(c -> c.getValue().statusProperty());
+
+
+        List<TableColumn<?, ?>> allCols = List.of(
+                colResidentName, colVulnerability, colDistance, colRescueStatus, colResidentAction,
+                colMissingName, colMissingContact, colLastKnownLocation,
+                colEvacName, colEvacCapacity, colEvacOccupancy, colEvacDistance, colEvacStatus,
+                colTeamName, colTeamAvailability, colTeamVehicle, colTeamETA,
+                colResourceType, colResourceQuantity, colResourceStatus
+        );
+
+        for (TableColumn<?, ?> col : allCols) {
+            col.setReorderable(false);
+            col.setResizable(false);
+            if (col != colResidentAction) {
+                col.setStyle("-fx-alignment: CENTER-LEFT;");
+            }
+        }
+    }
+
+    private void resetDashboard() {
+        Platform.runLater(() -> {
+            // 1. Re-enable the Declare button
+            btnDeclareIncident.setDisable(false);
+            btnDeclareIncident.setText("＋ Declare Incident");
+
+            // 2. Reset KPI Labels
+            lblStatus.setText("IDLE");
+            lblStatus.setStyle("-fx-text-fill: #9ca3af;"); // Gray color
+            lblEmergencyType.setText("No Active Incident");
+            lblSeverity.setText("—");
+            lblSeverityDot.setStyle("-fx-text-fill: #4b5563;");
+            lblCoordinates.setText("0.000, 0.000");
+            lblAffectedRadius.setText("0 m");
+
+            // 3. Clear all tables
+            tblPriorityResidents.getItems().clear();
+            tblMissingResidents.getItems().clear();
+            tblRescueTeams.getItems().clear();
+            tblEvacuationCenters.getItems().clear();
+            tblResources.getItems().clear();
+
+            // 4. Reset Analytics Counters
+            totalAffected = 0; rescued = 0; missing = 0; evacuated = 0;
+            updateAnalytics();
+
+            // 5. Reset Class State
+            this.incidentId = null;
+            this.ctx = null;
+
+            // 6. Clear Map (Optional: reloads empty map)
+            if (mapWebView != null) {
+                mapWebView.getEngine().executeScript("if(window.clearResidentMarkers) clearResidentMarkers();");
+                mapWebView.getEngine().executeScript("if(window.map && window.emergencyCircle) map.removeLayer(emergencyCircle);");
+            }
+
+            addLog("Dashboard reset. System in IDLE mode.");
+            residentStatusCache.clear();
+        });
     }
 }

@@ -312,6 +312,15 @@ public class ResidentsController {
 
     private void handleDeleteResident(Resident resident) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Delete " + resident.getFullName() + "?", ButtonType.YES, ButtonType.NO);
+
+
+        if (residentsTable.getScene() != null && residentsTable.getScene().getWindow() != null) {
+            alert.initOwner(residentsTable.getScene().getWindow());
+        }
+
+        alert.setTitle("Confirm Deletion");
+        alert.setHeaderText(null); 
+
         if (alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
             repository.delete(resident.getId());
             loadData();

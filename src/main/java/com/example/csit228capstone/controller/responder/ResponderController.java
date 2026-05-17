@@ -164,8 +164,13 @@ public class ResponderController implements Initializable {
     // ══════════════════════════════════════════════════════════════
 
     private void updateRegistryKPIs(List<Responder> all) {
-        long available = all.stream().filter(r -> "available".equals(r.getStatus())).count();
-        long onMission = all.stream().filter(r -> "on_mission".equals(r.getStatus())).count();
+        long available = all.stream()
+                .filter(r -> "available".equalsIgnoreCase(r.getStatus()))
+                .count();
+        long onMission = all.stream()
+                .filter(r -> "on_mission".equalsIgnoreCase(r.getStatus()) || "on mission".equalsIgnoreCase(r.getStatus()))
+                .count();
+
         lblAvailable.setText(String.valueOf(available));
         lblTotal.setText(String.valueOf(all.size()));
         lblOnMission.setText(String.valueOf(onMission));
@@ -485,28 +490,38 @@ public class ResponderController implements Initializable {
         colDispatchActions.setCellFactory(col -> new TableCell<>() {
             private final Button btnReturn  = new Button("Return");
             private final Button btnCancel  = new Button("Cancel");
-            private final HBox   box        = new HBox(6, btnReturn, btnCancel);
-
+            private final Button btnDelete  = new Button("Delete");                          // ✅ new
+            private final HBox   box        = new HBox(6, btnReturn, btnCancel, btnDelete); // ✅ added
 
             {
                 box.setAlignment(Pos.CENTER);
                 btnReturn.setStyle("""
-                    -fx-background-color: #3aab8a;
-                    -fx-text-fill: white;
-                    -fx-font-size: 11px;
-                    -fx-padding: 5 12 5 12;
-                    -fx-background-radius: 8;
-                    -fx-cursor: hand;
-                    """);
+            -fx-background-color: #3aab8a;
+            -fx-text-fill: white;
+            -fx-font-size: 11px;
+            -fx-padding: 5 12 5 12;
+            -fx-background-radius: 8;
+            -fx-cursor: hand;
+            """);
 
                 btnCancel.setStyle("""
-                    -fx-background-color: #c0392b;
-                    -fx-text-fill: white;
-                    -fx-font-size: 11px;
-                    -fx-padding: 5 12 5 12;
-                    -fx-background-radius: 8;
-                    -fx-cursor: hand;
-                    """);
+            -fx-background-color: #c0392b;
+            -fx-text-fill: white;
+            -fx-font-size: 11px;
+            -fx-padding: 5 12 5 12;
+            -fx-background-radius: 8;
+            -fx-cursor: hand;
+            """);
+
+                // ✅ Style for delete button
+                btnDelete.setStyle("""
+            -fx-background-color: #4b1c1c;
+            -fx-text-fill: #ff6b6b;
+            -fx-font-size: 11px;
+            -fx-padding: 5 12 5 12;
+            -fx-background-radius: 8;
+            -fx-cursor: hand;
+            """);
 
                 btnReturn.setOnAction(e -> {
                     DispatchedResponder dr = getTableView().getItems().get(getIndex());
@@ -517,12 +532,16 @@ public class ResponderController implements Initializable {
                     DispatchedResponder dr = getTableView().getItems().get(getIndex());
                     updateMissionStatus(dr, "cancelled");
                 });
+
+                // ✅ Delete action
+                btnDelete.setOnAction(e -> {
+                    DispatchedResponder dr = getTableView().getItems().get(getIndex());
+                    confirmDeleteMission(dr);
+                });
             }
 
             @Override
-            public void updateSelected(boolean selected) {
-                super.updateSelected(false);
-            }
+            public void updateSelected(boolean selected) { super.updateSelected(false); }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
@@ -531,7 +550,6 @@ public class ResponderController implements Initializable {
                     setGraphic(null); return;
                 }
                 DispatchedResponder dr = getTableView().getItems().get(getIndex());
-                // Hide buttons if already finished
                 boolean active = "dispatched".equalsIgnoreCase(dr.getStatus());
                 btnReturn.setDisable(!active);
                 btnCancel.setDisable(!active);
@@ -556,7 +574,7 @@ public class ResponderController implements Initializable {
 
     private void setupRegistryFilters() {
         filterStatus.setItems(FXCollections.observableArrayList(
-                "All", "available", "on_mission", "off_duty"));
+                "All", "Available", "On Mission", "Off Duty"));
         filterStatus.getSelectionModel().select("All");
 
         sortOrder.setItems(FXCollections.observableArrayList(
@@ -606,7 +624,7 @@ public class ResponderController implements Initializable {
                     || agency.equals(r.getAgency());
 
             boolean matchStatus = status == null || status.equals("All")
-                    || status.equals(r.getStatus());
+                    || status.equalsIgnoreCase(r.getStatus());
 
             return matchSearch && matchAgency && matchStatus;
         };
@@ -909,7 +927,7 @@ public class ResponderController implements Initializable {
         colDispatchTime.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.12));
         colDuration.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.08));
         colMissionStatus.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.10));
-        colDispatchActions.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.14));
+        colDispatchActions.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.21));
 
         // Apply constraints to Mission Log Columns
         for (TableColumn<DispatchedResponder, ?> col : List.of(
@@ -919,5 +937,38 @@ public class ResponderController implements Initializable {
             col.setReorderable(false);
             col.setStyle("-fx-alignment: CENTER;");
         }
+    }
+
+    private void confirmDeleteMission(DispatchedResponder dr) {
+        Alert alert = new Alert(
+                Alert.AlertType.CONFIRMATION,
+                "Delete this mission log for \"" + dr.getResponderName() + "\"? This cannot be undone.",
+                ButtonType.YES, ButtonType.CANCEL
+        );
+
+        if (mainTabPane.getScene() != null) {
+            alert.initOwner(mainTabPane.getScene().getWindow());
+        }
+
+        alert.setTitle("Delete Mission Log");
+        alert.showAndWait().ifPresent(btn -> {
+            if (btn == ButtonType.YES) {
+                try {
+                    dispatchRepo.delete(dr.getId());
+
+                    if ("dispatched".equalsIgnoreCase(dr.getStatus())) {
+                        List<DispatchedResponder> remaining = dispatchRepo.findByResponderId(dr.getResponderId())
+                                .stream().filter(d -> "dispatched".equals(d.getStatus())).toList();
+                        if (remaining.isEmpty()) {
+                            responderRepo.updateStatus(dr.getResponderId(), "available");
+                        }
+                    }
+
+                    loadAll();
+                } catch (SQLException ex) {
+                    showError("Delete failed: " + ex.getMessage());
+                }
+            }
+        });
     }
 }

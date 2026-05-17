@@ -152,6 +152,11 @@ public class AlertsController implements Initializable {
                     setOnMouseClicked(e -> {
                         if (e.getClickCount() == 2) { // Detects double-click
                             javafx.scene.control.Alert alertPopup = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+
+                            if (getTableView().getScene() != null) {
+                                alertPopup.initOwner(getTableView().getScene().getWindow());
+                            }
+
                             alertPopup.setTitle("Full Message");
                             alertPopup.setHeaderText(null);
                             alertPopup.setContentText(item);
@@ -237,8 +242,24 @@ public class AlertsController implements Initializable {
             private final HBox box = new HBox(8, btnEdit, btnDelete);
 
             {
-                btnEdit.getStyleClass().addAll("quick-action-btn", "qa-info");
-                btnDelete.getStyleClass().addAll("quick-action-btn", "qa-danger");
+                btnEdit.setStyle("""
+                    -fx-background-color: #d4a017;
+                    -fx-text-fill: white;
+                    -fx-font-size: 11px;
+                    -fx-padding: 5 12 5 12;
+                    -fx-background-radius: 8;
+                    -fx-cursor: hand;
+                    """);
+
+                btnDelete.setStyle("""
+                    -fx-background-color: #c0392b;
+                    -fx-text-fill: white;
+                    -fx-font-size: 11px;
+                    -fx-padding: 5 12 5 12;
+                    -fx-background-radius: 8;
+                    -fx-cursor: hand;
+                    """);
+
                 box.setAlignment(Pos.CENTER);
 
                 btnEdit.setOnAction(e -> openDialog(getTableView().getItems().get(getIndex())));
@@ -264,10 +285,19 @@ public class AlertsController implements Initializable {
             if (alert != null) ctrl.loadAlert(alert);
 
             Stage dialog = new Stage();
+
+            if (alertsTable.getScene() != null) {
+                dialog.initOwner(alertsTable.getScene().getWindow());
+            }
+
             dialog.setTitle(alert == null ? "Create Broadcast" : "Edit Broadcast");
             dialog.initModality(Modality.APPLICATION_MODAL);
             dialog.setScene(new Scene(root));
             dialog.setResizable(false);
+
+            dialog.setResizable(false);
+            dialog.setFullScreen(false);
+
             dialog.showAndWait();
         } catch (IOException e) {
             showError("Error opening dialog", e);
@@ -276,6 +306,11 @@ public class AlertsController implements Initializable {
 
     private void confirmAndDelete(Alert alert) {
         javafx.scene.control.Alert confirm = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION);
+
+        if (alertsTable.getScene() != null) {
+            confirm.initOwner(alertsTable.getScene().getWindow());
+        }
+
         confirm.setContentText("Delete \"" + alert.getTitle() + "\"?");
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -311,6 +346,11 @@ public class AlertsController implements Initializable {
     private void showError(String message, Exception e) {
         e.printStackTrace();
         javafx.scene.control.Alert err = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+
+        if (alertsTable.getScene() != null && alertsTable.getScene().getWindow() != null) {
+            err.initOwner(alertsTable.getScene().getWindow());
+        }
+
         err.setContentText(message + ": " + e.getMessage());
         err.showAndWait();
     }

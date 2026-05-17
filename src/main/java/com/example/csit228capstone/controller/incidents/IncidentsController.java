@@ -1,8 +1,8 @@
 package com.example.csit228capstone.controller.incidents;
-
 import com.example.csit228capstone.model.incident.*;
+import com.example.csit228capstone.repository.DispatchedResponderRepository;
 import com.example.csit228capstone.repository.IncidentRepository;
-
+import com.example.csit228capstone.repository.ResponderRepository;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,7 +20,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
@@ -28,25 +27,41 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
-
 public class IncidentsController implements Initializable {
-    @FXML private TextField searchField;
-    @FXML private ComboBox<String> filterSeverity;
-    @FXML private ComboBox<String> filterStatus;
-    @FXML private ComboBox<String> filterType;
-    @FXML private TableView<Incident> incidentsTable;
-    @FXML private TableColumn<Incident, String> colId;
-    @FXML private TableColumn<Incident, String> colType;
-    @FXML private TableColumn<Incident, String> colLocation;
-    @FXML private TableColumn<Incident, String> colReporter;
-    @FXML private TableColumn<Incident, String> colSeverity;
-    @FXML private TableColumn<Incident, String> colStatus;
-    @FXML private TableColumn<Incident, String> colTime;
-    @FXML private TableColumn<Incident, String> colResolved;
-    @FXML private TableColumn<Incident, Void> colActions;
-    @FXML private Label lblCritical;
-    @FXML private Label lblOngoing;
-    @FXML private Label lblResolved;
+    @FXML
+    private TextField searchField;
+    @FXML
+    private ComboBox<String> filterSeverity;
+    @FXML
+    private ComboBox<String> filterStatus;
+    @FXML
+    private ComboBox<String> filterType;
+    @FXML
+    private TableView<Incident> incidentsTable;
+    @FXML
+    private TableColumn<Incident, String> colId;
+    @FXML
+    private TableColumn<Incident, String> colType;
+    @FXML
+    private TableColumn<Incident, String> colLocation;
+    @FXML
+    private TableColumn<Incident, String> colReporter;
+    @FXML
+    private TableColumn<Incident, String> colSeverity;
+    @FXML
+    private TableColumn<Incident, String> colStatus;
+    @FXML
+    private TableColumn<Incident, String> colTime;
+    @FXML
+    private TableColumn<Incident, String> colResolved;
+    @FXML
+    private TableColumn<Incident, Void> colActions;
+    @FXML
+    private Label lblCritical;
+    @FXML
+    private Label lblOngoing;
+    @FXML
+    private Label lblResolved;
     private IncidentRepository repository;
     private ObservableList<Incident> incidentList;
     private FilteredList<Incident> filteredData;
@@ -172,6 +187,11 @@ public class IncidentsController implements Initializable {
 
     private void handleDirectResolve(Incident incident) {
         Stage resolveStage = new Stage();
+
+        if (incidentsTable.getScene() != null) {
+            resolveStage.initOwner(incidentsTable.getScene().getWindow());
+        }
+
         resolveStage.initModality(Modality.APPLICATION_MODAL);
         resolveStage.setTitle("Resolve Incident");
 
@@ -207,11 +227,19 @@ public class IncidentsController implements Initializable {
 
         btnConfirm.setOnAction(e -> {
             try {
-                repository.updateStatus(incident.getId(), IncidentStatus.RESOLVED, java.util.UUID.randomUUID(), "Quick Resolved from Dashboard");
+                repository.updateStatus(incident.getId(), IncidentStatus.RESOLVED,
+                        java.util.UUID.randomUUID(), "Quick Resolved from Dashboard");
+
+                // ✅ Auto-resolve all dispatched responders tied to this incident
+                new DispatchedResponderRepository()
+                        .updateStatusByIncidentId(incident.getId(), "returned");
+
+                new ResponderRepository()
+                        .markRespondersAvailableByIncident(incident.getId());
+
 
                 loadIncidentsData();
                 resolveStage.close();
-
                 System.out.println("Incident marked as resolved.");
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -234,6 +262,11 @@ public class IncidentsController implements Initializable {
 
     private void handleDirectDelete(Incident incident) {
         Stage confirmStage = new Stage();
+
+        if (incidentsTable.getScene() != null) {
+            confirmStage.initOwner(incidentsTable.getScene().getWindow());
+        }
+
         confirmStage.initModality(Modality.APPLICATION_MODAL);
         confirmStage.setTitle("Confirm Deletion");
 
@@ -384,9 +417,16 @@ public class IncidentsController implements Initializable {
             AddIncidentController addController = loader.getController();
 
             Stage stage = new Stage();
+
+            if (incidentsTable.getScene() != null) {
+                stage.initOwner(incidentsTable.getScene().getWindow());
+            }
+
             stage.setTitle("Report New Incident");
             stage.setScene(new Scene(root));
             stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setFullScreen(false);
+            stage.setResizable(false);
             stage.showAndWait();
 
             if (addController.isSaveClicked()) {
@@ -415,10 +455,17 @@ public class IncidentsController implements Initializable {
             controller.setIncidentData(selectedIncident);
 
             Stage stage = new Stage();
+
+            if (incidentsTable.getScene() != null) {
+                stage.initOwner(incidentsTable.getScene().getWindow());
+            }
+
             stage.setTitle("Incident Details - " + selectedIncident.getTitle());
             stage.setScene(new Scene(root));
 
             stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+            stage.setFullScreen(false);
             stage.setResizable(false);
 
             stage.showAndWait();
@@ -474,4 +521,5 @@ public class IncidentsController implements Initializable {
         colResolved.setReorderable(false);
         colActions.setReorderable(false);
     }
+
 }

@@ -46,6 +46,26 @@ public class ResponderFormController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         cbAgency.setItems(FXCollections.observableArrayList(KNOWN_AGENCIES));
         cbStatus.setItems(FXCollections.observableArrayList(STATUSES));
+
+        // Convert "on_mission" to "On Mission" for the UI
+        cbStatus.setConverter(new javafx.util.StringConverter<String>() {
+            @Override
+            public String toString(String systemName) {
+                if (systemName == null) return "";
+                return switch (systemName) {
+                    case "available"  -> "Available";
+                    case "on_mission" -> "On Mission";
+                    case "off_duty"   -> "Off Duty";
+                    default           -> systemName;
+                };
+            }
+
+            @Override
+            public String fromString(String string) {
+                return null; // Not needed for a non-editable ComboBox
+            }
+        });
+
         cbStatus.getSelectionModel().select("available");
     }
 
@@ -59,7 +79,11 @@ public class ResponderFormController implements Initializable {
             tfName.setText(r.getName());
             tfContact.setText(r.getContact() != null ? r.getContact() : "");
             cbAgency.setValue(r.getAgency());
-            cbStatus.setValue(r.getStatus());
+
+
+            if (r.getStatus() != null) {
+                cbStatus.setValue(r.getStatus().toLowerCase());
+            }
         }
     }
 

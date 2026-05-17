@@ -69,16 +69,24 @@ public class AddIncidentController implements Initializable {
             MapPickerController mapController = loader.getController();
 
             Stage stage = new Stage();
+
+            if (txtTitle.getScene() != null) {
+                stage.initOwner(txtTitle.getScene().getWindow());
+            }
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+            stage.setFullScreen(false);
+
             stage.setTitle("Pin Incident Location");
             stage.setScene(new Scene(root));
             stage.showAndWait();
 
-            String pinnedAddress = mapController.getSelectedAddress();
             double lat = mapController.getSelectedLatitude();
             double lng = mapController.getSelectedLongitude();
+            String pinnedAddress = mapController.getSelectedAddress();
 
-            if (pinnedAddress != null && !pinnedAddress.isEmpty()) {
-                txtDetail.setText(pinnedAddress);
+            if (lat != 0.0 || lng != 0.0) {
+                txtDetail.setText(pinnedAddress != null ? pinnedAddress : "");
                 this.pendingLatitude = lat;
                 this.pendingLongitude = lng;
                 this.isLocationPinned = true;
@@ -93,6 +101,8 @@ public class AddIncidentController implements Initializable {
     private void handleSave() {
         if (txtTitle.getText().isEmpty() || cbType.getValue() == null) {
             Alert alert = new Alert(Alert.AlertType.WARNING, "Title and Type are required.");
+
+            if (txtTitle.getScene() != null) alert.initOwner(txtTitle.getScene().getWindow());
             alert.show();
             return;
         }
@@ -114,6 +124,11 @@ public class AddIncidentController implements Initializable {
             if (chkSecurity.isSelected()) needsList.add("Security");
             if (chkWaterFood.isSelected()) needsList.add("Water/Food");
 
+            if (isLocationPinned) {
+                i.setLatitude(pendingLatitude);
+                i.setLongitude(pendingLongitude);
+            }
+
             LocalDate date = dpDate.getValue();
             i.setReportedAt(date.atTime(LocalTime.now()));
 
@@ -128,7 +143,10 @@ public class AddIncidentController implements Initializable {
 
         } catch (Exception e) {
             e.printStackTrace();
-            new Alert(Alert.AlertType.ERROR, "Save failed: " + e.getMessage()).show();
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Save failed: " + e.getMessage());
+
+            if (txtTitle.getScene() != null) alert.initOwner(txtTitle.getScene().getWindow());
+            alert.show();
         }
     }
 
@@ -143,6 +161,11 @@ public class AddIncidentController implements Initializable {
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+
+        if (txtTitle.getScene() != null && txtTitle.getScene().getWindow() != null) {
+            alert.initOwner(txtTitle.getScene().getWindow());
+        }
+
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);

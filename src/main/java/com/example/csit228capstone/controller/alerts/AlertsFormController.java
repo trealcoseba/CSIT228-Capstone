@@ -17,7 +17,6 @@ import java.util.UUID;
 
 public class AlertsFormController implements Initializable {
 
-    // Added fx:ids for the elements we want to change
     @FXML private Label            lblFormTitle;
     @FXML private Button           btnSchedule;
     @FXML private Button           btnSend;

@@ -367,11 +367,20 @@ public class ReportFormController {
             ctrl.loadReport(report, formData);
 
             Stage stage = new Stage();
+
+            if (tfReportName.getScene() != null) {
+                stage.initOwner(tfReportName.getScene().getWindow());
+            }
+
             stage.initModality(Modality.WINDOW_MODAL);
             stage.setScene(new Scene(root));
             stage.setTitle("Preview — " + report.getName());
+
             stage.setMinWidth(820);
             stage.setMinHeight(700);
+            stage.setFullScreen(false);
+            stage.setResizable(true);
+
             stage.show();
             ((Stage) tfReportName.getScene().getWindow()).close();
         } catch (IOException e) {
@@ -389,8 +398,17 @@ public class ReportFormController {
     }
 
     private void alert(String title, String msg) {
-        Alert a = new Alert(Alert.AlertType.WARNING);
-        a.setTitle(title); a.setHeaderText(null); a.setContentText(msg);
-        a.showAndWait();
+        javafx.application.Platform.runLater(() -> {
+            Alert a = new Alert(Alert.AlertType.WARNING);
+
+            if (tfReportName.getScene() != null && tfReportName.getScene().getWindow() != null) {
+                a.initOwner(tfReportName.getScene().getWindow());
+            }
+
+            a.setTitle(title);
+            a.setHeaderText(null);
+            a.setContentText(msg);
+            a.showAndWait();
+        });
     }
 }
