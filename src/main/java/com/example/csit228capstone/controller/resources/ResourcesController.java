@@ -87,12 +87,9 @@ public class ResourcesController {
     private final EvacuationService evacuationService = EvacuationService.getInstance();
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
 
-    // Holds all logs; the table shows a sorted/filtered view
     private ObservableList<ResourceLog> allLogs = FXCollections.observableArrayList();
-    // The resource ID currently highlighted in the log tab (null = show all)
     private UUID highlightedResourceId = null;
 
-    // ── Log sort options ──────────────────────────────────────────────────────
     private static final String SORT_DATE_DESC   = "Date Used (Newest)";
     private static final String SORT_DATE_ASC    = "Date Used (Oldest)";
     private static final String SORT_RESOURCE    = "Resource Name (A–Z)";
@@ -112,7 +109,6 @@ public class ResourcesController {
         resourcesTabPane.getTabs().remove(useResourceTab);
     }
 
-    // ── Log sort setup ────────────────────────────────────────────────────────
 
     private void setupLogSort() {
         if (cbLogSort == null) return; // guard for older FXML without the field
@@ -124,21 +120,14 @@ public class ResourcesController {
         cbLogSort.valueProperty().addListener((obs, o, n) -> applyLogView());
     }
 
-    /**
-     * Applies the current sort and optional resource filter to resourceLogTable.
-     * When highlightedResourceId is set the matching rows appear first (rows for
-     * that resource are still included in the full list but visually separated
-     * via row-factory styling).
-     */
+
     private void applyLogView() {
-        // If a filter is active, show only logs for that resource
         List<ResourceLog> base = (highlightedResourceId != null)
                 ? allLogs.stream()
                   .filter(rl -> highlightedResourceId.equals(rl.getResourceId()))
                   .collect(Collectors.toList())
                 : allLogs;
 
-        // --- sort ---
         String sortVal = cbLogSort != null ? cbLogSort.getValue() : SORT_DATE_DESC;
         Comparator<ResourceLog> cmp = switch (sortVal == null ? SORT_DATE_DESC : sortVal) {
             case SORT_DATE_ASC  -> Comparator.comparing(
@@ -157,7 +146,6 @@ public class ResourcesController {
 
         if (!sorted.isEmpty()) resourceLogTable.scrollTo(0);
 
-        // Show/hide the reset-filter button
         if (btnResetLogFilter != null) {
             btnResetLogFilter.setVisible(highlightedResourceId != null);
             btnResetLogFilter.setManaged(highlightedResourceId != null);
@@ -166,7 +154,6 @@ public class ResourcesController {
 
 
 
-    // ── Tab actions ───────────────────────────────────────────────────────────
 
     public void addResource(ActionEvent actionEvent) {
         if (!resourcesTabPane.getTabs().contains(addResourceTab)) {
@@ -254,10 +241,10 @@ public class ResourcesController {
         }
     }
 
-    // ── Table column setup ────────────────────────────────────────────────────
 
     private void setupTableColumns() {
         resourcesTable.getColumns().forEach(col -> col.setStyle("-fx-alignment: CENTER;"));
+        resourcesTable.getColumns().forEach(col -> col.setReorderable(false));
 
         colId.setCellValueFactory(cd -> {
             String value  = cd.getValue().getId() == null ? "-" : cd.getValue().getId().toString();
@@ -271,7 +258,6 @@ public class ResourcesController {
         colStatus.setCellValueFactory(cd   -> new ReadOnlyStringWrapper(computeStatus(cd.getValue())));
         colLocation.setCellValueFactory(cd -> new ReadOnlyStringWrapper("Barangay Storage"));
 
-        // ── Last Updated column: date + log-count badge ──────────────────────
         colLastUpdated.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(Void item, boolean empty) {
@@ -282,7 +268,6 @@ public class ResourcesController {
                 }
                 Resource resource = getTableRow().getItem();
 
-                // Count logs for this resource
                 long logCount = allLogs.stream()
                         .filter(rl -> resource.getId() != null && resource.getId().equals(rl.getResourceId()))
                         .count();
@@ -291,7 +276,6 @@ public class ResourcesController {
                 badgeBtn.getStyleClass().add("log-badge-btn");
                 badgeBtn.setOnAction(e -> navigateToResourceLogs(resource));
 
-                // Date label below the badge
                 LocalDateTime dt = resource.getUpdatedAt();
                 Label dateLabel = new Label(dt == null ? "-" : dt.format(DATE_FMT));
                 dateLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #666;");
@@ -302,7 +286,6 @@ public class ResourcesController {
             }
         });
 
-        // ── Actions column: Edit (yellow) + Delete (red) ────────────────────
         colActions.setCellFactory(col -> new TableCell<>() {
             private final Button editBtn   = new Button("Edit");
             private final Button deleteBtn = new Button("Delete");
@@ -333,6 +316,7 @@ public class ResourcesController {
 
     private void setupLogTableColumns() {
         resourceLogTable.getColumns().forEach(col -> col.setStyle("-fx-alignment: CENTER;"));
+        resourceLogTable.getColumns().forEach(col -> col.setReorderable(false));
         colLogPurpose.setStyle("-fx-alignment: CENTER-LEFT;");
 
         colLogDate.setCellValueFactory(cd -> {
@@ -347,14 +331,10 @@ public class ResourcesController {
         colLogAvailable.setCellValueFactory(cd -> new ReadOnlyStringWrapper(formatQtyWithUnit(
                 cd.getValue().getQuantityAvailableAtTime(), cd.getValue().getResourceUnit())));
 
-        // Rows are filtered by applyLogView(); no custom row factory needed.
     }
 
-    // ── Navigate from inventory row badge to log tab ──────────────────────────
 
-    /**
-     * Switches to the Log tab and sorts/highlights all log entries for the given resource.
-     */
+
     private void navigateToResourceLogs(Resource resource) {
         highlightedResourceId = resource.getId();
         applyLogView();   // always call directly so highlight + button state update
@@ -368,7 +348,6 @@ public class ResourcesController {
         applyLogView();
     }
 
-    // ── Form / data helpers ───────────────────────────────────────────────────
 
     private void setupFormDefaults() {
         cbResourceCategory.setItems(FXCollections.observableArrayList(

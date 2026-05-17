@@ -1414,7 +1414,6 @@
     -fx-text-transform: uppercase;
 }
 
-/* Styling the Tooltip popup */
 .message-tooltip {
     -fx-background-color: #2c3e50;
     -fx-text-fill: white;
@@ -1423,7 +1422,6 @@
     -fx-background-radius: 5px;
 }
 
-/* Styling the View button */
 .qa-view {
     -fx-background-color: #34495e;
     -fx-text-fill: white;
@@ -1432,21 +1430,17 @@
     -fx-background-color: #2c3e50;
 }
 
-/* Ensure the message column text doesn't wrap
-   (Ellipsis only works on single lines) */
 .incident-table .table-cell {
     -fx-alignment: CENTER-LEFT;
 }
 
-/* Center the text in the column headers */
 .table-view .column-header .label {
     -fx-alignment: CENTER;
     -fx-text-alignment: CENTER;
 }
 
-/* Ensure tooltips are readable */
 .tooltip {
-    -fx-show-delay: 200ms; /* Makes the tooltip appear faster (0.2 seconds) */
+    -fx-show-delay: 200ms;
     -fx-background-color: #2c3e50;
     -fx-text-fill: white;
     -fx-padding: 10;
@@ -1460,29 +1454,26 @@
     -fx-font-size: 14px;
 }
 
-/* Soft, modern gray for the icon */
+
 .empty-state-icon {
-    -fx-fill: #ecf0f1; /* Very light gray-blue */
-    -fx-stroke: #bdc3c7; /* Subtle outline */
+    -fx-fill: #ecf0f1;
+    -fx-stroke: #bdc3c7;
     -fx-stroke-width: 0.5;
 }
 
-/* Make the title look like a real dashboard title */
 .empty-state-title {
     -fx-font-size: 20px;
     -fx-font-weight: bold;
-    -fx-text-fill: #7f8c8d; /* Muted slate gray */
-    -fx-padding: 30 0 0 0; /* Space for the scaled icon */
+    -fx-text-fill: #7f8c8d;
+    -fx-padding: 30 0 0 0;
 }
 
-/* Subtitle with better line spacing */
 .empty-state-subtitle {
     -fx-font-size: 14px;
     -fx-text-fill: #95a5a6;
     -fx-line-spacing: 5px;
 }
 
-/* Ensure no weird blue background on the placeholder */
 .table-view .placeholder {
     -fx-background-color: white;
 }
@@ -1501,14 +1492,12 @@
     -fx-background-color: white;
 }
 
-/* Style for the filter HBox container */
 .filter-container {
     -fx-background-color: white;
     -fx-background-radius: 10;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);
 }
-/* ── Compact table action buttons (Edit / Use) ──────────────────────────── */
-/* Matches the small View/Delete style seen in the Generated Reports table   */
+
 .tbl-action-btn-yellow {
     -fx-background-color: #d4a017;
     -fx-text-fill: white;
@@ -1539,8 +1528,7 @@
     -fx-background-color: #96281b;
 }
 
-/* ── Resource log badge button (shown in Last Updated cell) ─────────────── */
-/* Badge is larger now, sits above the date                                  */
+
 .log-badge-btn {
     -fx-background-color: #1a3c6e;
     -fx-text-fill: white;
@@ -1556,7 +1544,6 @@
     -fx-background-color: #2a5298;
 }
 
-/* ── Highlighted log row (resource-specific view from badge click) ───────── */
 .log-row-highlight {
     -fx-background-color: #e8f0fe;
 }
@@ -1564,7 +1551,6 @@
     -fx-background-color: #b8d0f8;
 }
 
-/* ── Reset filter button (appears in Log tab when a resource filter is active) */
 .btn-reset-filter {
     -fx-background-color: #f0f0f0;
     -fx-text-fill: #c0392b;

@@ -12,7 +12,7 @@ public class LigtasApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        // Initialize DB connection pool
+
         SupabaseConnectionManager.getInstance();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/csit228capstone/login/Login.fxml"));
@@ -24,21 +24,16 @@ public class LigtasApp extends Application {
         primaryStage.setTitle("LIGTAS-Brgy — Barangay Command Center");
         primaryStage.setScene(scene);
 
-        // Set app icon — place your icon file at:
-        // src/main/resources/com/example/csit228capstone/images/app_icon.png
         try {
             Image icon = new Image(
                     getClass().getResourceAsStream("/images/ligtas-brgy-logo.png")
             );
             primaryStage.getIcons().add(icon);
         } catch (Exception e) {
-            // Icon not found — app still launches normally
             System.err.println("App icon not found: " + e.getMessage());
         }
 
-//        primaryStage.setMinWidth(1200);
-//        primaryStage.setMinHeight(800);
-//        primaryStage.setFullScreen(true);
+
         primaryStage.show();
     }
 
