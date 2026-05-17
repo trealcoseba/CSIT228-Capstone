@@ -95,9 +95,6 @@ public class ReportData<T> {
     public ReportFormData getFormData() { return formData; }
     public void setFormData(ReportFormData v) { this.formData = v; }
 
-    /**
-     * Convenience helper — only valid when T is List<List<String>>.
-     */
     @SuppressWarnings("unchecked")
     public List<List<String>> getRows() {
         if (payload instanceof List) {
