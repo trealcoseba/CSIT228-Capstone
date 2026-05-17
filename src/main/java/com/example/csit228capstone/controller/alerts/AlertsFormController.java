@@ -17,6 +17,11 @@ import java.util.UUID;
 
 public class AlertsFormController implements Initializable {
 
+    // Added fx:ids for the elements we want to change
+    @FXML private Label            lblFormTitle;
+    @FXML private Button           btnSchedule;
+    @FXML private Button           btnSend;
+
     @FXML private ComboBox<String> cmbType;
     @FXML private ComboBox<String> cmbPriority;
     @FXML private TextArea         txtMessage;
@@ -24,7 +29,6 @@ public class AlertsFormController implements Initializable {
     @FXML private CheckBox         chkSchedule;
     @FXML private DatePicker       dpExpires;
     @FXML private Label            lblStatus;
-
     private Alert existingAlert;
     private Runnable onSaveCallback;
     private final AlertsRepository repo = new AlertsRepository();
@@ -36,7 +40,6 @@ public class AlertsFormController implements Initializable {
                 "Health Notice", "Security Alert", "General Announcement"
         );
 
-        // Populate UI with Uppercase names for professional look
         cmbPriority.getItems().clear();
         for (AlertPriority p : AlertPriority.values()) {
             cmbPriority.getItems().add(p.name());
@@ -49,9 +52,26 @@ public class AlertsFormController implements Initializable {
 
     public void loadAlert(Alert alert) {
         this.existingAlert = alert;
+
+        // --- 1. CHANGE TITLE ---
+        lblFormTitle.setText("Edit Broadcast");
+
+        // --- 2. HIDE SCHEDULE BUTTON ---
+        // setVisible(false) makes it disappear
+        // setManaged(false) stops it from taking up physical space in the HBox
+        btnSchedule.setVisible(false);
+        btnSchedule.setManaged(false);
+
+        // --- 3. CHANGE SEND BUTTON TO SAVE ---
+        btnSend.setText("Save Changes");
+
+        // Optional: Change color to blue (qa-info) instead of orange (qa-warning)
+        btnSend.getStyleClass().remove("qa-warning");
+        btnSend.getStyleClass().add("qa-info");
+
+        // --- 4. FILL THE FIELDS ---
         cmbType.setValue(alert.getTitle());
 
-        // Ensure the UI shows the priority in Uppercase even if DB is lowercase
         if (alert.getPriority() != null) {
             cmbPriority.setValue(alert.getPriority().name().toUpperCase());
         }
@@ -74,7 +94,8 @@ public class AlertsFormController implements Initializable {
         if (!validateForm()) return;
         try {
             if (existingAlert != null) {
-                applyFormTo(existingAlert, false);
+                // If editing, use current schedule status (don't force off)
+                applyFormTo(existingAlert, chkSchedule.isSelected());
                 repo.update(existingAlert);
             } else {
                 repo.save(buildAlert(false));
@@ -125,15 +146,12 @@ public class AlertsFormController implements Initializable {
         a.setTitle(cmbType.getValue());
         a.setBody(txtMessage.getText().trim());
 
-        // CRITICAL FIX: Convert UI String to Uppercase before valueOf
         String selectedPriority = cmbPriority.getValue();
         if (selectedPriority != null) {
             try {
-                // valueOf is case-sensitive, so we MUST use toUpperCase()
                 a.setPriority(AlertPriority.valueOf(selectedPriority.toUpperCase().trim()));
             } catch (IllegalArgumentException e) {
-                System.err.println("Invalid priority: " + selectedPriority);
-                a.setPriority(AlertPriority.MEDIUM); // safe fallback
+                a.setPriority(AlertPriority.MEDIUM);
             }
         }
 
@@ -175,4 +193,6 @@ public class AlertsFormController implements Initializable {
             ((Stage) txtMessage.getScene().getWindow()).close();
         }
     }
+
+
 }

@@ -28,8 +28,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-
-// Added for Truncation & Tooltips
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.Tooltip;
 
