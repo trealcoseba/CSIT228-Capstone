@@ -1,21 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.web.WebView?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.web.*?>
 
-<ScrollPane fitToWidth="true" prefHeight="800.0" prefWidth="1000.0" styleClass="dashboard-scroll" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.evacuation.EvacuationController">
+<ScrollPane fitToWidth="true" prefHeight="800.0" prefWidth="1000.0" styleClass="dashboard-scroll" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.evacuation.EvacuationController">
 
     <content>
         <VBox fillWidth="true" spacing="16">
@@ -60,7 +50,7 @@
                     <children>
                         <Label styleClass="panel-title" text="Evacuation Map" />
                         <StackPane maxHeight="500" minHeight="500" prefHeight="500" VBox.vgrow="ALWAYS">
-                            <WebView fx:id="mapWebView" maxHeight="498.0" maxWidth="545.0" minHeight="400" minWidth="400" prefHeight="498.0" prefWidth="505.0" StackPane.alignment="CENTER" />
+                            <WebView fx:id="mapWebView" minHeight="-Infinity" minWidth="-Infinity" prefHeight="-1.0" prefWidth="-1.0" StackPane.alignment="CENTER" />
                         </StackPane>
                     </children>
                 </VBox>
@@ -75,7 +65,7 @@
             </HBox>
 
             <!-- Filters -->
-            <HBox spacing="12" alignment="CENTER_LEFT">
+            <HBox alignment="CENTER_LEFT" spacing="12">
                 <ComboBox fx:id="filterStatus" prefWidth="120" promptText="Status" />
                 <ComboBox fx:id="filterAscOrDesc" prefWidth="120" />
                 <Region HBox.hgrow="ALWAYS" />

@@ -10,17 +10,10 @@ import java.util.UUID;
 
 public class ResponderRepository {
 
-    // ─── Connection ──────────────────────────────────────────────────────────────
-
     private Connection getConn() throws SQLException {
         return SupabaseConnectionManager.getInstance().getConnection();
     }
 
-    // ─── READ: Fetch all responders with dispatch counts ─────────────────────────
-
-    /**
-     * Fetches all responders, annotated with total and active dispatch counts.
-     */
     public List<Responder> findAll() throws SQLException {
         String sql = """
             SELECT
@@ -139,11 +132,28 @@ public class ResponderRepository {
     // ─── DELETE ───────────────────────────────────────────────────────────────────
 
     public void delete(UUID id) throws SQLException {
-        String sql = "DELETE FROM responders WHERE id = ?";
-        try (Connection conn = getConn();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setObject(1, id);
-            ps.executeUpdate();
+        // Must delete child records first before deleting the responder
+        String deleteDispatches = "DELETE FROM dispatched_responders WHERE responder_id = ?";
+        String deleteResponder  = "DELETE FROM responders WHERE id = ?";
+
+        try (Connection conn = getConn()) {
+            conn.setAutoCommit(false); // wrap both in a transaction
+            try (PreparedStatement ps1 = conn.prepareStatement(deleteDispatches);
+                 PreparedStatement ps2 = conn.prepareStatement(deleteResponder)) {
+
+                ps1.setObject(1, id);
+                ps1.executeUpdate();
+
+                ps2.setObject(1, id);
+                ps2.executeUpdate();
+
+                conn.commit();
+            } catch (SQLException ex) {
+                conn.rollback();
+                throw ex;
+            } finally {
+                conn.setAutoCommit(true);
+            }
         }
     }
 

@@ -1,8 +1,10 @@
 package com.example.csit228capstone.controller.responder;
 
+import com.example.csit228capstone.model.incident.Incident;
 import com.example.csit228capstone.model.responder.DispatchedResponder;
 import com.example.csit228capstone.model.responder.Responder;
 import com.example.csit228capstone.repository.DispatchedResponderRepository;
+import com.example.csit228capstone.repository.IncidentRepository;
 import com.example.csit228capstone.repository.ResponderRepository;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -27,14 +29,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
-/**
- * Controller for dispatch_form.fxml.
- * Usage:
- *   DispatchFormController ctrl = FxmlUtil.openDialog(...);
- *   ctrl.preSelectResponder(responder); // optional — pre-fill from registry click
- *   ctrl.setIncidentIds(incidentIds);   // pass in list of UUIDs
- *   ctrl.setOnDispatched(this::loadData);
- */
+
 public class DispatchedFormController implements Initializable {
 
     // ─── FXML ────────────────────────────────────────────────────────────────────
@@ -59,8 +54,7 @@ public class DispatchedFormController implements Initializable {
     // ─── State ────────────────────────────────────────────────────────────────────
     private final ResponderRepository           responderRepo = new ResponderRepository();
     private final DispatchedResponderRepository  dispatchRepo  = new DispatchedResponderRepository();
-    private final com.example.csit228capstone.repository.IncidentRepository incidentRepo =
-            new com.example.csit228capstone.repository.IncidentRepository();
+    private final IncidentRepository incidentRepo = new IncidentRepository();
 
     private Runnable onDispatched;
     private List<com.example.csit228capstone.model.incident.Incident> incidentCache = new java.util.ArrayList<>();
@@ -154,45 +148,30 @@ public class DispatchedFormController implements Initializable {
      * Returns one of {"Low","Moderate","High","Critical"} based on the incident,
      * or null if no severity information is available.
      */
-    private String resolveSeverity(com.example.csit228capstone.model.incident.Incident i) {
-        // Option A — if Incident has getSeverity() returning a String
-        try {
-            String sev = (String) i.getClass().getMethod("getSeverity").invoke(i);
-            if (sev != null) {
-                // Normalize casing: "high" → "High", "CRITICAL" → "Critical", etc.
-                for (String canonical : SEVERITIES) {
-                    if (canonical.equalsIgnoreCase(sev.trim())) return canonical;
-                }
-                return sev; // return as-is if not a standard value
+    private String resolveSeverity(Incident i) {
+        if (i.getSeverity() != null) {
+            for (String canonical : SEVERITIES) {
+                if (canonical.equalsIgnoreCase(i.getSeverity().getDisplayName())) return canonical;
             }
-        } catch (Exception ignored) { }
-
-        // Option B — derive from incident type
+        }
+        // fallback to type-based mapping
         if (i.getType() != null) {
             return switch (i.getType().name().toUpperCase()) {
-                case "FIRE", "EXPLOSION"          -> "Critical";
-                case "FLOOD", "EARTHQUAKE"        -> "High";
-                case "MEDICAL", "ACCIDENT"        -> "Moderate";
-                default                           -> "Low";
+                case "FIRE", "EXPLOSION"   -> "Critical";
+                case "FLOOD", "EARTHQUAKE" -> "High";
+                case "MEDICAL", "ACCIDENT" -> "Moderate";
+                default                    -> "Low";
             };
         }
-
         return null;
     }
 
-    /** Returns a human-readable location string from the incident, or null. */
     private String resolveLocation(com.example.csit228capstone.model.incident.Incident i) {
-        // Try getLocation() first, then getAddress()
-        for (String getter : new String[]{"getLocation", "getAddress"}) {
-            try {
-                Object val = i.getClass().getMethod(getter).invoke(i);
-                if (val instanceof String s && !s.isBlank()) return s;
-            } catch (Exception ignored) { }
-        }
-        return null;
+        String detail = i.getLocationDetail();
+        return (detail != null && !detail.isBlank()) ? detail : null;
     }
 
-    private double resolveLatitude(com.example.csit228capstone.model.incident.Incident i) {
+    private double resolveLatitude(Incident i) {
         for (String getter : new String[]{"getLatitude", "getLat"}) {
             try {
                 Object val = i.getClass().getMethod(getter).invoke(i);
@@ -203,7 +182,7 @@ public class DispatchedFormController implements Initializable {
         return 0.0;
     }
 
-    private double resolveLongitude(com.example.csit228capstone.model.incident.Incident i) {
+    private double resolveLongitude(Incident i) {
         for (String getter : new String[]{"getLongitude", "getLng"}) {
             try {
                 Object val = i.getClass().getMethod(getter).invoke(i);
@@ -214,14 +193,8 @@ public class DispatchedFormController implements Initializable {
         return 0.0;
     }
 
-    private LocalDateTime resolveTime(com.example.csit228capstone.model.incident.Incident i) {
-        for (String getter : new String[]{"getTimeOccurred", "getOccurredAt", "getCreatedAt", "getTimestamp"}) {
-            try {
-                Object val = i.getClass().getMethod(getter).invoke(i);
-                if (val instanceof LocalDateTime ldt) return ldt;
-            } catch (Exception ignored) { }
-        }
-        return null;
+    private LocalDateTime resolveTime(Incident i) {
+        return i.getReportedAt(); // already a LocalDateTime
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
@@ -268,9 +241,20 @@ public class DispatchedFormController implements Initializable {
             com.example.csit228capstone.controller.map.MapPickerController mapCtrl = loader.getController();
 
             Stage stage = new Stage();
+
+            // FIX: Set Owner to the current form window
+            if (btnDispatch.getScene() != null) {
+                stage.initOwner(btnDispatch.getScene().getWindow());
+            }
+
             stage.setTitle("Pin Deployment Location");
             stage.setScene(new javafx.scene.Scene(root));
             stage.initModality(Modality.APPLICATION_MODAL);
+
+            // FIX: Disable resizability and force full-screen off
+            stage.setResizable(false);
+            stage.setFullScreen(false);
+
             stage.showAndWait();
 
             String address = mapCtrl.getSelectedAddress();
@@ -426,7 +410,13 @@ public class DispatchedFormController implements Initializable {
     }
 
     private void showError(String msg) {
-        new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK).showAndWait();
+        Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
+
+        if (btnDispatch.getScene() != null && btnDispatch.getScene().getWindow() != null) {
+            alert.initOwner(btnDispatch.getScene().getWindow());
+        }
+
+        alert.showAndWait();
     }
 
     private void closeStage() {

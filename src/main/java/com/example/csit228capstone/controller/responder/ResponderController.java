@@ -109,6 +109,7 @@ public class ResponderController implements Initializable {
         setupMissionFilters();
         setupSearchBar();
         loadAll();
+        formatTable();
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -198,10 +199,9 @@ public class ResponderController implements Initializable {
         // ── DISPATCH CARD COLUMN ──────────────────────────────────────────────────
         colDispatches.setCellFactory(col -> new TableCell<>() {
 
-            // Header chip (always visible, clickable)
+
             private final Button chip = new Button();
 
-            // Mini overview rows (up to 3 most recent missions)
             private final VBox overviewBox = new VBox(3);
             private final VBox container   = new VBox(5, chip, overviewBox);
 
@@ -212,6 +212,11 @@ public class ResponderController implements Initializable {
                     Responder r = getTableView().getItems().get(getIndex());
                     jumpToMissionLog(r);
                 });
+            }
+
+            @Override
+            public void updateSelected(boolean selected) {
+                super.updateSelected(false);
             }
 
             @Override
@@ -228,7 +233,6 @@ public class ResponderController implements Initializable {
                 int total  = r.getTotalDispatches();
                 int active = r.getActiveDispatches();
 
-                // ── Chip label & color ──
                 String dotColor;
                 String chipLabel;
                 if (active > 0) {
@@ -254,24 +258,23 @@ public class ResponderController implements Initializable {
                                 "-fx-padding: 3 8;"
                 );
 
-                // ── Mini mission overview (pulled from the already-loaded missionList) ──
                 if (total > 0) {
                     missionList.stream()
                             .filter(dr -> r.getId().equals(dr.getResponderId()))
                             .limit(3)
                             .forEach(dr -> {
-                                // Status dot
+
                                 String dot = switch (dr.getStatus() != null ? dr.getStatus() : "") {
                                     case "dispatched" -> "🟡";
                                     case "returned"   -> "🟢";
                                     default           -> "⚫";
                                 };
-                                // Severity / incident type (fall back to short incident ID)
+
                                 String type = (dr.getSeverity() != null && !dr.getSeverity().isBlank())
                                         ? dr.getSeverity()
                                         : "INC-" + dr.getShortIncidentId();
 
-                                // Date (dispatch date only, compact)
+
                                 String date = dr.getDispatchedAt() != null
                                         ? dr.getDispatchedAt().toLocalDate()
                                           .format(java.time.format.DateTimeFormatter.ofPattern("MMM dd"))
@@ -291,30 +294,35 @@ public class ResponderController implements Initializable {
             }
         });
 
-        // ── STATUS BADGE COLUMN ────────────────────────────────────────────────────
+
         colStatus.setCellFactory(col -> new TableCell<>() {
             private final Label badge = new Label();
+            private final HBox  box   = new HBox(badge); // ← wrap in HBox
+
+            {
+                box.setAlignment(Pos.CENTER); // ← center here, not on the cell
+            }
+
+            @Override
+            public void updateSelected(boolean selected) { super.updateSelected(false); }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || getIndex() >= getTableView().getItems().size()) {
-                    setGraphic(null);
-                    return;
+                    setGraphic(null); return;
                 }
 
                 Responder r = getTableView().getItems().get(getIndex());
 
-                String bg, fg;
+                String bg, fg, text;
                 switch (r.getStatus() != null ? r.getStatus() : "") {
-                    case "available"  -> { bg = "#052e16"; fg = "#00ff88"; }
-                    case "on_mission" -> { bg = "#451a03"; fg = "#ffb300"; }
-                    default           -> { bg = "#1f2937"; fg = "#9ca3af"; }
+                    case "available"  -> { bg = "#052e16"; fg = "#00ff88"; text = "Available";  }
+                    case "on_mission" -> { bg = "#451a03"; fg = "#ffb300"; text = "On Mission"; }
+                    default           -> { bg = "#1f2937"; fg = "#9ca3af"; text = "Off Duty";   }
                 }
 
-                badge.setText(r.getStatusLabel());
-
-                // ✅ Set the FULL style fresh every time — never append to getStyle()
+                badge.setText(text);
                 badge.setStyle(
                         "-fx-padding: 3 10;" +
                                 "-fx-background-radius: 12;" +
@@ -324,47 +332,46 @@ public class ResponderController implements Initializable {
                                 "-fx-text-fill: " + fg + ";"
                 );
 
-                setAlignment(Pos.CENTER);
-                // ✅ Clear the cell's own background so selection doesn't bleed through
                 setStyle("-fx-background-color: transparent;");
-                setGraphic(badge);
+                setGraphic(box); // ← set the HBox, not the bare badge
             }
         });
 
-        // ── ACTION BUTTONS COLUMN ─────────────────────────────────────────────────
         colAction.setCellFactory(col -> new TableCell<>() {
             private final Button btnEdit     = new Button("Edit");
             private final Button btnDelete   = new Button("Delete");
             private final Button btnDispatch = new Button("Dispatch");
             private final HBox   box         = new HBox(4, btnEdit, btnDispatch, btnDelete);
 
+
             {
                 box.setAlignment(Pos.CENTER);
                 btnDispatch.setStyle("""
-                                -fx-background-color: #bbf7d0;
-                                -fx-text-fill: #166534;
-                                -fx-font-size: 10px;
-                                -fx-padding: 3 8 3 8;
-                                -fx-background-radius: 4;
-                                -fx-cursor: hand;
-                                """);
-                btnEdit.setStyle("""
-                                -fx-background-color: #bfdbfe;
-                                -fx-text-fill: #1e40af;
-                                -fx-font-size: 10px;
-                                -fx-padding: 3 8 3 8;
-                                -fx-background-radius: 4;
-                                -fx-cursor: hand;
-                                """);
-                btnDelete.setStyle("""
-                                -fx-background-color: #fecaca;
-                                -fx-text-fill: #991b1b;
-                                -fx-font-size: 10px;
-                                -fx-padding: 3 8 3 8;
-                                -fx-background-radius: 4;
-                                -fx-cursor: hand;
-                                """);
+                    -fx-background-color: #3aab8a;
+                    -fx-text-fill: white;
+                    -fx-font-size: 11px;
+                    -fx-padding: 5 12 5 12;
+                    -fx-background-radius: 8;
+                    -fx-cursor: hand;
+                    """);
 
+                btnEdit.setStyle("""
+                    -fx-background-color: #d4a017;
+                    -fx-text-fill: white;
+                    -fx-font-size: 11px;
+                    -fx-padding: 5 12 5 12;
+                    -fx-background-radius: 8;
+                    -fx-cursor: hand;
+                    """);
+
+                btnDelete.setStyle("""
+                    -fx-background-color: #c0392b;
+                    -fx-text-fill: white;
+                    -fx-font-size: 11px;
+                    -fx-padding: 5 12 5 12;
+                    -fx-background-radius: 8;
+                    -fx-cursor: hand;
+                    """);
 
                 btnEdit.setOnAction(e -> {
                     Responder r = getTableView().getItems().get(getIndex());
@@ -383,6 +390,11 @@ public class ResponderController implements Initializable {
             }
 
             @Override
+            public void updateSelected(boolean selected) {
+                super.updateSelected(false);
+            }
+
+            @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 setGraphic(empty ? null : box);
@@ -392,6 +404,8 @@ public class ResponderController implements Initializable {
         // Wrap in FilteredList
         filteredResponders = new FilteredList<>(responderList, p -> true);
         tblResponders.setItems(filteredResponders);
+
+
     }
 
     private void styleActionButton(Button btn, String bg, String fg) {
@@ -441,6 +455,11 @@ public class ResponderController implements Initializable {
             }
 
             @Override
+            public void updateSelected(boolean selected) {
+                super.updateSelected(false);
+            }
+
+            @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || getIndex() >= getTableView().getItems().size()) {
@@ -464,14 +483,30 @@ public class ResponderController implements Initializable {
 
         // ── OPERATIONS COLUMN ─────────────────────────────────────────────────────
         colDispatchActions.setCellFactory(col -> new TableCell<>() {
-            private final Button btnReturn  = new Button("✅ Return");
-            private final Button btnCancel  = new Button("✖ Cancel");
+            private final Button btnReturn  = new Button("Return");
+            private final Button btnCancel  = new Button("Cancel");
             private final HBox   box        = new HBox(6, btnReturn, btnCancel);
+
 
             {
                 box.setAlignment(Pos.CENTER);
-                styleActionButton(btnReturn, "#052e16", "#00ff88");
-                styleActionButton(btnCancel, "#3b0f0f", "#f87171");
+                btnReturn.setStyle("""
+                    -fx-background-color: #3aab8a;
+                    -fx-text-fill: white;
+                    -fx-font-size: 11px;
+                    -fx-padding: 5 12 5 12;
+                    -fx-background-radius: 8;
+                    -fx-cursor: hand;
+                    """);
+
+                btnCancel.setStyle("""
+                    -fx-background-color: #c0392b;
+                    -fx-text-fill: white;
+                    -fx-font-size: 11px;
+                    -fx-padding: 5 12 5 12;
+                    -fx-background-radius: 8;
+                    -fx-cursor: hand;
+                    """);
 
                 btnReturn.setOnAction(e -> {
                     DispatchedResponder dr = getTableView().getItems().get(getIndex());
@@ -482,6 +517,11 @@ public class ResponderController implements Initializable {
                     DispatchedResponder dr = getTableView().getItems().get(getIndex());
                     updateMissionStatus(dr, "cancelled");
                 });
+            }
+
+            @Override
+            public void updateSelected(boolean selected) {
+                super.updateSelected(false);
             }
 
             @Override
@@ -501,6 +541,13 @@ public class ResponderController implements Initializable {
 
         filteredMissions = new FilteredList<>(missionList, p -> true);
         tblDispatched.setItems(filteredMissions);
+
+        // At the end, after filteredMissions setup
+        tblDispatched.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                Platform.runLater(() -> tblDispatched.getSelectionModel().clearSelection());
+            }
+        });
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -634,30 +681,26 @@ public class ResponderController implements Initializable {
     private void jumpToMissionLog(Responder r) {
         missionFilterResponderId = r.getId();
 
-        // Show filter banner
         lblMissionFilter.setText("Showing missions for: " + r.getName());
         lblMissionFilter.setVisible(true);
         lblMissionFilter.setManaged(true);
 
         applyMissionFilter();
-
-        // Switch tab
         mainTabPane.getSelectionModel().select(1);
 
-        // Highlight all rows for this responder
-        tblDispatched.refresh();
         Platform.runLater(() -> {
             tblDispatched.setRowFactory(tv -> new TableRow<>() {
                 @Override
                 protected void updateItem(DispatchedResponder item, boolean empty) {
                     super.updateItem(item, empty);
                     if (item != null && r.getId().equals(item.getResponderId())) {
-                        setStyle("-fx-background-color: #adccf7;");
+                        setStyle("-fx-background-color: #aac8f0;"); // dark blue fits dark theme better
                     } else {
                         setStyle("");
                     }
                 }
             });
+            tblDispatched.refresh();
         });
     }
 
@@ -680,10 +723,19 @@ public class ResponderController implements Initializable {
             ctrl.setOnSaved(this::loadAll);
 
             Stage stage = new Stage();
+
+            // FIX: Set Owner and prevent full screen
+            if (mainTabPane.getScene() != null) {
+                stage.initOwner(mainTabPane.getScene().getWindow());
+            }
+
             stage.setTitle(editTarget == null ? "Add Responder" : "Edit Responder");
             stage.setScene(new Scene(root));
             stage.initModality(Modality.APPLICATION_MODAL);
+
             stage.setResizable(false);
+            stage.setFullScreen(false);
+
             stage.showAndWait();
 
         } catch (IOException ex) {
@@ -705,15 +757,23 @@ public class ResponderController implements Initializable {
 
             if (preSelected != null) ctrl.preSelectResponder(preSelected);
 
-            // Incidents are loaded automatically inside DispatchFormController.initialize()
-
             ctrl.setOnDispatched(this::loadAll);
 
             Stage stage = new Stage();
+
+            // FIX: Set Owner and prevent full screen
+            if (mainTabPane.getScene() != null) {
+                stage.initOwner(mainTabPane.getScene().getWindow());
+            }
+
             stage.setTitle("Log Dispatch Mission");
             stage.setScene(new Scene(root));
             stage.initModality(Modality.APPLICATION_MODAL);
+
+            // FIX: Force floating window behavior
             stage.setResizable(false);
+            stage.setFullScreen(false);
+
             stage.showAndWait();
 
         } catch (IOException ex) {
@@ -726,14 +786,22 @@ public class ResponderController implements Initializable {
     // ══════════════════════════════════════════════════════════════
 
     private void confirmDelete(Responder r) {
+        String warningLine = r.getTotalDispatches() > 0
+                ? "\nThis will also delete " + r.getTotalDispatches() + " mission record(s)."
+                : "";
+
         Alert alert = new Alert(
                 Alert.AlertType.CONFIRMATION,
-                "Delete responder \"" + r.getName() + "\"? This cannot be undone.",
+                "Delete responder \"" + r.getName() + "\"? This cannot be undone." + warningLine,
                 ButtonType.YES, ButtonType.CANCEL
         );
 
-        alert.setTitle("Confirm Delete");
+        // FIX: Set Owner
+        if (mainTabPane.getScene() != null) {
+            alert.initOwner(mainTabPane.getScene().getWindow());
+        }
 
+        alert.setTitle("Confirm Delete");
         alert.showAndWait().ifPresent(btn -> {
             if (btn == ButtonType.YES) {
                 try {
@@ -803,6 +871,61 @@ public class ResponderController implements Initializable {
     }
 
     private void showError(String msg) {
-        new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK).showAndWait();
+        Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
+
+        // FIX: Set Owner
+        if (mainTabPane.getScene() != null) {
+            alert.initOwner(mainTabPane.getScene().getWindow());
+        }
+
+        alert.showAndWait();
+    }
+
+    private void formatTable() {
+
+        // ── REGISTRY TABLE ────────────────────────────────────────────────────────
+        colId.setPrefWidth(90);
+        colName.setPrefWidth(160);
+        colAgency.setPrefWidth(140);
+        colContact.setPrefWidth(140);
+        colDispatches.setPrefWidth(220);
+        colStatus.setPrefWidth(110);
+        colAction.setPrefWidth(210);
+
+        for (TableColumn<Responder, ?> col : List.of(
+                colId, colName, colAgency, colContact, colDispatches, colStatus, colAction)) {
+            col.setResizable(false);
+            col.setStyle("-fx-alignment: CENTER");
+            col.setReorderable(false);
+        }
+
+        colStatus.setStyle("-fx-alignment: CENTER;");
+
+
+        // ── MISSION LOG TABLE ─────────────────────────────────────────────────────
+        colDispatchId.setPrefWidth(90);
+        colDispatchName.setPrefWidth(150);
+        colIncidentId.setPrefWidth(100);
+        colSeverity.setPrefWidth(100);
+        colLocation.setPrefWidth(180);
+        colDispatchTime.setPrefWidth(140);
+        colDuration.setPrefWidth(110);
+        colMissionStatus.setPrefWidth(120);
+        colDispatchActions.setPrefWidth(160);
+
+        for (TableColumn<DispatchedResponder, ?> col : List.of(
+                colDispatchId, colDispatchName, colIncidentId, colSeverity,
+                colLocation, colDispatchTime, colDuration, colMissionStatus, colDispatchActions)) {
+            col.setResizable(false);
+            col.setReorderable(false);
+            col.setStyle("-fx-alignment: CENTER");
+        }
+
+        colMissionStatus.setStyle("-fx-alignment: CENTER;");
+        colId.setStyle("-fx-alignment: CENTER;");
+        colDispatchId.setStyle("-fx-alignment: CENTER;");
+
+
+
     }
 }

@@ -158,22 +158,58 @@ public class DashboardController {
             List<Resource> resources = resourceRepo.findAll();
 
             // Sum totalQty and availableQty per category
-            Map<String, double[]> map = new HashMap<>(); // category → [totalQty, availableQty]
+            Map<String, double[]> map = new HashMap<>();
             for (Resource r : resources) {
-                String cat = r.getCategory() == null ? "Uncategorised" : r.getCategory();
+                // Normalize the category: trim spaces and convert to uppercase for consistent mapping
+                String cat = (r.getCategory() == null) ? "UNCATEGORIZED" : r.getCategory().trim().toUpperCase();
+
                 map.merge(cat,
                         new double[]{r.getTotalQty(), r.getAvailableQty()},
                         (a, b) -> new double[]{a[0] + b[0], a[1] + b[1]});
             }
 
-            setResourceRow(map, "Relief Goods",   lblRelief, pbRelief);
-            setResourceRow(map, "Medical",         lblMed,    pbMed);
-            setResourceRow(map, "Emergency Fund",  lblFund,   pbFund);
-            setResourceRow(map, "Evacuation",      lblEvac,   pbEvac);
+            // We use a helper that checks if the map keys CONTAIN our keyword
+            updateUIForCategory(map, "RELIEF",   lblRelief, pbRelief);
+            updateUIForCategory(map, "MEDICAL",  lblMed,    pbMed);
+            updateUIForCategory(map, "FUND",     lblFund,   pbFund);
+            updateUIForCategory(map, "EVAC",     lblEvac,   pbEvac);
 
         } catch (Exception e) {
             System.err.println("Resource status load error: " + e.getMessage());
+            e.printStackTrace();
         }
+    }
+
+    /**
+     * Searches the map for any keys containing the 'keyword' (e.g., "MED" matches "MEDICAL SUPPLIES")
+     */
+    private void updateUIForCategory(Map<String, double[]> map, String keyword, Label lbl, ProgressBar pb) {
+        if (lbl == null || pb == null) return;
+
+        double total = 0;
+        double available = 0;
+
+        for (Map.Entry<String, double[]> entry : map.entrySet()) {
+            if (entry.getKey().contains(keyword.toUpperCase())) {
+                total += entry.getValue()[0];
+                available += entry.getValue()[1];
+            }
+        }
+
+        double pct = (total > 0) ? available / total : 0;
+
+        // Use Platform.runLater to ensure UI updates happen on the JavaFX thread
+        javafx.application.Platform.runLater(() -> {
+            lbl.setText(String.format("%.0f%%", pct * 100));
+            pb.setProgress(pct);
+
+            // Optional: Change progress bar color to red if low
+            if (pct < 0.20) {
+                pb.setStyle("-fx-accent: #e74c3c;");
+            } else {
+                pb.setStyle("-fx-accent: #2ecc71;");
+            }
+        });
     }
 
     private void setResourceRow(Map<String, double[]> map, String category,

@@ -22,9 +22,6 @@ public class LigtasApp extends Application {
 
         primaryStage.setTitle("LIGTAS-Brgy — Barangay Command Center");
         primaryStage.setScene(scene);
-//        primaryStage.setMinWidth(1200);
-//        primaryStage.setMinHeight(800);
-//        primaryStage.setFullScreen(true);
         primaryStage.show();
     }
 

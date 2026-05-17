@@ -62,10 +62,10 @@
                     <TableView fx:id="tblResponders" styleClass="incident-table" VBox.vgrow="ALWAYS">
                         <columns>
                             <TableColumn fx:id="colId" prefWidth="90" text="ID" />
-                            <TableColumn fx:id="colName" prefWidth="190" text="Name" />
+                            <TableColumn fx:id="colName" prefWidth="190" text="Team Name" />
                             <TableColumn fx:id="colAgency" prefWidth="130" text="Agency" />
                             <TableColumn fx:id="colContact" prefWidth="130" text="Contact" />
-                            <!-- Dispatch card column — clickable mini-card -->
+                           
                             <TableColumn fx:id="colDispatches" prefWidth="140" text="Missions" />
                             <TableColumn fx:id="colStatus" prefWidth="130" text="Status" />
                             <TableColumn fx:id="colAction" prefWidth="160" text="Actions" />

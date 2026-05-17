@@ -118,9 +118,17 @@ public class ResidentFormController {
             MapPickerController mapController = loader.getController();
 
             Stage stage = new Stage();
+
+            if (txtFirstName.getScene() != null) {
+                stage.initOwner(txtFirstName.getScene().getWindow());
+            }
+
             stage.setTitle("Pin Resident Location");
             stage.setScene(new Scene(root));
             stage.showAndWait();
+
+            stage.setResizable(false);
+            stage.setFullScreen(false);
 
             String pinnedAddress = mapController.getSelectedAddress();
             double lat = mapController.getSelectedLatitude();   // ← add this
@@ -279,6 +287,11 @@ public class ResidentFormController {
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+
+        if (txtFirstName.getScene() != null && txtFirstName.getScene().getWindow() != null) {
+            alert.initOwner(txtFirstName.getScene().getWindow());
+        }
+
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);

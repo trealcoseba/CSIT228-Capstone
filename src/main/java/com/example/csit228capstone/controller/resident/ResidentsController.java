@@ -236,22 +236,22 @@ public class ResidentsController {
             private final HBox container = new HBox(10, btnEdit, btnDelete);
             {
                 btnEdit.setStyle("""
-                            -fx-background-color: #fef08a;
-                            -fx-text-fill: #854d0e;
-                            -fx-font-size: 10px;
-                            -fx-padding: 3 8 3 8;
-                            -fx-background-radius: 4;
-                            -fx-cursor: hand;
-                            """);
+                    -fx-background-color: #d4a017;
+                    -fx-text-fill: white;
+                    -fx-font-size: 11px;
+                    -fx-padding: 5 12 5 12;
+                    -fx-background-radius: 8;
+                    -fx-cursor: hand;
+                    """);
 
                 btnDelete.setStyle("""
-                            -fx-background-color: #fecaca;
-                            -fx-text-fill: #991b1b;
-                            -fx-font-size: 10px;
-                            -fx-padding: 3 8 3 8;
-                            -fx-background-radius: 4;
-                            -fx-cursor: hand;
-                            """);
+                    -fx-background-color: #c0392b;
+                    -fx-text-fill: white;
+                    -fx-font-size: 11px;
+                    -fx-padding: 5 12 5 12;
+                    -fx-background-radius: 8;
+                    -fx-cursor: hand;
+                    """);
 
                 container.setStyle("-fx-alignment: CENTER;");
 
@@ -276,16 +276,34 @@ public class ResidentsController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/csit228capstone/resident/ResidentForm.fxml"));
             Parent root = loader.load();
+
             ResidentFormController controller = loader.getController();
             controller.setParentController(this);
             if (resident != null) controller.setResidentData(resident);
 
             Stage stage = new Stage();
+
+            // 1. CRITICAL: Link the pop-up to the main window
+            // This prevents the pop-up from inheriting the "Full Screen" state as a new window
+            if (residentsTable.getScene() != null) {
+                stage.initOwner(residentsTable.getScene().getWindow());
+            }
+
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle(resident == null ? "Register New Resident" : "Edit Resident");
-            stage.setScene(new Scene(root));
+
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+
+            // 2. Disable resizing and force full-screen to false
+            stage.setResizable(false);
             stage.setFullScreen(false);
+
+            // 3. Ensure the window size fits the FXML content exactly
+            stage.sizeToScene();
+
             stage.show();
+
         } catch (IOException e) {
             e.printStackTrace();
             showAlert("Error", "Could not open form.");

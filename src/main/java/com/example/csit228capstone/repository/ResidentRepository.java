@@ -326,6 +326,8 @@ public class ResidentRepository {
         r.setHouseholdHead(rs.getBoolean("is_household_head"));
         r.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         r.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+        r.setLatitude(rs.getDouble("latitude"));   //
+        r.setLongitude(rs.getDouble("longitude")); //
         return r;
     }
 }

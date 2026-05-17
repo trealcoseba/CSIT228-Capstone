@@ -14,14 +14,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.ResourceBundle;
 
-/**
- * Controller for responder_form.fxml.
- * Open with:
- *   ResponderFormController ctrl = FxmlUtil.openDialog(
- *       getClass(), "/fxml/responder/responder_form.fxml", "Add Responder", owner);
- *   ctrl.setResponder(existingResponder); // for edit mode
- *   ctrl.setOnSaved(this::loadResponders); // callback
- */
 public class ResponderFormController implements Initializable {
 
     // ─── FXML ────────────────────────────────────────────────────────────────────
@@ -154,7 +146,17 @@ public class ResponderFormController implements Initializable {
     }
 
     private void showError(String msg) {
-        new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK).showAndWait();
+        Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
+
+        // FIX: Set the owner so the alert floats over the form in full-screen mode
+        if (tfName.getScene() != null && tfName.getScene().getWindow() != null) {
+            alert.initOwner(tfName.getScene().getWindow());
+        }
+
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        alert.showAndWait();
     }
 
     // ─── Helpers ─────────────────────────────────────────────────────────────────

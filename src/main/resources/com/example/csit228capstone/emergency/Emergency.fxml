@@ -6,7 +6,12 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.web.*?>
 
-<BorderPane prefHeight="900" prefWidth="1440" style="-fx-background-color: #0d1117;" styleClass="root-pane" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.emergency.EmergencyController">
+<BorderPane prefHeight="900" prefWidth="1440"
+            style="-fx-background-color: #0d1117;"
+            stylesheets="@../../../../css/application.css"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.csit228capstone.controller.emergency.EmergencyController">
 
     <!-- ============================================================ -->
     <!-- TOP: INCIDENT OVERVIEW PANEL                                  -->
@@ -14,71 +19,129 @@
     <top>
         <VBox style="-fx-background-color: #161b22; -fx-border-color: #ff4757; -fx-border-width: 0 0 2 0;">
 
-            <!-- Command Bar — styled like top-bar from dashboard -->
-            <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 9 16 9 16; -fx-background-color: #ff4757;">
-                <Label style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;" styleClass="brand-title" text="⚠  LIGTAS-BRGY — EMERGENCY OPERATIONS CENTER" />
+            <!-- Command Bar -->
+            <HBox alignment="CENTER_LEFT" spacing="12"
+                  style="-fx-padding: 9 16 9 16; -fx-background-color: #ff4757;">
+                <Label style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"
+                       text="⚠  LIGTAS-BRGY — EMERGENCY OPERATIONS CENTER" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Label fx:id="lblSystemTime" style="-fx-text-fill: white; -fx-font-size: 12px; -fx-font-family: 'Courier New';" text="--:--:--" />
+                <Label fx:id="lblSystemTime"
+                       style="-fx-text-fill: white; -fx-font-size: 12px; -fx-font-family: 'Courier New';"
+                       text="--:--:--" />
                 <Label style="-fx-text-fill: #00ff88; -fx-font-size: 10px;" text="●" />
-                <Label style="-fx-text-fill: #00ff88; -fx-font-size: 11px; -fx-font-weight: bold;" styleClass="active-incidents-badge" text="LIVE" />
+                <Label style="-fx-text-fill: #00ff88; -fx-font-size: 11px; -fx-font-weight: bold;"
+                       text="LIVE" />
+
+                <!-- ── Declare Incident button lives here in the red bar ── -->
+                <Button fx:id="btnDeclareIncident" onAction="#handleDeclareIncident"
+                        text="＋ Declare Incident"
+                        style="-fx-background-color: white; -fx-text-fill: #dc2626;
+                               -fx-font-weight: bold; -fx-font-size: 12px;
+                               -fx-background-radius: 7; -fx-padding: 6 16 6 16;
+                               -fx-cursor: hand;" />
             </HBox>
 
-            <!-- KPI / Incident Detail Cards Row — mirrors kpiRow from dashboard -->
-            <HBox fx:id="incidentKpiRow" alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 12 16 12 16;">
+            <!-- KPI Cards Row -->
+            <HBox fx:id="incidentKpiRow" alignment="CENTER_LEFT" spacing="12"
+                  style="-fx-padding: 12 16 12 16;">
 
-                <!-- Emergency Type -->
-                <VBox style="-fx-background-color: #1f2937; -fx-min-width: 155; -fx-padding: 10 16 10 16; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: rgba(192,57,43,0.35); -fx-border-width: 1;" styleClass="kpi-card, kpi-danger">
-                    <Label style="-fx-text-fill: #6b7280; -fx-font-size: 9px; -fx-font-weight: bold;" styleClass="kpi-label" text="EMERGENCY TYPE" />
-                    <Label fx:id="lblEmergencyType" style="-fx-text-fill: #ff4757; -fx-font-size: 15px; -fx-font-weight: bold;" styleClass="kpi-value" text="—" />
-                    <Label style="-fx-text-fill: #4b5563; -fx-font-size: 9px;" styleClass="kpi-sub" text="Active incident" />
+                <VBox style="-fx-background-color: #1f2937; -fx-min-width: 155; -fx-padding: 10 16 10 16;
+                             -fx-background-radius: 10; -fx-border-radius: 10;
+                             -fx-border-color: rgba(192,57,43,0.35); -fx-border-width: 1;">
+                    <Label style="-fx-text-fill: #6b7280; -fx-font-size: 9px; -fx-font-weight: bold;"
+                           text="EMERGENCY TYPE" />
+                    <Label fx:id="lblEmergencyType"
+                           style="-fx-text-fill: #ff4757; -fx-font-size: 15px; -fx-font-weight: bold;"
+                           text="—" />
+                    <Label style="-fx-text-fill: #4b5563; -fx-font-size: 9px;" text="Active incident" />
                 </VBox>
 
-                <!-- Severity Badge -->
-                <VBox style="-fx-background-color: #1f2937; -fx-min-width: 125; -fx-padding: 10 16 10 16; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #21262d; -fx-border-width: 1;" styleClass="kpi-card">
-                    <Label style="-fx-text-fill: #6b7280; -fx-font-size: 9px; -fx-font-weight: bold;" styleClass="kpi-label" text="SEVERITY" />
+                <VBox style="-fx-background-color: #1f2937; -fx-min-width: 125; -fx-padding: 10 16 10 16;
+                             -fx-background-radius: 10; -fx-border-radius: 10;
+                             -fx-border-color: #21262d; -fx-border-width: 1;">
+                    <Label style="-fx-text-fill: #6b7280; -fx-font-size: 9px; -fx-font-weight: bold;"
+                           text="SEVERITY" />
                     <HBox alignment="CENTER_LEFT" spacing="6">
-                        <Label fx:id="lblSeverityDot" style="-fx-text-fill: #ff4757; -fx-font-size: 12px;" text="●" />
-                        <Label fx:id="lblSeverity" style="-fx-text-fill: #f9fafb; -fx-font-size: 15px; -fx-font-weight: bold;" styleClass="kpi-value" text="—" />
+                        <Label fx:id="lblSeverityDot" style="-fx-text-fill: #ff4757; -fx-font-size: 12px;"
+                               text="●" />
+                        <Label fx:id="lblSeverity"
+                               style="-fx-text-fill: #f9fafb; -fx-font-size: 15px; -fx-font-weight: bold;"
+                               text="—" />
                     </HBox>
-                    <Label style="-fx-text-fill: #4b5563; -fx-font-size: 9px;" styleClass="kpi-sub" text="Threat level" />
+                    <Label style="-fx-text-fill: #4b5563; -fx-font-size: 9px;" text="Threat level" />
                 </VBox>
 
-                <!-- Timestamp -->
-                <VBox style="-fx-background-color: #1f2937; -fx-min-width: 180; -fx-padding: 10 16 10 16; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #21262d; -fx-border-width: 1;" styleClass="kpi-card">
-                    <Label style="-fx-text-fill: #6b7280; -fx-font-size: 9px; -fx-font-weight: bold;" styleClass="kpi-label" text="TIMESTAMP" />
-                    <Label fx:id="lblTimestamp" style="-fx-text-fill: #f9fafb; -fx-font-size: 13px; -fx-font-family: 'Courier New';" text="—" />
-                    <Label style="-fx-text-fill: #4b5563; -fx-font-size: 9px;" styleClass="kpi-sub" text="Incident reported" />
+                <VBox style="-fx-background-color: #1f2937; -fx-min-width: 180; -fx-padding: 10 16 10 16;
+                             -fx-background-radius: 10; -fx-border-radius: 10;
+                             -fx-border-color: #21262d; -fx-border-width: 1;">
+                    <Label style="-fx-text-fill: #6b7280; -fx-font-size: 9px; -fx-font-weight: bold;"
+                           text="TIMESTAMP" />
+                    <Label fx:id="lblTimestamp"
+                           style="-fx-text-fill: #f9fafb; -fx-font-size: 13px; -fx-font-family: 'Courier New';"
+                           text="—" />
+                    <Label style="-fx-text-fill: #4b5563; -fx-font-size: 9px;" text="Incident reported" />
                 </VBox>
 
-                <!-- Status Indicator -->
-                <VBox style="-fx-background-color: #1f2937; -fx-min-width: 125; -fx-padding: 10 16 10 16; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #21262d; -fx-border-width: 1;" styleClass="kpi-card">
-                    <Label style="-fx-text-fill: #6b7280; -fx-font-size: 9px; -fx-font-weight: bold;" styleClass="kpi-label" text="STATUS" />
-                    <Label fx:id="lblStatus" style="-fx-text-fill: #fbbf24; -fx-font-size: 13px; -fx-font-weight: bold;" text="—" />
-                    <Label style="-fx-text-fill: #4b5563; -fx-font-size: 9px;" styleClass="kpi-sub" text="Response state" />
+                <VBox style="-fx-background-color: #1f2937; -fx-min-width: 125; -fx-padding: 10 16 10 16;
+                             -fx-background-radius: 10; -fx-border-radius: 10;
+                             -fx-border-color: #21262d; -fx-border-width: 1;">
+                    <Label style="-fx-text-fill: #6b7280; -fx-font-size: 9px; -fx-font-weight: bold;"
+                           text="STATUS" />
+                    <Label fx:id="lblStatus"
+                           style="-fx-text-fill: #fbbf24; -fx-font-size: 13px; -fx-font-weight: bold;"
+                           text="—" />
+                    <Label style="-fx-text-fill: #4b5563; -fx-font-size: 9px;" text="Response state" />
                 </VBox>
 
-                <!-- Incident Coordinates -->
-                <VBox minWidth="188.0" prefHeight="63.0" prefWidth="188.0" style="-fx-background-color: #1f2937; -fx-min-width: 200; -fx-padding: 10 16 10 16; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: rgba(52,152,219,0.25); -fx-border-width: 1;" styleClass="kpi-card, kpi-info">
-                    <Label style="-fx-text-fill: #6b7280; -fx-font-size: 9px; -fx-font-weight: bold;" styleClass="kpi-label" text="INCIDENT COORDINATES" />
-                    <Label fx:id="lblCoordinates" style="-fx-text-fill: #60a5fa; -fx-font-size: 13px; -fx-font-family: 'Courier New';" text="—" />
-                    <Label style="-fx-text-fill: #4b5563; -fx-font-size: 9px;" styleClass="kpi-sub" text="GPS location" />
+                <VBox style="-fx-background-color: #1f2937; -fx-min-width: 200; -fx-padding: 10 16 10 16;
+                             -fx-background-radius: 10; -fx-border-radius: 10;
+                             -fx-border-color: rgba(52,152,219,0.25); -fx-border-width: 1;">
+                    <Label style="-fx-text-fill: #6b7280; -fx-font-size: 9px; -fx-font-weight: bold;"
+                           text="INCIDENT COORDINATES" />
+                    <Label fx:id="lblCoordinates"
+                           style="-fx-text-fill: #60a5fa; -fx-font-size: 13px; -fx-font-family: 'Courier New';"
+                           text="—" />
+                    <Label style="-fx-text-fill: #4b5563; -fx-font-size: 9px;" text="GPS location" />
                 </VBox>
 
-                <!-- Affected Radius -->
-                <VBox style="-fx-background-color: #1f2937; -fx-min-width: 125; -fx-padding: 10 16 10 16; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #21262d; -fx-border-width: 1;" styleClass="kpi-card">
-                    <Label style="-fx-text-fill: #6b7280; -fx-font-size: 9px; -fx-font-weight: bold;" styleClass="kpi-label" text="AFFECTED RADIUS" />
-                    <Label fx:id="lblAffectedRadius" style="-fx-text-fill: #f9fafb; -fx-font-size: 15px; -fx-font-weight: bold;" styleClass="kpi-value" text="—" />
-                    <Label style="-fx-text-fill: #4b5563; -fx-font-size: 9px;" styleClass="kpi-sub" text="Impact zone" />
+                <VBox style="-fx-background-color: #1f2937; -fx-min-width: 125; -fx-padding: 10 16 10 16;
+                             -fx-background-radius: 10; -fx-border-radius: 10;
+                             -fx-border-color: #21262d; -fx-border-width: 1;">
+                    <Label style="-fx-text-fill: #6b7280; -fx-font-size: 9px; -fx-font-weight: bold;"
+                           text="AFFECTED RADIUS" />
+                    <Label fx:id="lblAffectedRadius"
+                           style="-fx-text-fill: #f9fafb; -fx-font-size: 15px; -fx-font-weight: bold;"
+                           text="—" />
+                    <Label style="-fx-text-fill: #4b5563; -fx-font-size: 9px;" text="Impact zone" />
                 </VBox>
 
-                <Region prefHeight="63.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                <Region HBox.hgrow="ALWAYS" />
 
-                <!-- Action Buttons — styled like quick-action-btn -->
                 <HBox alignment="CENTER_RIGHT" spacing="8">
-                    <Button fx:id="btnActivateDispatch" onAction="#assignDispatch" prefHeight="46.0" prefWidth="119.0" style="-fx-font-size: 12px; -fx-padding: 8 14 8 14;" styleClass="quick-action-btn, qa-danger" text="Activate &#10;Dispatch" />
-                    <Button fx:id="btnNotifyResidents" onAction="#notifyResidents" prefHeight="48.0" prefWidth="85.0" style="-fx-font-size: 12px; -fx-padding: 8 14 8 14;" styleClass="quick-action-btn, qa-warning" text="Notify&#10; Residents" textAlignment="CENTER" />
-                    <Button fx:id="btnRefreshData" onAction="#refreshDashboard" style="-fx-font-size: 12px; -fx-padding: 8 14 8 14; -fx-text-fill: #9ca3af; -fx-border-color: #374151;" styleClass="btn-outline" text="Refresh" />
-                    <Button fx:id="btnEndEmergency" onAction="#endEmergency" style="-fx-background-color: #111827; -fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-font-size: 12px; -fx-background-radius: 8; -fx-padding: 8 14 8 14; -fx-cursor: hand; -fx-border-color: #ef4444; -fx-border-radius: 8;" text="End Emergency" />
+                    <Button fx:id="btnActivateDispatch" onAction="#assignDispatch"
+                            prefHeight="46" prefWidth="119"
+                            style="-fx-background-color: #dc2626; -fx-text-fill: white;
+                                   -fx-font-weight: bold; -fx-font-size: 12px;
+                                   -fx-background-radius: 8; -fx-padding: 8 14 8 14; -fx-cursor: hand;"
+                            text="Activate&#10;Dispatch" />
+                    <Button fx:id="btnNotifyResidents" onAction="#notifyResidents"
+                            prefHeight="48" prefWidth="85"
+                            style="-fx-background-color: #d97706; -fx-text-fill: white;
+                                   -fx-font-weight: bold; -fx-font-size: 12px;
+                                   -fx-background-radius: 8; -fx-padding: 8 14 8 14; -fx-cursor: hand;"
+                            text="Notify&#10; Residents" textAlignment="CENTER" />
+                    <Button fx:id="btnRefreshData" onAction="#refreshDashboard"
+                            style="-fx-background-color: transparent; -fx-text-fill: #9ca3af;
+                                   -fx-border-color: #374151; -fx-border-radius: 8;
+                                   -fx-background-radius: 8; -fx-font-size: 12px;
+                                   -fx-padding: 8 14 8 14; -fx-cursor: hand;"
+                            text="Refresh" />
+                    <Button fx:id="btnEndEmergency" onAction="#endEmergency"
+                            style="-fx-background-color: #111827; -fx-text-fill: #ef4444;
+                                   -fx-font-weight: bold; -fx-font-size: 12px;
+                                   -fx-background-radius: 8; -fx-padding: 8 14 8 14;
+                                   -fx-cursor: hand; -fx-border-color: #ef4444; -fx-border-radius: 8;"
+                            text="End Emergency" />
                 </HBox>
 
             </HBox>
@@ -89,71 +152,79 @@
     <!-- LEFT: RESIDENTS PRIORITY PANEL                                -->
     <!-- ============================================================ -->
     <left>
-        <VBox prefWidth="315" spacing="0" style="-fx-background-color: #161b22; -fx-border-color: #21262d; -fx-border-width: 0 1 0 0;">
+        <VBox prefWidth="315" spacing="0"
+              style="-fx-background-color: #161b22; -fx-border-color: #21262d; -fx-border-width: 0 1 0 0;">
 
-            <!-- Priority Residents Header — panel-card style header -->
-            <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding: 10 14 10 14; -fx-background-color: #1f2937; -fx-border-color: #21262d; -fx-border-width: 0 0 1 0;">
-                <Label style="-fx-text-fill: #f9fafb; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0;" styleClass="panel-title" text="PRIORITY RESIDENTS" />
+            <HBox alignment="CENTER_LEFT" spacing="8"
+                  style="-fx-padding: 10 14 10 14; -fx-background-color: #1f2937;
+                         -fx-border-color: #21262d; -fx-border-width: 0 0 1 0;">
+                <Label style="-fx-text-fill: #f9fafb; -fx-font-size: 11px; -fx-font-weight: bold;"
+                       text="PRIORITY RESIDENTS" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Label fx:id="lblResidentCount" style="-fx-text-fill: #60a5fa; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-color: #1e3a5f; -fx-background-radius: 10; -fx-padding: 2 8 2 8;" text="0" />
+                <Label fx:id="lblResidentCount"
+                       style="-fx-text-fill: #60a5fa; -fx-font-size: 11px; -fx-font-weight: bold;
+                              -fx-background-color: #1e3a5f; -fx-background-radius: 10;
+                              -fx-padding: 2 8 2 8;" text="0" />
             </HBox>
 
-            <!-- Priority Legend — clean pill-style like status badges -->
+            <!-- Priority legend -->
             <HBox spacing="10" style="-fx-padding: 6 14 2 14; -fx-background-color: #161b22;">
-                <HBox alignment="CENTER_LEFT" spacing="4" style="-fx-background-color: rgba(192,57,43,0.12); -fx-background-radius: 10; -fx-padding: 3 8 3 8;">
+                <HBox alignment="CENTER_LEFT" spacing="4"
+                      style="-fx-background-color: rgba(192,57,43,0.12); -fx-background-radius: 10;
+                             -fx-padding: 3 8 3 8;">
                     <Label style="-fx-text-fill: #ff4757; -fx-font-size: 8px;" text="●" />
-                    <Label style="-fx-text-fill: #ff4757; -fx-font-size: 9px; -fx-font-weight: bold;" text="P1: Vulnerable" />
+                    <Label style="-fx-text-fill: #ff4757; -fx-font-size: 9px; -fx-font-weight: bold;"
+                           text="P1: Vulnerable" />
                 </HBox>
-                <HBox alignment="CENTER_LEFT" spacing="4" style="-fx-background-color: rgba(52,152,219,0.12); -fx-background-radius: 10; -fx-padding: 3 8 3 8;">
+                <HBox alignment="CENTER_LEFT" spacing="4"
+                      style="-fx-background-color: rgba(52,152,219,0.12); -fx-background-radius: 10;
+                             -fx-padding: 3 8 3 8;">
                     <Label style="-fx-text-fill: #60a5fa; -fx-font-size: 8px;" text="●" />
-                    <Label style="-fx-text-fill: #60a5fa; -fx-font-size: 9px; -fx-font-weight: bold;" text="P2: General" />
+                    <Label style="-fx-text-fill: #60a5fa; -fx-font-size: 9px; -fx-font-weight: bold;"
+                           text="P2: General" />
                 </HBox>
             </HBox>
             <VBox style="-fx-padding: 0 0 4 0;" />
 
-            <!-- Priority Residents Table — incident-table style -->
-            <TableView fx:id="tblPriorityResidents" style="-fx-background-color: #161b22; -fx-border-color: transparent; -fx-table-cell-border-color: #21262d; -fx-font-size: 11px;" styleClass="incident-table" VBox.vgrow="ALWAYS">
+            <TableView fx:id="tblPriorityResidents" VBox.vgrow="ALWAYS"
+                       style="-fx-background-color: #161b22; -fx-border-color: transparent;
+                              -fx-table-cell-border-color: #21262d; -fx-font-size: 11px;">
                 <columns>
-                    <TableColumn fx:id="colResidentName" prefWidth="105" text="Name">
-                        <cellValueFactory><PropertyValueFactory property="residentName" /></cellValueFactory>
-                    </TableColumn>
-                    <TableColumn fx:id="colVulnerability" prefWidth="80" text="Type">
-                        <cellValueFactory><PropertyValueFactory property="vulnerabilityType" /></cellValueFactory>
-                    </TableColumn>
-                    <TableColumn fx:id="colDistance" prefWidth="65" text="Dist (m)">
-                        <cellValueFactory><PropertyValueFactory property="distanceFromIncident" /></cellValueFactory>
-                    </TableColumn>
-                    <TableColumn fx:id="colRescueStatus" prefWidth="65" text="Status">
-                        <cellValueFactory><PropertyValueFactory property="rescueStatus" /></cellValueFactory>
-                    </TableColumn>
+                    <TableColumn fx:id="colResidentName"  prefWidth="105" text="Name" />
+                    <TableColumn fx:id="colVulnerability" prefWidth="80"  text="Type" />
+                    <TableColumn fx:id="colDistance"      prefWidth="65"  text="Dist (m)" />
+                    <TableColumn fx:id="colRescueStatus"  prefWidth="65"  text="Status" />
+                    <TableColumn fx:id="colResidentAction" prefWidth="175" text="Actions" />
                 </columns>
                 <placeholder>
-                    <Label style="-fx-text-fill: #4b5563; -fx-font-size: 11px;" text="No affected residents loaded." />
+                    <Label style="-fx-text-fill: #4b5563; -fx-font-size: 11px;"
+                           text="No affected residents loaded." />
                 </placeholder>
             </TableView>
 
-            <!-- Missing Residents Header — danger-tinted panel header -->
-            <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding: 9 14 9 14; -fx-background-color: #2d1b1b; -fx-border-color: #7f1d1d; -fx-border-width: 1 0 1 0;">
-                <Label style="-fx-text-fill: #fca5a5; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0;" styleClass="panel-title" text="MISSING RESIDENTS" />
+            <HBox alignment="CENTER_LEFT" spacing="8"
+                  style="-fx-padding: 9 14 9 14; -fx-background-color: #2d1b1b;
+                         -fx-border-color: #7f1d1d; -fx-border-width: 1 0 1 0;">
+                <Label style="-fx-text-fill: #fca5a5; -fx-font-size: 11px; -fx-font-weight: bold;"
+                       text="MISSING RESIDENTS" />
                 <Region HBox.hgrow="ALWAYS" />
-                <Label fx:id="lblMissingCount" style="-fx-text-fill: #fca5a5; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-color: #7f1d1d; -fx-background-radius: 10; -fx-padding: 2 8 2 8;" text="0" />
+                <Label fx:id="lblMissingCount"
+                       style="-fx-text-fill: #fca5a5; -fx-font-size: 11px; -fx-font-weight: bold;
+                              -fx-background-color: #7f1d1d; -fx-background-radius: 10;
+                              -fx-padding: 2 8 2 8;" text="0" />
             </HBox>
 
-            <!-- Missing Residents Table -->
-            <TableView fx:id="tblMissingResidents" prefHeight="185" style="-fx-background-color: #1a0e0e; -fx-border-color: transparent; -fx-table-cell-border-color: #2d1b1b; -fx-font-size: 11px;" styleClass="incident-table">
+            <TableView fx:id="tblMissingResidents" prefHeight="185"
+                       style="-fx-background-color: #1a0e0e; -fx-border-color: transparent;
+                              -fx-table-cell-border-color: #2d1b1b; -fx-font-size: 11px;">
                 <columns>
-                    <TableColumn fx:id="colMissingName" prefWidth="100" text="Name">
-                        <cellValueFactory><PropertyValueFactory property="residentName" /></cellValueFactory>
-                    </TableColumn>
-                    <TableColumn fx:id="colMissingContact" prefWidth="100" text="Contact">
-                        <cellValueFactory><PropertyValueFactory property="contactNumber" /></cellValueFactory>
-                    </TableColumn>
-                    <TableColumn fx:id="colLastKnownLocation" prefWidth="115" text="Last Location">
-                        <cellValueFactory><PropertyValueFactory property="lastKnownLocation" /></cellValueFactory>
-                    </TableColumn>
+                    <TableColumn fx:id="colMissingName"       prefWidth="100" text="Name" />
+                    <TableColumn fx:id="colMissingContact"    prefWidth="100" text="Contact" />
+                    <TableColumn fx:id="colLastKnownLocation" prefWidth="115" text="Last Location" />
                 </columns>
                 <placeholder>
-                    <Label style="-fx-text-fill: #4b5563; -fx-font-size: 11px;" text="No missing residents reported." />
+                    <Label style="-fx-text-fill: #4b5563; -fx-font-size: 11px;"
+                           text="No missing residents reported." />
                 </placeholder>
             </TableView>
 
@@ -165,23 +236,27 @@
     <!-- ============================================================ -->
     <center>
         <StackPane style="-fx-background-color: #0d1117;">
-
-            <!-- Map WebView fills entire center -->
             <AnchorPane style="-fx-background-color: #0d1117;">
-                <WebView fx:id="mapWebView" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
+                <WebView fx:id="mapWebView"
+                         AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"
+                         AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0" />
             </AnchorPane>
-
-            <!-- Floating Map Header Overlay — top-bar style -->
             <VBox alignment="TOP_LEFT" pickOnBounds="false">
-                <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding: 8 12 8 12; -fx-background-color: rgba(22,27,34,0.92); -fx-border-color: #21262d; -fx-border-width: 0 0 1 0;">
-                    <Label style="-fx-text-fill: #f9fafb; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0;" styleClass="panel-title" text="LIVE INCIDENT MAP" />
+                <HBox alignment="CENTER_LEFT" spacing="8"
+                      style="-fx-padding: 8 12 8 12; -fx-background-color: rgba(22,27,34,0.92);
+                             -fx-border-color: #21262d; -fx-border-width: 0 0 1 0;">
+                    <Label style="-fx-text-fill: #f9fafb; -fx-font-size: 11px; -fx-font-weight: bold;"
+                           text="LIVE INCIDENT MAP" />
                     <Label style="-fx-text-fill: #00ff88; -fx-font-size: 9px;" text="●" />
-                    <Label style="-fx-text-fill: #00ff88; -fx-font-size: 10px; -fx-font-weight: bold;                                   -fx-background-color: rgba(0,255,136,0.12); -fx-background-radius: 10; -fx-padding: 2 8 2 8;" text="REAL-TIME" />
+                    <Label style="-fx-text-fill: #00ff88; -fx-font-size: 10px; -fx-font-weight: bold;
+                                  -fx-background-color: rgba(0,255,136,0.12); -fx-background-radius: 10;
+                                  -fx-padding: 2 8 2 8;" text="REAL-TIME" />
                     <Region HBox.hgrow="ALWAYS" />
-                    <Label fx:id="lblMapCoords" style="-fx-text-fill: #6b7280; -fx-font-size: 10px; -fx-font-family: 'Courier New';" text="Lat: — | Lng: —" />
+                    <Label fx:id="lblMapCoords"
+                           style="-fx-text-fill: #6b7280; -fx-font-size: 10px; -fx-font-family: 'Courier New';"
+                           text="Lat: — | Lng: —" />
                 </HBox>
             </VBox>
-
         </StackPane>
     </center>
 
@@ -189,113 +264,123 @@
     <!-- RIGHT: EVACUATION + RESCUE TEAMS + RESOURCES PANEL           -->
     <!-- ============================================================ -->
     <right>
-        <VBox prefWidth="325" spacing="0" style="-fx-background-color: #161b22; -fx-border-color: #21262d; -fx-border-width: 0 0 0 1;">
+        <VBox prefWidth="325" spacing="0"
+              style="-fx-background-color: #161b22; -fx-border-color: #21262d; -fx-border-width: 0 0 0 1;">
 
-            <!-- SECTION 1: Evacuation Centers — panel-card header style -->
+            <!-- SECTION 1: Evacuation Centers -->
             <VBox VBox.vgrow="ALWAYS">
-                <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding: 10 14 10 14; -fx-background-color: #1f2937; -fx-border-color: #21262d; -fx-border-width: 0 0 1 0;">
-                    <Label style="-fx-text-fill: #f9fafb; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0;" styleClass="panel-title" text="EVACUATION CENTERS" />
+                <HBox alignment="CENTER_LEFT" spacing="8"
+                      style="-fx-padding: 10 14 10 14; -fx-background-color: #1f2937;
+                             -fx-border-color: #21262d; -fx-border-width: 0 0 1 0;">
+                    <Label style="-fx-text-fill: #f9fafb; -fx-font-size: 11px; -fx-font-weight: bold;"
+                           text="EVACUATION CENTERS" />
                     <Region HBox.hgrow="ALWAYS" />
-                    <Label fx:id="lblEvacCenterCount" style="-fx-text-fill: #34d399; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-color: #064e3b; -fx-background-radius: 10; -fx-padding: 2 8 2 8;" text="0" />
+                    <Label fx:id="lblEvacCenterCount"
+                           style="-fx-text-fill: #34d399; -fx-font-size: 11px; -fx-font-weight: bold;
+                                  -fx-background-color: #064e3b; -fx-background-radius: 10;
+                                  -fx-padding: 2 8 2 8;" text="0" />
                 </HBox>
-
-                <TableView fx:id="tblEvacuationCenters" style="-fx-background-color: #161b22; -fx-border-color: transparent; -fx-table-cell-border-color: #21262d; -fx-font-size: 10px;" styleClass="incident-table" VBox.vgrow="ALWAYS">
+                <TableView fx:id="tblEvacuationCenters" VBox.vgrow="ALWAYS"
+                           style="-fx-background-color: #161b22; -fx-border-color: transparent;
+                                  -fx-table-cell-border-color: #21262d; -fx-font-size: 10px;">
                     <columns>
-                        <TableColumn fx:id="colEvacName" prefWidth="100" text="Center">
-                            <cellValueFactory><PropertyValueFactory property="centerName" /></cellValueFactory>
-                        </TableColumn>
-                        <TableColumn fx:id="colEvacCapacity" prefWidth="40" text="Cap">
-                            <cellValueFactory><PropertyValueFactory property="capacity" /></cellValueFactory>
-                        </TableColumn>
-                        <TableColumn fx:id="colEvacOccupancy" prefWidth="40" text="Occ">
-                            <cellValueFactory><PropertyValueFactory property="occupancy" /></cellValueFactory>
-                        </TableColumn>
-                        <TableColumn fx:id="colEvacDistance" prefWidth="52" text="Dist">
-                            <cellValueFactory><PropertyValueFactory property="distance" /></cellValueFactory>
-                        </TableColumn>
-                        <TableColumn fx:id="colEvacStatus" prefWidth="93" text="Status">
-                            <cellValueFactory><PropertyValueFactory property="status" /></cellValueFactory>
-                        </TableColumn>
+                        <TableColumn fx:id="colEvacName"      prefWidth="100" text="Center" />
+                        <TableColumn fx:id="colEvacCapacity"  prefWidth="40"  text="Cap" />
+                        <TableColumn fx:id="colEvacOccupancy" prefWidth="40"  text="Occ" />
+                        <TableColumn fx:id="colEvacDistance"  prefWidth="52"  text="Dist" />
+                        <TableColumn fx:id="colEvacStatus"    prefWidth="93"  text="Status" />
                     </columns>
                     <placeholder>
-                        <Label style="-fx-text-fill: #4b5563; -fx-font-size: 11px;" text="No centers available." />
+                        <Label style="-fx-text-fill: #4b5563; -fx-font-size: 11px;"
+                               text="No centers available." />
                     </placeholder>
                 </TableView>
             </VBox>
 
             <!-- SECTION 2: Rescue Teams -->
             <VBox VBox.vgrow="ALWAYS">
-                <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding: 10 14 10 14; -fx-background-color: #1f2937; -fx-border-color: #21262d; -fx-border-width: 1 0 1 0;">
-                    <Label style="-fx-text-fill: #f9fafb; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0;" styleClass="panel-title" text="RESCUE TEAMS" />
+                <HBox alignment="CENTER_LEFT" spacing="8"
+                      style="-fx-padding: 10 14 10 14; -fx-background-color: #1f2937;
+                             -fx-border-color: #21262d; -fx-border-width: 1 0 1 0;">
+                    <Label style="-fx-text-fill: #f9fafb; -fx-font-size: 11px; -fx-font-weight: bold;"
+                           text="RESCUE TEAMS" />
                     <Region HBox.hgrow="ALWAYS" />
-                    <Label fx:id="lblTeamCount" style="-fx-text-fill: #60a5fa; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-color: #1e3a5f; -fx-background-radius: 10; -fx-padding: 2 8 2 8;" text="0" />
+                    <Label fx:id="lblTeamCount"
+                           style="-fx-text-fill: #60a5fa; -fx-font-size: 11px; -fx-font-weight: bold;
+                                  -fx-background-color: #1e3a5f; -fx-background-radius: 10;
+                                  -fx-padding: 2 8 2 8;" text="0" />
                 </HBox>
-
-                <TableView fx:id="tblRescueTeams" style="-fx-background-color: #161b22; -fx-border-color: transparent; -fx-table-cell-border-color: #21262d; -fx-font-size: 10px;" styleClass="incident-table" VBox.vgrow="ALWAYS">
+                <TableView fx:id="tblRescueTeams" VBox.vgrow="ALWAYS"
+                           style="-fx-background-color: #161b22; -fx-border-color: transparent;
+                                  -fx-table-cell-border-color: #21262d; -fx-font-size: 10px;">
                     <columns>
-                        <TableColumn fx:id="colTeamName" prefWidth="95" text="Team">
-                            <cellValueFactory><PropertyValueFactory property="teamName" /></cellValueFactory>
-                        </TableColumn>
-                        <TableColumn fx:id="colTeamAvailability" prefWidth="72" text="Status">
-                            <cellValueFactory><PropertyValueFactory property="availability" /></cellValueFactory>
-                        </TableColumn>
-                        <TableColumn fx:id="colTeamVehicle" prefWidth="78" text="Vehicle">
-                            <cellValueFactory><PropertyValueFactory property="vehicle" /></cellValueFactory>
-                        </TableColumn>
-                        <TableColumn fx:id="colTeamETA" prefWidth="80" text="ETA">
-                            <cellValueFactory><PropertyValueFactory property="eta" /></cellValueFactory>
-                        </TableColumn>
+                        <TableColumn fx:id="colTeamName"         prefWidth="95" text="Team" />
+                        <TableColumn fx:id="colTeamAvailability" prefWidth="72" text="Status" />
+                        <TableColumn fx:id="colTeamVehicle"      prefWidth="78" text="Agency" />
+                        <TableColumn fx:id="colTeamETA"          prefWidth="80" text="ETA" />
                     </columns>
                     <placeholder>
-                        <Label style="-fx-text-fill: #4b5563; -fx-font-size: 11px;" text="No rescue teams available." />
+                        <Label style="-fx-text-fill: #4b5563; -fx-font-size: 11px;"
+                               text="No rescue teams available." />
                     </placeholder>
                 </TableView>
             </VBox>
 
-            <!-- SECTION 3: Resources — with progress bars like dashboard's Resource Status -->
+            <!-- SECTION 3: Resources -->
             <VBox VBox.vgrow="ALWAYS">
-                <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding: 10 14 10 14; -fx-background-color: #1f2937; -fx-border-color: #21262d; -fx-border-width: 1 0 0 0;">
-                    <Label style="-fx-text-fill: #f9fafb; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0;" styleClass="panel-title" text="RESOURCES" />
+                <HBox alignment="CENTER_LEFT" spacing="8"
+                      style="-fx-padding: 10 14 10 14; -fx-background-color: #1f2937;
+                             -fx-border-color: #21262d; -fx-border-width: 1 0 0 0;">
+                    <Label style="-fx-text-fill: #f9fafb; -fx-font-size: 11px; -fx-font-weight: bold;"
+                           text="RESOURCES" />
                     <Region HBox.hgrow="ALWAYS" />
-                    <Label fx:id="lblResourceCount" style="-fx-text-fill: #a78bfa; -fx-font-size: 11px; -fx-font-weight: bold; -fx-background-color: #2e1065; -fx-background-radius: 10; -fx-padding: 2 8 2 8;" text="0" />
+                    <Label fx:id="lblResourceCount"
+                           style="-fx-text-fill: #a78bfa; -fx-font-size: 11px; -fx-font-weight: bold;
+                                  -fx-background-color: #2e1065; -fx-background-radius: 10;
+                                  -fx-padding: 2 8 2 8;" text="0" />
                 </HBox>
-
-                <!-- Quick Resource Progress Summary — mirrors dashboard's Resource Status -->
-                <VBox spacing="6" style="-fx-padding: 10 14 8 14; -fx-background-color: #161b22; -fx-border-color: #21262d; -fx-border-width: 0 0 1 0;">
+                <VBox spacing="6"
+                      style="-fx-padding: 10 14 8 14; -fx-background-color: #161b22;
+                             -fx-border-color: #21262d; -fx-border-width: 0 0 1 0;">
                     <HBox alignment="CENTER_LEFT">
-                        <Label style="-fx-text-fill: #9ca3af; -fx-font-size: 10px;" styleClass="resource-label" text="Relief Goods" />
+                        <Label style="-fx-text-fill: #9ca3af; -fx-font-size: 10px;" text="Relief Goods" />
                         <Region HBox.hgrow="ALWAYS" />
-                        <Label fx:id="lblReliefPct" style="-fx-text-fill: #6b7280; -fx-font-size: 10px;" styleClass="resource-pct" text="—" />
+                        <Label fx:id="lblReliefPct" style="-fx-text-fill: #6b7280; -fx-font-size: 10px;"
+                               text="—" />
                     </HBox>
-                    <ProgressBar fx:id="pbRelief" maxWidth="Infinity" progress="0.0" style="-fx-pref-height: 5; -fx-background-radius: 3;" styleClass="progress-green" />
+                    <ProgressBar fx:id="pbRelief" maxWidth="Infinity" progress="0.0"
+                                 style="-fx-pref-height: 5; -fx-background-radius: 3;
+                                        -fx-accent: #34d399;" />
                     <HBox alignment="CENTER_LEFT">
-                        <Label style="-fx-text-fill: #9ca3af; -fx-font-size: 10px;" styleClass="resource-label" text="Med Supplies" />
+                        <Label style="-fx-text-fill: #9ca3af; -fx-font-size: 10px;" text="Med Supplies" />
                         <Region HBox.hgrow="ALWAYS" />
-                        <Label fx:id="lblMedPct" style="-fx-text-fill: #6b7280; -fx-font-size: 10px;" styleClass="resource-pct" text="—" />
+                        <Label fx:id="lblMedPct" style="-fx-text-fill: #6b7280; -fx-font-size: 10px;"
+                               text="—" />
                     </HBox>
-                    <ProgressBar fx:id="pbMed" maxWidth="Infinity" progress="0.0" style="-fx-pref-height: 5; -fx-background-radius: 3;" styleClass="progress-amber" />
+                    <ProgressBar fx:id="pbMed" maxWidth="Infinity" progress="0.0"
+                                 style="-fx-pref-height: 5; -fx-background-radius: 3;
+                                        -fx-accent: #fbbf24;" />
                     <HBox alignment="CENTER_LEFT">
-                        <Label style="-fx-text-fill: #9ca3af; -fx-font-size: 10px;" styleClass="resource-label" text="Evac Center Cap." />
+                        <Label style="-fx-text-fill: #9ca3af; -fx-font-size: 10px;" text="Evac Center Cap." />
                         <Region HBox.hgrow="ALWAYS" />
-                        <Label fx:id="lblEvacCapPct" style="-fx-text-fill: #6b7280; -fx-font-size: 10px;" styleClass="resource-pct" text="—" />
+                        <Label fx:id="lblEvacCapPct" style="-fx-text-fill: #6b7280; -fx-font-size: 10px;"
+                               text="—" />
                     </HBox>
-                    <ProgressBar fx:id="pbEvacCap" maxWidth="Infinity" progress="0.0" style="-fx-pref-height: 5; -fx-background-radius: 3;" styleClass="progress-blue" />
+                    <ProgressBar fx:id="pbEvacCap" maxWidth="Infinity" progress="0.0"
+                                 style="-fx-pref-height: 5; -fx-background-radius: 3;
+                                        -fx-accent: #60a5fa;" />
                 </VBox>
-
-                <TableView fx:id="tblResources" style="-fx-background-color: #161b22; -fx-border-color: transparent; -fx-table-cell-border-color: #21262d; -fx-font-size: 10px;" styleClass="incident-table" VBox.vgrow="ALWAYS">
+                <TableView fx:id="tblResources" VBox.vgrow="ALWAYS"
+                           style="-fx-background-color: #161b22; -fx-border-color: transparent;
+                                  -fx-table-cell-border-color: #21262d; -fx-font-size: 10px;">
                     <columns>
-                        <TableColumn fx:id="colResourceType" prefWidth="140" text="Resource">
-                            <cellValueFactory><PropertyValueFactory property="resourceType" /></cellValueFactory>
-                        </TableColumn>
-                        <TableColumn fx:id="colResourceQuantity" prefWidth="55" text="Qty">
-                            <cellValueFactory><PropertyValueFactory property="quantity" /></cellValueFactory>
-                        </TableColumn>
-                        <TableColumn fx:id="colResourceStatus" prefWidth="130" text="Status">
-                            <cellValueFactory><PropertyValueFactory property="status" /></cellValueFactory>
-                        </TableColumn>
+                        <TableColumn fx:id="colResourceType"     prefWidth="140" text="Resource" />
+                        <TableColumn fx:id="colResourceQuantity" prefWidth="55"  text="Qty" />
+                        <TableColumn fx:id="colResourceStatus"   prefWidth="130" text="Status" />
                     </columns>
                     <placeholder>
-                        <Label style="-fx-text-fill: #4b5563; -fx-font-size: 11px;" text="No resources loaded." />
+                        <Label style="-fx-text-fill: #4b5563; -fx-font-size: 11px;"
+                               text="No resources loaded." />
                     </placeholder>
                 </TableView>
             </VBox>
@@ -307,67 +392,93 @@
     <!-- BOTTOM: LOGS + ANALYTICS + STAT CARDS PANEL                  -->
     <!-- ============================================================ -->
     <bottom>
-        <HBox prefHeight="225" style="-fx-background-color: #161b22; -fx-border-color: #21262d; -fx-border-width: 1 0 0 0;">
+        <HBox prefHeight="225"
+              style="-fx-background-color: #161b22; -fx-border-color: #21262d; -fx-border-width: 1 0 0 0;">
 
-            <!-- LEFT: Incident Logs -->
-            <VBox prefWidth="430" style="-fx-border-color: #21262d; -fx-border-width: 0 1 0 0;">
-                <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding: 8 14 8 14; -fx-background-color: #1f2937; -fx-border-color: #21262d; -fx-border-width: 0 0 1 0;">
-                    <Label style="-fx-text-fill: #f9fafb; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0;" styleClass="panel-title" text="INCIDENT LOGS" />
+            <VBox prefWidth="430"
+                  style="-fx-border-color: #21262d; -fx-border-width: 0 1 0 0;">
+                <HBox alignment="CENTER_LEFT" spacing="8"
+                      style="-fx-padding: 8 14 8 14; -fx-background-color: #1f2937;
+                             -fx-border-color: #21262d; -fx-border-width: 0 0 1 0;">
+                    <Label style="-fx-text-fill: #f9fafb; -fx-font-size: 11px; -fx-font-weight: bold;"
+                           text="INCIDENT LOGS" />
                 </HBox>
-
-                <ListView fx:id="listIncidentLogs" style="-fx-background-color: #0d1117; -fx-border-color: transparent; -fx-font-family: 'Courier New'; -fx-font-size: 10px;" VBox.vgrow="ALWAYS">
+                <ListView fx:id="listIncidentLogs" VBox.vgrow="ALWAYS"
+                          style="-fx-background-color: #0d1117; -fx-border-color: transparent;
+                                 -fx-font-family: 'Courier New'; -fx-font-size: 10px;">
                     <placeholder>
-                        <Label style="-fx-text-fill: #4b5563; -fx-font-size: 11px;" text="No logs recorded." />
+                        <Label style="-fx-text-fill: #4b5563; -fx-font-size: 11px;"
+                               text="No logs recorded." />
                     </placeholder>
                 </ListView>
             </VBox>
 
-            <!-- RIGHT: Analytics Charts + Stat Summary Cards -->
             <VBox HBox.hgrow="ALWAYS">
-                <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding: 8 14 8 14; -fx-background-color: #1f2937; -fx-border-color: #21262d; -fx-border-width: 0 0 1 0;">
-                    <Label style="-fx-text-fill: #f9fafb; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0;" styleClass="panel-title" text="ANALYTICS OVERVIEW" />
+                <HBox alignment="CENTER_LEFT" spacing="8"
+                      style="-fx-padding: 8 14 8 14; -fx-background-color: #1f2937;
+                             -fx-border-color: #21262d; -fx-border-width: 0 0 1 0;">
+                    <Label style="-fx-text-fill: #f9fafb; -fx-font-size: 11px; -fx-font-weight: bold;"
+                           text="ANALYTICS OVERVIEW" />
                 </HBox>
-
                 <HBox spacing="0" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
 
-                    <!-- Bar Chart -->
-                    <BarChart fx:id="chartAnalytics" animated="false" legendVisible="false" style="-fx-background-color: transparent; -fx-font-size: 10px;" styleClass="analytical-bar-chart" HBox.hgrow="ALWAYS">
+                    <BarChart fx:id="chartAnalytics" animated="false" legendVisible="false"
+                              style="-fx-background-color: transparent; -fx-font-size: 10px;"
+                              HBox.hgrow="ALWAYS">
                         <xAxis>
-                            <CategoryAxis fx:id="chartXAxis" style="-fx-tick-label-fill: #6b7280; -fx-tick-label-font-size: 10px;" styleClass="chart-axis" />
+                            <CategoryAxis fx:id="chartXAxis"
+                                          style="-fx-tick-label-fill: #6b7280; -fx-tick-label-font-size: 10px;" />
                         </xAxis>
                         <yAxis>
-                            <NumberAxis fx:id="chartYAxis" style="-fx-tick-label-fill: #6b7280; -fx-tick-label-font-size: 10px;" styleClass="chart-axis" />
+                            <NumberAxis fx:id="chartYAxis"
+                                        style="-fx-tick-label-fill: #6b7280; -fx-tick-label-font-size: 10px;" />
                         </yAxis>
                     </BarChart>
 
-                    <!-- Stat Summary Cards — mirrors dashboard KPI cards in dark variant -->
-                    <HBox alignment="CENTER" spacing="10" style="-fx-padding: 14 16 14 8;">
-
-                        <!-- Total Affected -->
-                        <VBox alignment="CENTER" minWidth="110" style="-fx-background-color: #1f2937; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #21262d; -fx-border-width: 1; -fx-padding: 10 16 10 16;" styleClass="kpi-card">
-                            <Label style="-fx-text-fill: #6b7280; -fx-font-size: 8px; -fx-font-weight: bold;" styleClass="kpi-label" text="TOTAL AFFECTED" />
-                            <Label fx:id="lblTotalAffected" style="-fx-text-fill: #f9fafb; -fx-font-size: 26px; -fx-font-weight: bold;" styleClass="kpi-value" text="—" />
+                    <HBox alignment="CENTER" spacing="10"
+                          style="-fx-padding: 14 16 14 8;">
+                        <VBox alignment="CENTER" minWidth="110"
+                              style="-fx-background-color: #1f2937; -fx-background-radius: 10;
+                                     -fx-border-radius: 10; -fx-border-color: #21262d;
+                                     -fx-border-width: 1; -fx-padding: 10 16 10 16;">
+                            <Label style="-fx-text-fill: #6b7280; -fx-font-size: 8px; -fx-font-weight: bold;"
+                                   text="TOTAL AFFECTED" />
+                            <Label fx:id="lblTotalAffected"
+                                   style="-fx-text-fill: #f9fafb; -fx-font-size: 26px; -fx-font-weight: bold;"
+                                   text="—" />
                         </VBox>
-
-                        <!-- Rescued — kpi-success style -->
-                        <VBox alignment="CENTER" minWidth="110" style="-fx-background-color: #1f2937; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: rgba(29,158,117,0.25); -fx-border-width: 1; -fx-padding: 10 16 10 16;" styleClass="kpi-card, kpi-success">
-                            <Label style="-fx-text-fill: #6b7280; -fx-font-size: 8px; -fx-font-weight: bold;" styleClass="kpi-label" text="RESCUED" />
-                            <Label fx:id="lblRescued" style="-fx-text-fill: #34d399; -fx-font-size: 26px; -fx-font-weight: bold;" styleClass="kpi-value" text="—" />
+                        <VBox alignment="CENTER" minWidth="110"
+                              style="-fx-background-color: #1f2937; -fx-background-radius: 10;
+                                     -fx-border-radius: 10; -fx-border-color: rgba(29,158,117,0.25);
+                                     -fx-border-width: 1; -fx-padding: 10 16 10 16;">
+                            <Label style="-fx-text-fill: #6b7280; -fx-font-size: 8px; -fx-font-weight: bold;"
+                                   text="RESCUED" />
+                            <Label fx:id="lblRescued"
+                                   style="-fx-text-fill: #34d399; -fx-font-size: 26px; -fx-font-weight: bold;"
+                                   text="—" />
                         </VBox>
-
-                        <!-- Missing — kpi-danger style -->
-                        <VBox alignment="CENTER" minWidth="110" style="-fx-background-color: #1f2937; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: rgba(192,57,43,0.25); -fx-border-width: 1; -fx-padding: 10 16 10 16;" styleClass="kpi-card, kpi-danger">
-                            <Label style="-fx-text-fill: #6b7280; -fx-font-size: 8px; -fx-font-weight: bold;" styleClass="kpi-label" text="MISSING" />
-                            <Label fx:id="lblMissing" style="-fx-text-fill: #fca5a5; -fx-font-size: 26px; -fx-font-weight: bold;" styleClass="kpi-value" text="—" />
+                        <VBox alignment="CENTER" minWidth="110"
+                              style="-fx-background-color: #1f2937; -fx-background-radius: 10;
+                                     -fx-border-radius: 10; -fx-border-color: rgba(192,57,43,0.25);
+                                     -fx-border-width: 1; -fx-padding: 10 16 10 16;">
+                            <Label style="-fx-text-fill: #6b7280; -fx-font-size: 8px; -fx-font-weight: bold;"
+                                   text="MISSING" />
+                            <Label fx:id="lblMissing"
+                                   style="-fx-text-fill: #fca5a5; -fx-font-size: 26px; -fx-font-weight: bold;"
+                                   text="—" />
                         </VBox>
-
-                        <!-- Evacuated — kpi-info style -->
-                        <VBox alignment="CENTER" minWidth="110" style="-fx-background-color: #1f2937; -fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: rgba(52,152,219,0.25); -fx-border-width: 1; -fx-padding: 10 16 10 16;" styleClass="kpi-card, kpi-info">
-                            <Label style="-fx-text-fill: #6b7280; -fx-font-size: 8px; -fx-font-weight: bold;" styleClass="kpi-label" text="EVACUATED" />
-                            <Label fx:id="lblEvacuated" style="-fx-text-fill: #60a5fa; -fx-font-size: 26px; -fx-font-weight: bold;" styleClass="kpi-value" text="—" />
+                        <VBox alignment="CENTER" minWidth="110"
+                              style="-fx-background-color: #1f2937; -fx-background-radius: 10;
+                                     -fx-border-radius: 10; -fx-border-color: rgba(52,152,219,0.25);
+                                     -fx-border-width: 1; -fx-padding: 10 16 10 16;">
+                            <Label style="-fx-text-fill: #6b7280; -fx-font-size: 8px; -fx-font-weight: bold;"
+                                   text="EVACUATED" />
+                            <Label fx:id="lblEvacuated"
+                                   style="-fx-text-fill: #60a5fa; -fx-font-size: 26px; -fx-font-weight: bold;"
+                                   text="—" />
                         </VBox>
-
                     </HBox>
+
                 </HBox>
             </VBox>
 
