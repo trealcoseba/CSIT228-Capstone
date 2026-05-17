@@ -724,7 +724,6 @@ public class ResponderController implements Initializable {
 
             Stage stage = new Stage();
 
-            // FIX: Set Owner and prevent full screen
             if (mainTabPane.getScene() != null) {
                 stage.initOwner(mainTabPane.getScene().getWindow());
             }
@@ -882,50 +881,43 @@ public class ResponderController implements Initializable {
     }
 
     private void formatTable() {
+        // ── REGISTRY TABLE PERCENTAGES ──────────────────────────────────────────
+        // Total should equal 1.0 (100%)
+        colId.prefWidthProperty().bind(tblResponders.widthProperty().multiply(0.08));
+        colName.prefWidthProperty().bind(tblResponders.widthProperty().multiply(0.15));
+        colAgency.prefWidthProperty().bind(tblResponders.widthProperty().multiply(0.10));
+        colContact.prefWidthProperty().bind(tblResponders.widthProperty().multiply(0.12));
+        colDispatches.prefWidthProperty().bind(tblResponders.widthProperty().multiply(0.25));
+        colStatus.prefWidthProperty().bind(tblResponders.widthProperty().multiply(0.10));
+        colAction.prefWidthProperty().bind(tblResponders.widthProperty().multiply(0.20));
 
-        // ── REGISTRY TABLE ────────────────────────────────────────────────────────
-        colId.setPrefWidth(90);
-        colName.setPrefWidth(160);
-        colAgency.setPrefWidth(140);
-        colContact.setPrefWidth(140);
-        colDispatches.setPrefWidth(220);
-        colStatus.setPrefWidth(110);
-        colAction.setPrefWidth(210);
-
+        // Apply constraints to Registry Columns
         for (TableColumn<Responder, ?> col : List.of(
                 colId, colName, colAgency, colContact, colDispatches, colStatus, colAction)) {
             col.setResizable(false);
-            col.setStyle("-fx-alignment: CENTER");
             col.setReorderable(false);
+            // Style alignment handled here
+            col.setStyle("-fx-alignment: CENTER;");
         }
 
-        colStatus.setStyle("-fx-alignment: CENTER;");
+        // ── MISSION LOG TABLE PERCENTAGES ────────────────────────────────────────
+        colDispatchId.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.08));
+        colDispatchName.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.14));
+        colIncidentId.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.08));
+        colSeverity.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.08));
+        colLocation.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.18));
+        colDispatchTime.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.12));
+        colDuration.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.08));
+        colMissionStatus.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.10));
+        colDispatchActions.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.14));
 
-
-        // ── MISSION LOG TABLE ─────────────────────────────────────────────────────
-        colDispatchId.setPrefWidth(90);
-        colDispatchName.setPrefWidth(150);
-        colIncidentId.setPrefWidth(100);
-        colSeverity.setPrefWidth(100);
-        colLocation.setPrefWidth(180);
-        colDispatchTime.setPrefWidth(140);
-        colDuration.setPrefWidth(110);
-        colMissionStatus.setPrefWidth(120);
-        colDispatchActions.setPrefWidth(160);
-
+        // Apply constraints to Mission Log Columns
         for (TableColumn<DispatchedResponder, ?> col : List.of(
                 colDispatchId, colDispatchName, colIncidentId, colSeverity,
                 colLocation, colDispatchTime, colDuration, colMissionStatus, colDispatchActions)) {
             col.setResizable(false);
             col.setReorderable(false);
-            col.setStyle("-fx-alignment: CENTER");
+            col.setStyle("-fx-alignment: CENTER;");
         }
-
-        colMissionStatus.setStyle("-fx-alignment: CENTER;");
-        colId.setStyle("-fx-alignment: CENTER;");
-        colDispatchId.setStyle("-fx-alignment: CENTER;");
-
-
-
     }
 }

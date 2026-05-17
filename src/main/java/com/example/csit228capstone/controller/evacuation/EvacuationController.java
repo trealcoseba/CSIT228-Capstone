@@ -620,31 +620,27 @@ public class EvacuationController {
     }
 
     private void formatTables() {
-        colName.setMinWidth(200);
-        colAddress.setMinWidth(300);
-        colCapacity.setMinWidth(100);
-        colOccupancy.setMinWidth(120);
-        colStatus.setMinWidth(120);
-        colManager.setMinWidth(150);
-        colContact.setMinWidth(150);
-        colActions.setMinWidth(250);
+        // Total should add up to 1.0 (100%)
+        // Adjust these percentages if you want specific columns to be wider/narrower
+        colName.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.15));      // 15%
+        colAddress.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.20));   // 20%
+        colManager.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.12));   // 12%
+        colContact.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.12));   // 12%
+        colCapacity.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.08));  // 8%
+        colOccupancy.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.08)); // 8%
+        colStatus.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.10));    // 10%
+        colActions.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.25));   // 15%
 
-        colName.setResizable(false);
-        colCapacity.setResizable(false);
-        colOccupancy.setResizable(false);
-        colStatus.setResizable(false);
-        colManager.setResizable(false);
-        colAddress.setResizable(false);
-        colContact.setResizable(false);
-        colActions.setResizable(false);
+        // Apply constraints and alignment to all columns
+        for (TableColumn<EvacuationCenter, ?> col : List.of(
+                colName, colAddress, colCapacity, colOccupancy,
+                colStatus, colManager, colContact, colActions)) {
 
-        colName.setReorderable(false);
-        colCapacity.setReorderable(false);
-        colOccupancy.setReorderable(false);
-        colStatus.setReorderable(false);
-        colManager.setReorderable(false);
-        colAddress.setReorderable(false);
-        colContact.setReorderable(false);
-        colActions.setReorderable(false);
+            col.setResizable(false);
+            col.setReorderable(false);
+
+            // This ensures text is centered within the column
+            col.setStyle("-fx-alignment: CENTER;");
+        }
     }
 }
