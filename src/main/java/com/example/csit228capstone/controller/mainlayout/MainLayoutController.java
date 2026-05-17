@@ -135,6 +135,23 @@ public class MainLayoutController {
         }
     }
 
+    public void openAddIncidentForm() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                    "/com/example/csit228capstone/incident/AddIncident.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setTitle("Incident Registration");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.show();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     // ── Emergency ────────────────────────────────────────────────────────────────
 
     @FXML

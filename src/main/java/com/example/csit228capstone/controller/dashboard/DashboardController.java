@@ -1,5 +1,6 @@
 package com.example.csit228capstone.controller.dashboard;
 
+import com.example.csit228capstone.controller.incidents.ViewIncidentController;
 import com.example.csit228capstone.controller.mainlayout.MainLayoutController;
 import com.example.csit228capstone.model.Resource;
 import com.example.csit228capstone.repository.ResourceRepository;
@@ -60,6 +61,7 @@ public class DashboardController {
 
     // ── Parent controller reference ───────────────────────────────────────────────
     private MainLayoutController mainLayoutController;
+    private ViewIncidentController viewIncidentController;
 
     // Weather API config (Open-Meteo: No API Key Required)
     private static final double LAT = 10.3157;
@@ -172,7 +174,6 @@ public class DashboardController {
             updateUIForCategory(map, "RELIEF",   lblRelief, pbRelief);
             updateUIForCategory(map, "MEDICAL",  lblMed,    pbMed);
             updateUIForCategory(map, "FUND",     lblFund,   pbFund);
-            updateUIForCategory(map, "EVAC",     lblEvac,   pbEvac);
 
         } catch (Exception e) {
             System.err.println("Resource status load error: " + e.getMessage());
@@ -337,8 +338,9 @@ public class DashboardController {
     void reportIncident(ActionEvent e) {
         if (mainLayoutController != null) {
             // Navigate to residents tab first, then open the add form
-            mainLayoutController.showResidents(null);
-            mainLayoutController.openAddResidentForm();
+            mainLayoutController.showIncidents(null);
+            mainLayoutController.openAddIncidentForm();
+
         }
     }
 

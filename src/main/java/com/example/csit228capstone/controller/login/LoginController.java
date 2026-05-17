@@ -58,8 +58,6 @@ public class LoginController {
             showError("Login Failed", "Invalid username or password.");
         }
 
-
-
     }
 
     private void navigateToDashboard(ActionEvent event) {
@@ -68,9 +66,7 @@ public class LoginController {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("LIGTAS-Brgy");
-//            stage.setFullScreen(true);
-            stage.setWidth(1200);
-            stage.setHeight(1000);
+            stage.setFullScreen(true);
             stage.centerOnScreen();
             stage.show();
         } catch (IOException e) {

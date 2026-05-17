@@ -92,13 +92,6 @@
                     </HBox>
                     <ProgressBar fx:id="pbFund" maxWidth="Infinity" progress="0" styleClass="progress-red" />
 
-                    <!-- Evacuation -->
-                    <HBox alignment="CENTER_LEFT">
-                        <Label styleClass="resource-label" text="Evacuation" />
-                        <Region HBox.hgrow="ALWAYS" />
-                        <Label fx:id="lblEvac" styleClass="resource-pct" text="–%" />
-                    </HBox>
-                    <ProgressBar fx:id="pbEvac" maxWidth="Infinity" progress="0" styleClass="progress-blue" />
                 </VBox>
             </VBox>
 
