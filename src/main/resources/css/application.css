@@ -1508,3 +1508,76 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 2);
 }
 
+/* ── Compact table action buttons (Edit / Use) ──────────────────────────── */
+/* Matches the small View/Delete style seen in the Generated Reports table   */
+.tbl-action-btn-yellow {
+    -fx-background-color: #d4a017;
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 12 3 12;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-min-width: 54px;
+    -fx-pref-width: 54px;
+}
+.tbl-action-btn-yellow:hover {
+    -fx-background-color: #b8860b;
+}
+
+.tbl-action-btn-red {
+    -fx-background-color: #c0392b;
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 12 3 12;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-min-width: 60px;
+    -fx-pref-width: 60px;
+}
+.tbl-action-btn-red:hover {
+    -fx-background-color: #96281b;
+}
+
+/* ── Resource log badge button (shown in Last Updated cell) ─────────────── */
+/* Badge is larger now, sits above the date                                  */
+.log-badge-btn {
+    -fx-background-color: #1a3c6e;
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 14 4 14;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-min-width: 70px;
+    -fx-pref-width: 70px;
+}
+.log-badge-btn:hover {
+    -fx-background-color: #2a5298;
+}
+
+/* ── Highlighted log row (resource-specific view from badge click) ───────── */
+.log-row-highlight {
+    -fx-background-color: #e8f0fe;
+}
+.log-row-highlight:selected {
+    -fx-background-color: #b8d0f8;
+}
+
+/* ── Reset filter button (appears in Log tab when a resource filter is active) */
+.btn-reset-filter {
+    -fx-background-color: #f0f0f0;
+    -fx-text-fill: #c0392b;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 12 3 12;
+    -fx-background-radius: 4;
+    -fx-border-color: #c0392b;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-cursor: hand;
+}
+.btn-reset-filter:hover {
+    -fx-background-color: #fdecea;
+}
