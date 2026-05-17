@@ -34,10 +34,10 @@ public class LigtasApp extends Application {
             System.err.println("App icon not found: " + e.getMessage());
         }
 
-//        primaryStage.setMinWidth(1200);
-//        primaryStage.setMinHeight(800);
-//        primaryStage.setFullScreen(true);
-        primaryStage.show();
+         primaryStage.setMinWidth(1200);
+         primaryStage.setMinHeight(800);
+          primaryStage.setFullScreen(true);
+          primaryStage.show();
     }
 
     @Override
