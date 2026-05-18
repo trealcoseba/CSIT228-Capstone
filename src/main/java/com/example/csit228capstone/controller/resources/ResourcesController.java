@@ -413,9 +413,9 @@ public class ResourcesController {
         lblFund.setText("P" + formatQty(fund));
         lblLowStock.setText(String.valueOf(lowStock));
 
-        setProgress(lblReliefPct, pbRelief, averagePct(resources, "relief"));
-        setProgress(lblMedPct,    pbMed,    averagePct(resources, "medical"));
-        setProgress(lblFundPct,   pbFund,   averagePct(resources, "fund"));
+        setProgress(lblReliefPct, pbRelief, totalPct(resources, "relief"));
+        setProgress(lblMedPct,    pbMed,    totalPct(resources, "medical"));
+        setProgress(lblFundPct,   pbFund,   totalPct(resources, "fund"));
     }
 
     private void setProgress(Label label, ProgressBar bar, double pct) {
@@ -430,11 +430,16 @@ public class ResourcesController {
                 .mapToDouble(Resource::getAvailableQty).sum();
     }
 
-    private double averagePct(List<Resource> list, String categoryKeyword) {
+    private double totalPct(List<Resource> list, String categoryKeyword) {
         List<Resource> filtered = list.stream()
-                .filter(r -> safeText(r.getCategory()).toLowerCase().contains(categoryKeyword)).toList();
+                .filter(r -> safeText(r.getCategory()).toLowerCase().contains(categoryKeyword))
+                .toList();
         if (filtered.isEmpty()) return 0;
-        return filtered.stream().mapToDouble(Resource::getAvailablePercent).average().orElse(0);
+
+        double totalAvailable = filtered.stream().mapToDouble(Resource::getAvailableQty).sum();
+        double totalCapacity  = filtered.stream().mapToDouble(Resource::getTotalQty).sum();
+
+        return totalCapacity == 0 ? 0 : (totalAvailable / totalCapacity) * 100.0;
     }
 
     private String computeStatus(Resource resource) {
@@ -528,7 +533,7 @@ public class ResourcesController {
 
     private void confirmAndDelete(Resource resource) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-       
+
         if (resourcesTable.getScene() != null) confirm.initOwner(resourcesTable.getScene().getWindow());
         confirm.setTitle("Delete Resource");
         confirm.setHeaderText(null);

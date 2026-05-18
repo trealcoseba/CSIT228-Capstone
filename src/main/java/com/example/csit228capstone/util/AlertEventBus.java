@@ -4,10 +4,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-/**
- * Observer pattern — publish/subscribe event bus for real-time UI updates.
- * Controllers subscribe to event types; services publish when data changes.
- */
 public class AlertEventBus {
 
     public enum EventType {

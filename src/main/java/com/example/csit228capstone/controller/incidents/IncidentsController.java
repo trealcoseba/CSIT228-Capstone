@@ -147,8 +147,8 @@ public class IncidentsController implements Initializable {
                 btnResolve.setStyle("-fx-background-color: #20a074; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;");
                 btnResolve.setPrefWidth(75);
 
-                btnResolve.setOnMouseEntered(e -> btnResolve.setStyle("-fx-background-color: #1b8a63; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"));
-                btnResolve.setOnMouseExited(e -> btnResolve.setStyle("-fx-background-color: #20a074; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"));
+                btnResolve.setOnMouseEntered(e -> btnResolve.setStyle("-fx-background-color: #1b8a63; -fx-text-fill: white; -fx-background-radius: 6; -fx-cursor: hand;"));
+                btnResolve.setOnMouseExited(e -> btnResolve.setStyle("-fx-background-color: #20a074; -fx-text-fill: white; -fx-background-radius: 6; -fx-cursor: hand;"));
 
                 btnDelete.setStyle("-fx-background-color: #c0392b; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;");
                 btnDelete.setPrefWidth(70);
@@ -171,11 +171,11 @@ public class IncidentsController implements Initializable {
 
                     if (incident.getStatus() == IncidentStatus.RESOLVED) {
                         btnResolve.setDisable(true);
-                        btnResolve.setStyle("-fx-background-color: #167d5b; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-opacity: 1.0;");
+                        btnResolve.setStyle("-fx-background-color: #167d5b; -fx-text-fill: white; -fx-background-radius: 8; -fx-opacity: 1.0;");
                         btnResolve.setText("Done");
                     } else {
                         btnResolve.setDisable(false);
-                        btnResolve.setStyle("-fx-background-color: #20a074; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-opacity: 1.0;");
+                        btnResolve.setStyle("-fx-background-color: #20a074; -fx-text-fill: white; -fx-background-radius: 8; -fx-opacity: 1.0;");
                         btnResolve.setText("Resolve");
                     }
 

@@ -6,15 +6,7 @@ import java.sql.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Raw analytics queries.
- * Every method opens its own connection so it can be called from a background
- * thread without sharing state.
- *
- * Adjusted to match the actual `incidents` table schema:
- *   - `type`        replaces `disaster_category`
- *   - `reported_at` replaces `created_at`
- */
+
 public class AnalyticsRepository {
 
     private Connection getConn() throws SQLException {
@@ -25,7 +17,6 @@ public class AnalyticsRepository {
     // INCIDENT COUNTS  (table: incidents)
     // ─────────────────────────────────────────────────────────────────────────
 
-    /** Total incidents reported in the current calendar month. */
     public int countIncidentsThisMonth() {
         String sql = """
                 SELECT COUNT(*) FROM incidents
@@ -34,7 +25,6 @@ public class AnalyticsRepository {
         return querySingleInt(sql);
     }
 
-    /** Total incidents reported in the previous calendar month. */
     public int countIncidentsPrevMonth() {
         String sql = """
                 SELECT COUNT(*) FROM incidents
@@ -44,10 +34,6 @@ public class AnalyticsRepository {
         return querySingleInt(sql);
     }
 
-    /**
-     * Frequency of incidents per incident type (all time).
-     * Returns a map of  type → count  ordered by count desc.
-     */
     public Map<String, Integer> incidentFrequencyByCategory() {
         String sql = """
                 SELECT COALESCE(type::text, 'Unknown') AS category,
@@ -73,10 +59,7 @@ public class AnalyticsRepository {
     // RESOLUTION TIME  (hours between reported_at and resolved_at)
     // ─────────────────────────────────────────────────────────────────────────
 
-    /**
-     * Average resolution time (hours) for the current month.
-     * Returns 0.0 when there are no resolved incidents.
-     */
+
     public double avgResolutionHoursThisMonth() {
         String sql = """
                 SELECT COALESCE(
@@ -88,7 +71,6 @@ public class AnalyticsRepository {
         return querySingleDouble(sql);
     }
 
-    /** Same metric for the previous month. */
     public double avgResolutionHoursPrevMonth() {
         String sql = """
                 SELECT COALESCE(
@@ -101,9 +83,6 @@ public class AnalyticsRepository {
         return querySingleDouble(sql);
     }
 
-    /**
-     * Average resolution time (hours) per incident type.
-     */
     public Map<String, Double> avgResolutionByCategory() {
         String sql = """
                 SELECT COALESCE(type::text, 'Unknown') AS category,
@@ -132,7 +111,7 @@ public class AnalyticsRepository {
     // SHELTER UTILISATION  (evacuation_centers)
     // ─────────────────────────────────────────────────────────────────────────
 
-    /** Current overall utilisation % across all active centres. */
+
     public double currentShelterUtilizationPct() {
         String sql = """
                 SELECT CASE WHEN SUM(max_capacity) = 0 THEN 0
@@ -144,13 +123,7 @@ public class AnalyticsRepository {
         return querySingleDouble(sql);
     }
 
-    /**
-     * "Peak last month" – maximum single-day occupancy ratio recorded in the
-     * previous month.  Falls back to 0 if the optional log table doesn't exist.
-     *
-     * Assumes an optional table: evacuation_occupancy_log(center_id, logged_at,
-     * occupancy, max_capacity).
-     */
+
     public double peakShelterUtilizationPrevMonth() {
         String sql = """
                 SELECT COALESCE(
@@ -168,10 +141,7 @@ public class AnalyticsRepository {
         }
     }
 
-    /**
-     * Per-center resource breakdown: used_qty and available_qty per center.
-     * Returns map of centerName → [usedQty, availableQty].
-     */
+
     public Map<String, double[]> resourceUsagePerCenter() {
         String sql = """
                 SELECT ec.name AS center_name,
@@ -221,7 +191,6 @@ public class AnalyticsRepository {
     // VULNERABILITY RATIO  (resident_vulnerabilities)
     // ─────────────────────────────────────────────────────────────────────────
 
-    /** % of residents that have at least one vulnerability tag (current). */
     public double vulnerabilityRatioPct() {
         String sql = """
                 SELECT CASE WHEN (SELECT COUNT(*) FROM residents) = 0 THEN 0
@@ -234,9 +203,7 @@ public class AnalyticsRepository {
         return querySingleDouble(sql);
     }
 
-    /**
-     * Vulnerability ratio for residents created last month.
-     */
+
     public double vulnerabilityRatioPrevMonthPct() {
         String sql = """
                 SELECT CASE WHEN total = 0 THEN 0
@@ -255,10 +222,7 @@ public class AnalyticsRepository {
         return querySingleDouble(sql);
     }
 
-    /**
-     * Demographic breakdown: vulnerability tag → distinct resident count.
-     * Used by the PieChart.
-     */
+    
     public Map<String, Integer> vulnerabilityTagBreakdown() {
         String sql = """
                 SELECT tag::text AS tag, COUNT(DISTINCT resident_id) AS cnt

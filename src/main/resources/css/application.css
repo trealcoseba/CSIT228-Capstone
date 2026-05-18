@@ -1514,7 +1514,6 @@
     -fx-background-color: #d4a017;
     -fx-text-fill: white;
     -fx-font-size: 11px;
-    -fx-font-weight: bold;
     -fx-padding: 3 12 3 12;
     -fx-background-radius: 4;
     -fx-cursor: hand;
@@ -1529,7 +1528,6 @@
     -fx-background-color: #c0392b;
     -fx-text-fill: white;
     -fx-font-size: 11px;
-    -fx-font-weight: bold;
     -fx-padding: 3 12 3 12;
     -fx-background-radius: 4;
     -fx-cursor: hand;
