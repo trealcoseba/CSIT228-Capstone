@@ -447,6 +447,11 @@ public class ResourcesController {
 
     private void openEditDialog(Resource resource) {
         Dialog<ButtonType> dialog = new Dialog<>();
+
+        if (resourcesTabPane.getScene() != null) {
+            dialog.initOwner(resourcesTabPane.getScene().getWindow());
+        }
+
         dialog.setTitle("Edit Resource");
         DialogPane pane = dialog.getDialogPane();
         pane.getStylesheets().add(getClass().getResource("/css/application.css").toExternalForm());
@@ -521,12 +526,14 @@ public class ResourcesController {
 
     // ── Misc helpers ──────────────────────────────────────────────────────────
 
-    /** Called by the Delete button in the table row. */
     private void confirmAndDelete(Resource resource) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+       
+        if (resourcesTable.getScene() != null) confirm.initOwner(resourcesTable.getScene().getWindow());
         confirm.setTitle("Delete Resource");
         confirm.setHeaderText(null);
         confirm.setContentText("Delete \"" + resource.getName() + "\" permanently? This cannot be undone.");
+
         Optional<ButtonType> result = confirm.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
@@ -594,12 +601,16 @@ public class ResourcesController {
 
     private void showInfo(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+
+        if (resourcesTabPane.getScene() != null) alert.initOwner(resourcesTabPane.getScene().getWindow());
         alert.setTitle(title); alert.setHeaderText(null); alert.setContentText(message);
         alert.showAndWait();
     }
 
     private void showError(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+
+        if (resourcesTabPane.getScene() != null) alert.initOwner(resourcesTabPane.getScene().getWindow());
         alert.setTitle(title); alert.setHeaderText(null); alert.setContentText(message);
         alert.showAndWait();
     }

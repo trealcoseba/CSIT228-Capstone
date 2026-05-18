@@ -5,52 +5,93 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<ScrollPane fitToWidth="true" prefHeight="800.0" prefWidth="1000.0" styleClass="dashboard-scroll" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://fxml.com/fxml/1" fx:controller="com.example.csit228capstone.controller.settings.SettingsController">
+<ScrollPane fitToWidth="true" prefHeight="800.0" prefWidth="1000.0"
+            styleClass="dashboard-scroll"
+            stylesheets="@../../../../css/application.css"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://fxml.com/fxml/1"
+            fx:controller="com.example.csit228capstone.controller.settings.SettingsController">
+
     <VBox spacing="16">
         <padding><Insets topRightBottomLeft="16" /></padding>
 
         <Label styleClass="page-title" text="Settings &amp; Configuration" />
 
         <TabPane tabClosingPolicy="UNAVAILABLE">
+
+            <!-- ═══════════════ Account Settings ═══════════════ -->
             <Tab text="Account Settings">
                 <VBox spacing="16" style="-fx-padding: 16;">
+
+                    <!-- Admin Profile -->
                     <VBox spacing="12" styleClass="panel-card">
                         <Label styleClass="panel-title" text="Admin Profile" />
                         <VBox spacing="8">
                             <Label styleClass="resource-label" text="First Name:" />
-                            <TextField promptText="First Name" />
+                            <TextField fx:id="firstNameField" promptText="First Name" />
                             <Label styleClass="resource-label" text="Last Name:" />
-                            <TextField promptText="Last Name" />
-                            <Label styleClass="resource-label" text="Email:" />
-                            <TextField promptText="Email Address" />
+                            <TextField fx:id="lastNameField" promptText="Last Name" />
                         </VBox>
+                        <Button onAction="#saveProfile"
+                                styleClass="quick-action-btn qa-navy"
+                                text="Save Profile" />
                     </VBox>
+
+                    <!-- Change Password -->
+                    <VBox spacing="12" styleClass="panel-card">
+                        <Label styleClass="panel-title" text="Change Password" />
+                        <VBox spacing="8">
+                            <Label styleClass="resource-label" text="Current Password:" />
+                            <PasswordField fx:id="oldPasswordField" promptText="Current password" />
+                            <Label styleClass="resource-label" text="New Password:" />
+                            <PasswordField fx:id="newPasswordField" promptText="New password (min 8 chars)" />
+                            <Label styleClass="resource-label" text="Confirm New Password:" />
+                            <PasswordField fx:id="confirmPasswordField" promptText="Confirm new password" />
+                        </VBox>
+                        <Button onAction="#changePassword"
+                                styleClass="quick-action-btn qa-navy"
+                                text="Change Password" />
+                    </VBox>
+
                 </VBox>
             </Tab>
 
+            <!-- ═══════════════ Notifications ═══════════════ -->
             <Tab text="Notifications">
                 <VBox spacing="16" style="-fx-padding: 16;">
                     <VBox spacing="12" styleClass="panel-card">
                         <Label styleClass="panel-title" text="Notification Settings" />
-
-                        <!-- Added -fx-text-fill inline to guarantee it is black/dark gray -->
-                        <CheckBox selected="true" style="-fx-text-fill: #1A1815;" text="Notify on New Incidents" />
-                        <CheckBox selected="true" style="-fx-text-fill: #1A1815;" text="Notify on Evacuation Orders" />
-                        <CheckBox selected="true" style="-fx-text-fill: #1A1815;" text="Email Notifications" />
-
+                        <CheckBox fx:id="notifyIncidents" selected="true"
+                                  style="-fx-text-fill: #1A1815;"
+                                  text="Notify on New Incidents" />
+                        <CheckBox fx:id="notifyEvacuation" selected="true"
+                                  style="-fx-text-fill: #1A1815;"
+                                  text="Notify on Evacuation Orders" />
+                        <CheckBox fx:id="notifyEmail" selected="true"
+                                  style="-fx-text-fill: #1A1815;"
+                                  text="Email Notifications" />
+                        <Button onAction="#saveNotifications"
+                                styleClass="quick-action-btn qa-navy"
+                                text="Save Preferences" />
                     </VBox>
                 </VBox>
             </Tab>
 
+            <!-- ═══════════════ Backup & Maintenance ═══════════════ -->
             <Tab text="Backup &amp; Maintenance">
                 <VBox spacing="16" style="-fx-padding: 16;">
                     <VBox spacing="12" styleClass="panel-card">
                         <Label styleClass="panel-title" text="Database Backup" />
-                        <Label styleClass="page-subtitle" text="Last Backup: 2026-05-04 02:30 AM" />
-                        <Button onAction="#backupNow" styleClass="quick-action-btn qa-navy" text="Backup Now" />
+                        <Label fx:id="lastBackupLabel"
+                               styleClass="page-subtitle"
+                               text="Last Backup: 2026-05-04 02:30 AM" />
+                        <Button onAction="#backupNow"
+                                styleClass="quick-action-btn qa-navy"
+                                text="Backup Now" />
                     </VBox>
                 </VBox>
             </Tab>
+
         </TabPane>
     </VBox>
 </ScrollPane>

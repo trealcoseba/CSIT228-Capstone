@@ -8,7 +8,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -20,6 +22,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public class MainLayoutController {
 
@@ -120,36 +123,38 @@ public class MainLayoutController {
      */
     public void openAddResidentForm() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(
-                    "/com/example/csit228capstone/resident/ResidentForm.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/csit228capstone/resident/ResidentForm.fxml"));
             Parent root = loader.load();
 
             Stage stage = new Stage();
+            // FIX: Set Owner and prevent full screen
+            if (layoutPane.getScene() != null) stage.initOwner(layoutPane.getScene().getWindow());
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setFullScreen(false);
+            stage.setResizable(false);
+
             stage.setTitle("Resident Registration");
             stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL);
             stage.show();
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        } catch (IOException ex) { ex.printStackTrace(); }
     }
 
     public void openAddIncidentForm() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(
-                    "/com/example/csit228capstone/incident/AddIncident.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/csit228capstone/incident/AddIncident.fxml"));
             Parent root = loader.load();
 
             Stage stage = new Stage();
+            // FIX: Set Owner and prevent full screen
+            if (layoutPane.getScene() != null) stage.initOwner(layoutPane.getScene().getWindow());
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setFullScreen(false);
+            stage.setResizable(false);
+
             stage.setTitle("Incident Registration");
             stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL);
             stage.show();
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        } catch (IOException ex) { ex.printStackTrace(); }
     }
 
     // ── Emergency ────────────────────────────────────────────────────────────────
@@ -190,19 +195,25 @@ public class MainLayoutController {
     // ── Logout ───────────────────────────────────────────────────────────────────
 
     public void handleLogout(ActionEvent actionEvent) throws Exception {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Logout");
+        confirm.setHeaderText("Are you sure you want to logout?");
+        confirm.setContentText("Any unsaved changes will be lost.");
+
+        Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+        confirm.initOwner(stage);
+        confirm.initModality(Modality.APPLICATION_MODAL);
+
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) return;
+
         FXMLLoader loader = new FXMLLoader(
                 getClass().getResource("/com/example/csit228capstone/login/Login.fxml"));
         Parent root = loader.load();
 
-        Scene scene = new Scene(root, 1440, 900);
-        scene.getStylesheets().add(
-                getClass().getResource("/css/application.css").toExternalForm());
+        stage.getScene().setRoot(root);
 
-        Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-        stage.setScene(scene);
+        stage.setFullScreen(true);
         stage.centerOnScreen();
-        stage.setMinWidth(1200);
-        stage.setMinHeight(800);
-        stage.show();
     }
 }

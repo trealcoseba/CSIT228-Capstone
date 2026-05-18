@@ -141,16 +141,16 @@ public class IncidentsController implements Initializable {
             private final HBox container = new HBox(5, btnEdit, btnResolve, btnDelete);
 
             {
-                btnEdit.setStyle("-fx-background-color: #D4A017; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;");
+                btnEdit.setStyle("-fx-background-color: #D4A017; -fx-text-fill: white;  -fx-background-radius: 8; -fx-cursor: hand;");
                 btnEdit.setPrefWidth(60);
 
-                btnResolve.setStyle("-fx-background-color: #20a074; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;");
+                btnResolve.setStyle("-fx-background-color: #20a074; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;");
                 btnResolve.setPrefWidth(75);
 
                 btnResolve.setOnMouseEntered(e -> btnResolve.setStyle("-fx-background-color: #1b8a63; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"));
                 btnResolve.setOnMouseExited(e -> btnResolve.setStyle("-fx-background-color: #20a074; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"));
 
-                btnDelete.setStyle("-fx-background-color: #c0392b; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;");
+                btnDelete.setStyle("-fx-background-color: #c0392b; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;");
                 btnDelete.setPrefWidth(70);
 
                 container.setAlignment(javafx.geometry.Pos.CENTER);

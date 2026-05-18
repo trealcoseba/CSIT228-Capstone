@@ -1,6 +1,7 @@
 package com.example.csit228capstone.controller.login;
 
 import com.example.csit228capstone.repository.UserRepository;
+import com.example.csit228capstone.util.SessionManager;
 import com.example.csit228capstone.util.SupabaseConnectionManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -53,6 +54,7 @@ public class LoginController {
         String password = tfPassword.getText();
 
         if(repository.authenticate(username, password)) {
+            SessionManager.getInstance().setLoggedInUsername(username);
             navigateToDashboard(actionEvent);
         } else {
             showError("Login Failed", "Invalid username or password.");
@@ -64,12 +66,13 @@ public class LoginController {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/com/example/csit228capstone/mainlayout/MainLayout.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("LIGTAS-Brgy");
-            stage.setFullScreen(true);
+
             stage.setFullScreenExitHint("");
-            stage.centerOnScreen();
-            stage.show();
+
+            stage.getScene().setRoot(root);
+            
+            stage.setFullScreen(true);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -77,6 +80,11 @@ public class LoginController {
 
     private void showError(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+
+        if (btnLogin.getScene() != null && btnLogin.getScene().getWindow() != null) {
+            alert.initOwner(btnLogin.getScene().getWindow());
+        }
+
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);
