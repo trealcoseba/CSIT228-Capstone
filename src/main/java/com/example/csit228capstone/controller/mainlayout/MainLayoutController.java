@@ -162,6 +162,9 @@ public class MainLayoutController {
     @FXML
     void activateEmergency(ActionEvent e) {
         try {
+            // Get the current main stage
+            Stage primaryStage = (Stage) layoutPane.getScene().getWindow();
+
             FXMLLoader authLoader = new FXMLLoader(getClass().getResource(
                     "/com/example/csit228capstone/emergency/EmergencyAuth.fxml"));
             Parent authRoot = authLoader.load();
@@ -170,9 +173,13 @@ public class MainLayoutController {
             Stage authStage = new Stage();
             authStage.setTitle("Security Check");
             authStage.setScene(new Scene(authRoot));
+
+            // FIX 1: Set the owner so it stays on top of the main layout
+            authStage.initOwner(primaryStage);
             authStage.initModality(Modality.APPLICATION_MODAL);
             authStage.setResizable(false);
             authStage.initStyle(javafx.stage.StageStyle.UTILITY);
+
             authStage.showAndWait();
 
             if (authController.isAuthorized()) {
@@ -181,8 +188,19 @@ public class MainLayoutController {
                 Parent mainRoot = mainLoader.load();
 
                 Stage mainStage = new Stage();
+
+                // FIX 2: If the primary stage is Full Screen, toggle it to Maximized
+                // to prevent the OS from minimizing it when the new window opens.
+                if (primaryStage.isFullScreen()) {
+                    primaryStage.setFullScreen(false);
+                    primaryStage.setMaximized(true);
+                }
+
                 mainStage.setTitle("LIGTAS-BRGY — Emergency Operations Center");
                 mainStage.setScene(new Scene(mainRoot));
+
+                // FIX 3: Link the owner
+                mainStage.initOwner(primaryStage);
                 mainStage.setMaximized(true);
                 mainStage.show();
             }
