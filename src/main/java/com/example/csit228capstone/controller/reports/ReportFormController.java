@@ -360,29 +360,36 @@ public class ReportFormController {
 
     private void openPreview(Report report, ReportFormData formData) {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/com/example/csit228capstone/report/ReportPreview.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/csit228capstone/report/ReportPreview.fxml"));
             Parent root = loader.load();
             ReportPreviewController ctrl = loader.getController();
             ctrl.loadReport(report, formData);
 
             Stage stage = new Stage();
 
-            if (tfReportName.getScene() != null) {
-                stage.initOwner(tfReportName.getScene().getWindow());
+            // FIX: Capture the current window BEFORE closing it
+            Stage currentStage = (Stage) tfReportName.getScene().getWindow();
+
+            // FIX: Set Owner to the Dashboard (the window behind this form)
+            if (currentStage.getOwner() != null) {
+                stage.initOwner(currentStage.getOwner());
             }
 
-            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(root));
             stage.setTitle("Preview — " + report.getName());
 
+            // FIX: Enforce non-fullscreen for the popup
             stage.setMinWidth(820);
             stage.setMinHeight(700);
             stage.setFullScreen(false);
             stage.setResizable(true);
 
             stage.show();
-            ((Stage) tfReportName.getScene().getWindow()).close();
+
+            // Close the entry form
+            currentStage.close();
+
         } catch (IOException e) {
             e.printStackTrace();
             alert("Error", "Could not open preview: " + e.getMessage());
@@ -401,6 +408,7 @@ public class ReportFormController {
         javafx.application.Platform.runLater(() -> {
             Alert a = new Alert(Alert.AlertType.WARNING);
 
+            // FIX: Improved ownership detection
             if (tfReportName.getScene() != null && tfReportName.getScene().getWindow() != null) {
                 a.initOwner(tfReportName.getScene().getWindow());
             }
