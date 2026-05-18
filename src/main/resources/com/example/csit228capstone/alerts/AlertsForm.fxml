@@ -56,7 +56,7 @@
         <VBox spacing="6">
             <CheckBox fx:id="chkSchedule" text="Schedule this broadcast" />
             <HBox alignment="CENTER_LEFT" spacing="8">
-                <Label styleClass="field-label" text="Expires on:" />
+                <Label styleClass="field-label" text="Broadcasts on:" />
                 <DatePicker fx:id="dpExpires" promptText="Pick a date" />
             </HBox>
         </VBox>
