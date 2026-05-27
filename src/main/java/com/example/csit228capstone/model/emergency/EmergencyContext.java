@@ -5,10 +5,6 @@ import com.example.csit228capstone.model.incident.IncidentType;
 
 import java.util.UUID;
 
-/**
- * Lightweight data-carrier passed from the "Trigger Incident" dialog
- * into EmergencyController via scene userData or a static setter.
- */
 public class EmergencyContext {
 
     private UUID    incidentId;
@@ -18,17 +14,14 @@ public class EmergencyContext {
     private String  description;
     private double  latitude;
     private double  longitude;
-    private double  radiusMeters;   // affected radius the admin entered
+    private double  radiusMeters;
     private String  locationPurok;
     private String  locationDetail;
-    private UUID    reportedBy;     // admin user UUID (may be null)
+    private UUID    reportedBy;
 
     public EmergencyContext() {}
 
-    // ─── Getters / Setters ────────────────────────────────────────────────────
-
     public UUID getIncidentId()          { return incidentId; }
-    public void setIncidentId(UUID v)    { this.incidentId = v; }
 
     public IncidentType getType()        { return type; }
     public void setType(IncidentType v)  { this.type = v; }
@@ -52,7 +45,6 @@ public class EmergencyContext {
     public void setRadiusMeters(double v){ this.radiusMeters = v; }
 
     public String getLocationPurok()     { return locationPurok; }
-    public void setLocationPurok(String v){ this.locationPurok = v; }
 
     public String getLocationDetail()    { return locationDetail; }
     public void setLocationDetail(String v){ this.locationDetail = v; }

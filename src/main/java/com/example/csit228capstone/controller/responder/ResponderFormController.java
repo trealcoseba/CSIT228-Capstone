@@ -16,7 +16,6 @@ import java.util.ResourceBundle;
 
 public class ResponderFormController implements Initializable {
 
-    // ─── FXML ────────────────────────────────────────────────────────────────────
     @FXML private Label       lblFormTitle;
     @FXML private TextField   tfName;
     @FXML private ComboBox<String> cbAgency;
@@ -24,15 +23,13 @@ public class ResponderFormController implements Initializable {
     @FXML private ComboBox<String> cbStatus;
     @FXML private Button      btnSave;
 
-    // Error labels
     @FXML private Label errName;
     @FXML private Label errAgency;
     @FXML private Label errStatus;
 
-    // ─── State ────────────────────────────────────────────────────────────────────
     private final ResponderRepository repo = new ResponderRepository();
-    private Responder editTarget;   // null = create mode
-    private Runnable onSaved;       // callback to refresh parent table
+    private Responder editTarget;
+    private Runnable onSaved;
 
     private static final List<String> KNOWN_AGENCIES =
             List.of("BFP", "PNP", "MDRRMO", "NBI", "PCG", "AFP", "DOH", "Other");
@@ -40,14 +37,11 @@ public class ResponderFormController implements Initializable {
     private static final List<String> STATUSES =
             List.of("available", "on_mission", "off_duty");
 
-    // ─── Init ─────────────────────────────────────────────────────────────────────
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         cbAgency.setItems(FXCollections.observableArrayList(KNOWN_AGENCIES));
         cbStatus.setItems(FXCollections.observableArrayList(STATUSES));
 
-        // Convert "on_mission" to "On Mission" for the UI
         cbStatus.setConverter(new javafx.util.StringConverter<String>() {
             @Override
             public String toString(String systemName) {
@@ -62,14 +56,12 @@ public class ResponderFormController implements Initializable {
 
             @Override
             public String fromString(String string) {
-                return null; // Not needed for a non-editable ComboBox
+                return null;
             }
         });
 
         cbStatus.getSelectionModel().select("available");
     }
-
-    // ─── Public API (called by parent before showing) ─────────────────────────────
 
     public void setResponder(Responder r) {
         this.editTarget = r;
@@ -91,8 +83,6 @@ public class ResponderFormController implements Initializable {
         this.onSaved = callback;
     }
 
-    // ─── Handlers ─────────────────────────────────────────────────────────────────
-
     @FXML
     private void handleSave(ActionEvent event) {
         if (!validate()) return;
@@ -104,11 +94,9 @@ public class ResponderFormController implements Initializable {
 
         try {
             if (editTarget == null) {
-                // ── CREATE ──
                 Responder r = new Responder(name, contact, agency, status);
                 repo.save(r);
             } else {
-                // ── UPDATE ──
                 editTarget.setName(name);
                 editTarget.setAgency(agency);
                 editTarget.setContact(contact);
@@ -128,8 +116,6 @@ public class ResponderFormController implements Initializable {
     private void handleCancel(ActionEvent event) {
         closeStage();
     }
-
-    // ─── Validation ───────────────────────────────────────────────────────────────
 
     private boolean validate() {
         boolean valid = true;
@@ -172,7 +158,6 @@ public class ResponderFormController implements Initializable {
     private void showError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
 
-        // FIX: Set the owner so the alert floats over the form in full-screen mode
         if (tfName.getScene() != null && tfName.getScene().getWindow() != null) {
             alert.initOwner(tfName.getScene().getWindow());
         }
@@ -182,8 +167,6 @@ public class ResponderFormController implements Initializable {
         alert.setContentText(msg);
         alert.showAndWait();
     }
-
-    // ─── Helpers ─────────────────────────────────────────────────────────────────
 
     private void closeStage() {
         ((Stage) btnSave.getScene().getWindow()).close();

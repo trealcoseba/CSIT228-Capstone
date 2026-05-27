@@ -4,11 +4,9 @@ import com.example.csit228capstone.model.Resident;
 import com.example.csit228capstone.controller.map.MapPickerController;
 import com.example.csit228capstone.model.vulnerability.VulnerabilityTag;
 import com.example.csit228capstone.repository.ResidentRepository;
-import com.github.sarxos.webcam.Webcam;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import com.github.sarxos.webcam.WebcamResolution;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -18,8 +16,7 @@ import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -63,8 +60,6 @@ public class ResidentFormController {
         });
     }
 
-    // ─── Photo ────────────────────────────────────────────────────────────────
-
     @FXML
     public void handleChooseFile(ActionEvent actionEvent) {
         FileChooser chooser = new FileChooser();
@@ -80,35 +75,12 @@ public class ResidentFormController {
     }
 
     @FXML
-    public void handleTakePhoto(ActionEvent actionEvent) {
-//        try {
-//            Webcam webcam = Webcam.getWebcams().getFirst();
-//            if (webcam != null) {
-//                webcam.setViewSize(WebcamResolution.VGA.getSize());
-//                webcam.open();
-//                BufferedImage image = webcam.getImage();
-//                File tempFile = new File("temp_capture.jpg");
-//                ImageIO.write(image, "JPG", tempFile);
-//                this.selectedImageFile = tempFile;
-//                ivAvatar.setImage(new Image(tempFile.toURI().toString()));
-//                lblFilePath.setText("Captured: " + tempFile.getName());
-//                webcam.close();
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            showAlert("Camera Error", "Hardware busy or not found: " + e.getMessage());
-//        }
-    }
-
-    @FXML
     public void handleDeletePhoto(ActionEvent event) {
         ivAvatar.setImage(new Image(getClass().getResourceAsStream("/images/default-avatar.jpg")));
         lblFilePath.setText("Photo removed");
         this.selectedImageFile = null;
         this.existingPhotoPath = "EMPTY";
     }
-
-    // ─── Map ──────────────────────────────────────────────────────────────────
 
     @FXML
     public void handleOpenMap(ActionEvent actionEvent) {
@@ -128,18 +100,15 @@ public class ResidentFormController {
             stage.setTitle("Pin Resident Location");
             stage.setScene(new Scene(root));
 
-            // FIX: Move these BEFORE showAndWait()
             stage.setResizable(false);
             stage.setFullScreen(false);
 
-            stage.showAndWait(); // The code pauses here until the map window is closed
+            stage.showAndWait();
 
             String pinnedAddress = mapController.getSelectedAddress();
             double lat = mapController.getSelectedLatitude();
             double lng = mapController.getSelectedLongitude();
 
-            // Check for 0.0 specifically to avoid overwriting with bad data
-            // if the user just closed the map without pinning
             if (lat != 0.0 && lng != 0.0) {
                 this.pendingLatitude = lat;
                 this.pendingLongitude = lng;
@@ -152,8 +121,6 @@ public class ResidentFormController {
             showAlert("Map Error", "Could not open map: " + e.getMessage());
         }
     }
-
-    // ─── Populate for Edit ────────────────────────────────────────────────────
 
     public void setResidentData(Resident r) {
         this.currentResidentId = r.getId();
@@ -173,7 +140,6 @@ public class ResidentFormController {
         this.pendingLatitude = r.getLatitude();
         this.pendingLongitude = r.getLongitude();
 
-        // Restore photo
         this.existingPhotoPath = r.getPhotoUrl();
         if (existingPhotoPath != null
                 && !existingPhotoPath.isBlank()
@@ -185,7 +151,6 @@ public class ResidentFormController {
             }
         }
 
-        // Restore vulnerability checkboxes
         if (r.getVulnerabilities() != null) {
             chkSenior.setSelected(r.getVulnerabilities().contains(VulnerabilityTag.SENIOR_CITIZEN));
             chkPWD.setSelected(r.getVulnerabilities().contains(VulnerabilityTag.PWD));
@@ -195,8 +160,6 @@ public class ResidentFormController {
             chkChild.setSelected(r.getVulnerabilities().contains(VulnerabilityTag.CHILD_0_5));
         }
     }
-
-    // ─── Save ─────────────────────────────────────────────────────────────────
 
     @FXML
     private void handleSave() {
@@ -214,8 +177,8 @@ public class ResidentFormController {
         r.setHouseholdHead(chkIsHead.isSelected());
         r.setAddress(txtAddress.getText() != null ? txtAddress.getText().trim() : "");
         r.setUpdatedAt(java.time.LocalDateTime.now());
-        r.setLatitude(pendingLatitude);   // ← add to Resident model
-        r.setLongitude(pendingLongitude); // ← add to Resident model
+        r.setLatitude(pendingLatitude);
+        r.setLongitude(pendingLongitude);
 
         try {
             if (selectedImageFile != null) {
@@ -244,8 +207,6 @@ public class ResidentFormController {
             showAlert("Database Error", "Failed to save: " + e.getMessage());
         }
     }
-
-    // ─── Helpers ──────────────────────────────────────────────────────────────
 
     private String saveImageToDisk(File sourceFile) throws IOException {
         String STORAGE_DIR = "data/resident_photos/";

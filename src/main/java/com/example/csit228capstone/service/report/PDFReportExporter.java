@@ -20,9 +20,6 @@ import java.io.File;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-/**
- * Clean PDF exporter pulling parameters into perfectly symmetric re-arranged layout grids.
- */
 public class PDFReportExporter implements ReportExporter<List<List<String>>> {
 
     private static final Color TEAL     = new DeviceRgb(0x1D, 0x9E, 0x75);
@@ -35,7 +32,6 @@ public class PDFReportExporter implements ReportExporter<List<List<String>>> {
 
     @Override public String getFormatName() { return "PDF"; }
 
-    // ── 1. Generic Tabular Report ────────────────────────────────────────────
     @Override
     public void export(ReportData<List<List<String>>> data, File dest) throws Exception {
         ReportFormData fd = data != null ? data.getFormData() : null;
@@ -70,7 +66,6 @@ public class PDFReportExporter implements ReportExporter<List<List<String>>> {
             String recContact = (fd != null && !nvl(fd.getRecorderContactInfo()).isBlank()) ? fd.getRecorderContactInfo() : "—";
             String computedType = data.getReportType() != null ? data.getReportType().getDisplayName() : "—";
 
-            // --- RE-ARRANGED SYMMETRIC GRID MAPPING ---
             doc.add(twoColRow("Date:", formDate, "Report No.:", reportNo));
             doc.add(twoColRow("Reported by:", reportedBy, "Recorded by:", recordedBy));
             doc.add(twoColRow("Reporter Contact:", repContact, "Recorder Contact:", recContact));
@@ -101,7 +96,6 @@ public class PDFReportExporter implements ReportExporter<List<List<String>>> {
         }
     }
 
-    // ── 2. Incident Report ───────────────────────────────────────────────────
     public void exportIncident(ReportData<ReportFormData> data, File dest) throws Exception {
         ReportFormData fd = data != null ? (data.getFormData() != null ? data.getFormData() : data.getPayload()) : null;
         if (fd == null) {
@@ -147,7 +141,6 @@ public class PDFReportExporter implements ReportExporter<List<List<String>>> {
             }
             String finalClassificationType = typeBuilder.length() > 0 ? typeBuilder.toString() : "—";
 
-            // --- RE-ARRANGED SYMMETRIC GRID MAPPING ---
             doc.add(twoColRow("Date:", formDate, "Report No.:", reportNo));
             doc.add(twoColRow("Reported by:", reportedBy, "Recorded by:", recordedBy));
             doc.add(twoColRow("Reporter Contact:", repContact, "Recorder Contact:", recContact));
@@ -185,7 +178,6 @@ public class PDFReportExporter implements ReportExporter<List<List<String>>> {
         }
     }
 
-    // ── iText Helpers ─────────────────────────────────────────────────────────
     private void govHeader(Document doc) {
         doc.add(para("Republic of the Philippines", 9, false, GRAY)
                 .setTextAlignment(TextAlignment.CENTER));
@@ -208,7 +200,6 @@ public class PDFReportExporter implements ReportExporter<List<List<String>>> {
     }
 
     private Table twoColRow(String l1, String v1, String l2, String v2) {
-        // Formatted with precise proportional sizing percentages
         Table t = new Table(UnitValue.createPercentArray(new float[]{1.8f, 3.2f, 1.8f, 3.2f}))
                 .useAllAvailableWidth().setMarginBottom(3);
 

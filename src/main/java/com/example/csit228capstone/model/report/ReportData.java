@@ -4,54 +4,29 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Generic, format-agnostic data container for any report type.
- *
- * <T> is the typed payload:
- *   - {@code List<List<String>>} for tabular reports (Residents, Resources, etc.)
- *   - {@code ReportFormData}     for Incident Reports
- *
- * All exporters receive a {@code ReportData<T>} and extract the payload
- * via {@link #getPayload()} according to their concrete T.
- */
 public class ReportData<T> {
 
-    // ── Core Identity ────────────────────────────────────────────────────────
     private String        title;
     private ReportType    reportType;
-    private LocalDateTime generatedDateTime; // Actual timestamp from the system
+    private LocalDateTime generatedDateTime;
 
-    // ── Metadata Fields (Used by Tabular/Generic Reports) ────────────────────
     private String        reportNo;
-    private String        generatedBy;         // "Reported by"
+    private String        generatedBy;
     private String        recordedBy;
     private String        reporterContactInfo;
     private String        recorderContactInfo;
     private LocalDate     startDate;
     private LocalDate     endDate;
 
-    // ── Table Structure ──────────────────────────────────────────────────────
-    /** Column headers — used for tabular-type reports. */
     private List<String>  headers;
 
-    /** One-line summary stats shown above the data table. */
     private List<String>  summaryLines;
 
-    /**
-     * The strongly-typed payload.
-     * For tabular reports : {@code List<List<String>>}
-     * For incident reports: {@code ReportFormData}
-     */
     private T payload;
 
-    /**
-     * Backup reference to form context if needed.
-     */
     private ReportFormData formData;
 
     public ReportData() {}
-
-    // ── Getters & Setters ─────────────────────────────────────────────────────
 
     public String getTitle() { return title; }
     public void setTitle(String v) { this.title = v; }

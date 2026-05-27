@@ -18,7 +18,6 @@
         <Label style="-fx-text-fill: gray; -fx-font-size: 12;" text="Click on the map to pin the exact household location." />
     </VBox>
 
-    <!-- The Map View -->
     <WebView fx:id="webView" VBox.vgrow="ALWAYS" style="-fx-border-color: #ddd; -fx-border-width: 1;"/>
 
     <HBox alignment="CENTER_LEFT" spacing="10.0">

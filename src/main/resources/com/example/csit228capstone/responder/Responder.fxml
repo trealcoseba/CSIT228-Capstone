@@ -7,7 +7,6 @@
 <VBox prefHeight="800.0" prefWidth="1100.0" spacing="16" styleClass="root-pane" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.responder.ResponderController">
     <padding><Insets topRightBottomLeft="16" /></padding>
 
-    <!-- ══════════════ HEADER ══════════════ -->
     <HBox alignment="CENTER_LEFT" spacing="12">
         <VBox>
             <Label styleClass="page-title" text="Responder Management" />
@@ -18,14 +17,11 @@
         <Button onAction="#handleRegisterResponder" styleClass="quick-action-btn" text="➕ Add Responder" />
     </HBox>
 
-    <!-- ══════════════ TABS ══════════════ -->
     <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
 
-        <!-- ─────────────── TAB 1 : RESPONDER REGISTRY ─────────────── -->
         <Tab text="Responders Registry">
             <VBox spacing="16" style="-fx-padding: 16 0 0 0;">
 
-                <!-- KPI Row -->
                 <HBox spacing="16">
                     <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
                         <Label styleClass="kpi-label" text="Available Personnel" />
@@ -41,14 +37,12 @@
                     </VBox>
                 </HBox>
 
-                <!-- Filter Row -->
                 <HBox alignment="CENTER_LEFT" spacing="12">
                     <ComboBox fx:id="filterAgency" prefWidth="160" promptText="Agency (BFP, PNP…)" />
                     <ComboBox fx:id="filterStatus" prefWidth="140" promptText="Status" />
                     <ComboBox fx:id="sortOrder" prefWidth="140" promptText="Sort By" />
                     <Button onAction="#clearRegistryFilters" styleClass="btn-outline" text="Clear Filters" />
                     <Region HBox.hgrow="ALWAYS" />
-                    <!-- Legend -->
                     <HBox alignment="CENTER_RIGHT" spacing="10">
                         <Label style="-fx-text-fill: #00ff88; -fx-font-size: 10px;" text="● Available" />
                         <Label style="-fx-text-fill: #ffb300; -fx-font-size: 10px;" text="● On Mission" />
@@ -56,7 +50,6 @@
                     </HBox>
                 </HBox>
 
-                <!-- Table -->
                 <VBox spacing="12" styleClass="panel-card" VBox.vgrow="ALWAYS">
                     <Label styleClass="panel-title" text="Personnel Registry" />
                     <TableView fx:id="tblResponders" styleClass="incident-table" VBox.vgrow="ALWAYS">
@@ -79,11 +72,9 @@
             </VBox>
         </Tab>
 
-        <!-- ─────────────── TAB 2 : MISSION LOG ─────────────── -->
         <Tab text="Mission Log">
             <VBox spacing="16" style="-fx-padding: 16 0 0 0;">
 
-                <!-- Mission KPIs -->
                 <HBox spacing="16">
                     <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
                         <Label styleClass="kpi-label" text="Total Missions" />
@@ -99,9 +90,7 @@
                     </VBox>
                 </HBox>
 
-                <!-- Filter Row for Mission Log -->
                 <HBox alignment="CENTER_LEFT" spacing="12">
-                    <!-- highlight banner when filtered by a responder from Registry -->
                     <Label fx:id="lblMissionFilter" managed="false" style="-fx-text-fill: #60a5fa; -fx-font-size: 11px; -fx-font-weight: bold;" text="" visible="false" />
                     <ComboBox fx:id="filterMissionStatus" prefWidth="150" promptText="Mission Status" />
                     <ComboBox fx:id="filterMissionSeverity" prefWidth="140" promptText="Severity" />
@@ -110,7 +99,6 @@
                     <Button fx:id="btnNewDispatch" onAction="#handleNewDispatch" styleClass="quick-action-btn" text=" Log Dispatch" />
                 </HBox>
 
-                <!-- Mission Table -->
                 <VBox spacing="12" styleClass="panel-card" VBox.vgrow="ALWAYS">
                     <HBox alignment="CENTER_LEFT">
                         <Label styleClass="panel-title" text="Mission Log" />

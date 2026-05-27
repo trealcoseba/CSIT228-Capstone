@@ -101,7 +101,6 @@ public class TriggerEmergencyController implements Initializable {
 
             Stage stage = new Stage();
 
-            // FIX: Set ownership and window properties BEFORE showAndWait()
             if (btnDeclare.getScene() != null) {
                 stage.initOwner(btnDeclare.getScene().getWindow());
             }
@@ -146,7 +145,6 @@ public class TriggerEmergencyController implements Initializable {
 
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
 
-        // FIX: Set ownership for full-screen compatibility
         if (btnDeclare.getScene() != null) {
             confirm.initOwner(btnDeclare.getScene().getWindow());
         }
@@ -187,8 +185,6 @@ public class TriggerEmergencyController implements Initializable {
     @FXML private void handleCancel() { closeStage(); }
 
     public void setEmergencyController(EmergencyController ctrl) { this.emergencyController = ctrl; }
-
-    // --- Helpers ---
 
     private void showError(String msg) { lblValidationError.setText("⚠  " + msg); }
 

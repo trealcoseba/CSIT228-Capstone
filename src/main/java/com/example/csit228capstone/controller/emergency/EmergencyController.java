@@ -48,37 +48,27 @@ import java.util.stream.Collectors;
 public class EmergencyController implements Initializable {
 
     private final Map<UUID, String> residentStatusCache = new HashMap<>();
-
-    // ── Repositories ─────────────────────────────────────────────────────────
     private final IncidentRepository               incidentRepo  = new IncidentRepository();
     private final ResidentRepository               residentRepo  = new ResidentRepository();
     private final ResponderRepository              responderRepo = new ResponderRepository();
     private final DispatchedResponderRepository    dispatchRepo  = new DispatchedResponderRepository();
     private final ResourceRepository               resourceRepo  = new ResourceRepository();
 
-    // ── State ─────────────────────────────────────────────────────────────────
     private EmergencyContext ctx;
     private UUID             incidentId;
     private Timeline         clockTimeline;
 
     private final ObservableList<String> logEntries = FXCollections.observableArrayList();
 
-    // ── Analytics counters ────────────────────────────────────────────────────
     private int totalAffected = 0;
     private int rescued       = 0;
     private int missing       = 0;
     private int evacuated     = 0;
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // FXML injections
-    // ─────────────────────────────────────────────────────────────────────────
-
     @FXML private Label lblSystemTime;
 
-    // ── NEW: Declare Incident button in the command bar ───────────────────────
     @FXML private Button btnDeclareIncident;
 
-    // KPI labels
     @FXML private Label lblEmergencyType;
     @FXML private Label lblSeverityDot;
     @FXML private Label lblSeverity;
@@ -87,14 +77,11 @@ public class EmergencyController implements Initializable {
     @FXML private Label lblCoordinates;
     @FXML private Label lblAffectedRadius;
 
-    // Action buttons
     @FXML private Button btnActivateDispatch;
     @FXML private Button btnNotifyResidents;
     @FXML private Button btnRefreshData;
     @FXML private Button btnEndEmergency;
 
-
-    // Left – Priority residents
     @FXML private Label                                    lblResidentCount;
     @FXML private TableView<PriorityResidentRow>           tblPriorityResidents;
     @FXML private TableColumn<PriorityResidentRow, String> colResidentName;
@@ -103,18 +90,15 @@ public class EmergencyController implements Initializable {
     @FXML private TableColumn<PriorityResidentRow, String> colRescueStatus;
     @FXML private TableColumn<PriorityResidentRow, Void> colResidentAction;
 
-    // Left – Missing residents
     @FXML private Label                                   lblMissingCount;
     @FXML private TableView<MissingResidentRow>           tblMissingResidents;
     @FXML private TableColumn<MissingResidentRow, String> colMissingName;
     @FXML private TableColumn<MissingResidentRow, String> colMissingContact;
     @FXML private TableColumn<MissingResidentRow, String> colLastKnownLocation;
 
-    // Center – Map
     @FXML private WebView mapWebView;
     @FXML private Label   lblMapCoords;
 
-    // Right – Evacuation centers
     @FXML private Label                                       lblEvacCenterCount;
     @FXML private TableView<EvacuationCenterRow>              tblEvacuationCenters;
     @FXML private TableColumn<EvacuationCenterRow, String>    colEvacName;
@@ -123,7 +107,6 @@ public class EmergencyController implements Initializable {
     @FXML private TableColumn<EvacuationCenterRow, String>    colEvacDistance;
     @FXML private TableColumn<EvacuationCenterRow, String>    colEvacStatus;
 
-    // Right – Rescue teams
     @FXML private Label                                  lblTeamCount;
     @FXML private TableView<RescueTeamRow>               tblRescueTeams;
     @FXML private TableColumn<RescueTeamRow, String>     colTeamName;
@@ -131,7 +114,6 @@ public class EmergencyController implements Initializable {
     @FXML private TableColumn<RescueTeamRow, String>     colTeamVehicle;
     @FXML private TableColumn<RescueTeamRow, String>     colTeamETA;
 
-    // Right – Resources
     @FXML private Label       lblResourceCount;
     @FXML private Label       lblReliefPct;
     @FXML private Label       lblMedPct;
@@ -144,10 +126,8 @@ public class EmergencyController implements Initializable {
     @FXML private TableColumn<ResourceRow, String> colResourceQuantity;
     @FXML private TableColumn<ResourceRow, String> colResourceStatus;
 
-    // Bottom – Logs
     @FXML private ListView<String> listIncidentLogs;
 
-    // Bottom – Analytics
     @FXML private BarChart<String, Number> chartAnalytics;
     @FXML private CategoryAxis             chartXAxis;
     @FXML private NumberAxis               chartYAxis;
@@ -155,10 +135,6 @@ public class EmergencyController implements Initializable {
     @FXML private Label lblRescued;
     @FXML private Label lblMissing;
     @FXML private Label lblEvacuated;
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Initialise
-    // ─────────────────────────────────────────────────────────────────────────
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -168,10 +144,6 @@ public class EmergencyController implements Initializable {
         startClock();
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // ── NEW: Open Trigger-Incident dialog from the command bar button ─────────
-    // ─────────────────────────────────────────────────────────────────────────
-
     @FXML
     private void handleDeclareIncident(ActionEvent e) {
         try {
@@ -180,7 +152,6 @@ public class EmergencyController implements Initializable {
             Parent root = loader.load();
 
             TriggerEmergencyController dlgCtrl = loader.getController();
-            // Pass ourselves so the dialog can call initWithContext() on us
             dlgCtrl.setEmergencyController(this);
 
 
@@ -202,18 +173,11 @@ public class EmergencyController implements Initializable {
 
             dlgStage.showAndWait();
 
-            // initWithContext() has already been called by the time we get here,
-            // so the dashboard will already be populating in the background.
-
         } catch (IOException ex) {
             addLog("⚠ Could not open Declare Incident dialog: " + ex.getMessage());
             ex.printStackTrace();
         }
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Entry-point called by TriggerIncidentController after confirmation
-    // ─────────────────────────────────────────────────────────────────────────
 
     public void initWithContext(EmergencyContext context) {
         this.ctx = context;
@@ -230,11 +194,9 @@ public class EmergencyController implements Initializable {
                     id = context.getIncidentId();
                 } else {
                     Incident inc = buildIncident(context);
-                    // The repo insert must happen first
                     id = incidentRepo.insert(inc);
                 }
 
-                // CRITICAL: Only assign to the class variable AFTER the DB insert is done
                 this.incidentId = id;
 
                 addLog("🚨 INCIDENT CREATED — ID: " + id.toString().substring(0, 8).toUpperCase());
@@ -250,10 +212,6 @@ public class EmergencyController implements Initializable {
             }
         });
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Dashboard population
-    // ─────────────────────────────────────────────────────────────────────────
 
     private void populateDashboard() {
         updateKpiCards();
@@ -276,10 +234,6 @@ public class EmergencyController implements Initializable {
                 ctx.getLatitude(), ctx.getLongitude()));
         lblAffectedRadius.setText((int) ctx.getRadiusMeters() + " m");
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Map
-    // ─────────────────────────────────────────────────────────────────────────
 
     private void loadMap() {
         if (mapWebView == null || ctx == null) return;
@@ -323,10 +277,6 @@ public class EmergencyController implements Initializable {
                 }, Platform::runLater);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Affected Residents
-    // ─────────────────────────────────────────────────────────────────────────
-
     private void loadAffectedResidents() {
         CompletableFuture.supplyAsync(() -> residentRepo.findAll())
                 .thenAcceptAsync(residents -> {
@@ -350,15 +300,12 @@ public class EmergencyController implements Initializable {
                         boolean vuln = r.getVulnerabilities() != null && !r.getVulnerabilities().isEmpty();
                         String name = r.getFirstName() + " " + r.getLastName();
 
-                        // 1. Create the row
                         PriorityResidentRow row = new PriorityResidentRow(r.getId(), name,
                                 vulnSummary(r.getVulnerabilities()), dist, vuln);
 
-                        // 2. CHECK CACHE: Restore the status if it exists
                         String savedStatus = residentStatusCache.getOrDefault(r.getId(), "Pending");
                         row.setRescueStatus(savedStatus);
 
-                        // 3. If they were Missing, add them back to the Missing table as well
                         if ("Missing".equals(savedStatus)) {
                             missingRows.add(new MissingResidentRow(r.getId(), name, r.getContactNumber(), "Last seen in zone"));
                         }
@@ -376,7 +323,6 @@ public class EmergencyController implements Initializable {
                         tblPriorityResidents.setItems(FXCollections.observableArrayList(rows));
                         lblResidentCount.setText(String.valueOf(rows.size()));
 
-                        // Restore Missing Table
                         tblMissingResidents.setItems(FXCollections.observableArrayList(missingRows));
                         lblMissingCount.setText(String.valueOf(missingRows.size()));
 
@@ -385,10 +331,6 @@ public class EmergencyController implements Initializable {
                     });
                 }, Platform::runLater);
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Evacuation Centers
-    // ─────────────────────────────────────────────────────────────────────────
 
     private void loadEvacuationCenters() {
         CompletableFuture.runAsync(() -> {
@@ -431,10 +373,6 @@ public class EmergencyController implements Initializable {
         });
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Rescue Teams
-    // ─────────────────────────────────────────────────────────────────────────
-
     private void loadRescueTeams() {
         CompletableFuture.runAsync(() -> {
             try {
@@ -451,10 +389,6 @@ public class EmergencyController implements Initializable {
             }
         });
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Resources
-    // ─────────────────────────────────────────────────────────────────────────
 
     private void loadResources() {
         CompletableFuture.runAsync(() -> {
@@ -483,10 +417,6 @@ public class EmergencyController implements Initializable {
         });
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Analytics
-    // ─────────────────────────────────────────────────────────────────────────
-
     private void updateAnalytics() {
         lblTotalAffected.setText(String.valueOf(totalAffected));
         lblRescued.setText(String.valueOf(rescued));
@@ -501,10 +431,6 @@ public class EmergencyController implements Initializable {
         chartAnalytics.getData().clear();
         chartAnalytics.getData().add(series);
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Button handlers
-    // ─────────────────────────────────────────────────────────────────────────
 
     @FXML
     void assignDispatch(ActionEvent e) {
@@ -644,10 +570,6 @@ public class EmergencyController implements Initializable {
         });
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-// Resident Action Column
-// ─────────────────────────────────────────────────────────────────────────
-
     private void setupResidentActions() {
         colResidentAction.setCellFactory(col -> new TableCell<>() {
 
@@ -713,7 +635,6 @@ public class EmergencyController implements Initializable {
                 PriorityResidentRow row = getTableView().getItems().get(getIndex());
                 String status = row.getRescueStatus();
 
-                // Disable all buttons once a status is set
                 boolean locked = status != null && !status.isBlank() && !status.equals("Pending");
                 btnRescued.setDisable(locked);
                 btnEvacuated.setDisable(locked);
@@ -723,8 +644,6 @@ public class EmergencyController implements Initializable {
             }
         });
     }
-
-// ── Rescued ───────────────────────────────────────────────────────────────
 
     private void markResident(PriorityResidentRow row, String status) {
         String prev = row.getRescueStatus();
@@ -737,10 +656,7 @@ public class EmergencyController implements Initializable {
         addLog("✅ " + row.getResidentName() + " marked as " + status.toUpperCase());
     }
 
-// ── Evacuated → find nearest evac center ─────────────────────────────────
-
     private void handleEvacuated(PriorityResidentRow row) {
-        // Find closest available evac center from the already-loaded table
         EvacuationCenterRow nearest = tblEvacuationCenters.getItems().stream()
                 .filter(ec -> !"Full".equals(ec.getStatus()))
                 .min(Comparator.comparingDouble(ec -> parseKmDistance(ec.getDistance())))
@@ -771,8 +687,6 @@ public class EmergencyController implements Initializable {
         });
     }
 
-// ── Missing → capture last seen ───────────────────────────────────────────
-
     private void handleMissing(PriorityResidentRow row) {
         TextInputDialog dlg = new TextInputDialog();
         if (tblPriorityResidents.getScene() != null) {
@@ -785,7 +699,6 @@ public class EmergencyController implements Initializable {
         dlg.showAndWait().ifPresent(lastSeen -> {
             String contact = "N/A";
             try {
-                // FIX: Add .orElse(null) at the end of the findById call
                 Resident r = residentRepo.findById(row.getResidentId()).orElse(null);
 
                 if (r != null && r.getContactNumber() != null && !r.getContactNumber().isBlank()) {
@@ -800,11 +713,10 @@ public class EmergencyController implements Initializable {
             residentStatusCache.put(row.getResidentId(), "Missing");
             tblPriorityResidents.refresh();
 
-            // Add to the missing residents table with the contact number found
             MissingResidentRow missingRow = new MissingResidentRow(
                     row.getResidentId(),
                     row.getResidentName(),
-                    contact, // <--- NOW AUTOMATICALLY FILLED
+                    contact,
                     lastSeen.isBlank() ? "Last seen in zone" : lastSeen
             );
             tblMissingResidents.getItems().add(missingRow);
@@ -815,28 +727,17 @@ public class EmergencyController implements Initializable {
         });
     }
 
-// ── Analytics sync ────────────────────────────────────────────────────────
-
-    /**
-     * Adjusts the analytics counters when a resident's status changes.
-     * @param prev old status (may be null/"Pending")
-     * @param next new status
-     */
     private void recomputeAnalytics(String prev, String next) {
-        // Roll back old status
         if ("Rescued".equals(prev))   rescued--;
         if ("Missing".equals(prev))   missing--;
         if ("Evacuated".equals(prev)) evacuated--;
 
-        // Apply new status
         if ("Rescued".equals(next))   rescued++;
         if ("Missing".equals(next))   missing++;
         if ("Evacuated".equals(next)) evacuated++;
 
         updateAnalytics();
     }
-
-// ── Style helper ──────────────────────────────────────────────────────────
 
     private void styleResidentBtn(Button btn, String bg, String fg) {
         btn.setStyle(
@@ -852,15 +753,10 @@ public class EmergencyController implements Initializable {
     }
 
     private double parseKmDistance(String dist) {
-        // dist is formatted as "1.2 km" or "—"
         try { return Double.parseDouble(dist.replace(" km", "").trim()); }
         catch (Exception e) { return Double.MAX_VALUE; }
     }
 
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Clock
-    // ─────────────────────────────────────────────────────────────────────────
 
     private void startClock() {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -869,10 +765,6 @@ public class EmergencyController implements Initializable {
         clockTimeline.setCycleCount(Animation.INDEFINITE);
         clockTimeline.play();
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Helpers
-    // ─────────────────────────────────────────────────────────────────────────
 
     private Incident buildIncident(EmergencyContext ctx) {
         Incident i = new Incident();
@@ -968,7 +860,6 @@ public class EmergencyController implements Initializable {
 
     private void closeWindow() {
         try {
-            // Use btnDeclareIncident or any node that is definitely on the stage
             if (btnDeclareIncident.getScene() != null && btnDeclareIncident.getScene().getWindow() != null) {
                 Stage stage = (Stage) btnDeclareIncident.getScene().getWindow();
                 stage.close();
@@ -977,10 +868,6 @@ public class EmergencyController implements Initializable {
             System.err.println("Error closing emergency window: " + e.getMessage());
         }
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Table column binding
-    // ─────────────────────────────────────────────────────────────────────────
 
     @SuppressWarnings("unchecked")
     private void bindTableColumns() {
@@ -1047,35 +934,29 @@ public class EmergencyController implements Initializable {
 
     private void resetDashboard() {
         Platform.runLater(() -> {
-            // 1. Re-enable the Declare button
             btnDeclareIncident.setDisable(false);
             btnDeclareIncident.setText("＋ Declare Incident");
 
-            // 2. Reset KPI Labels
             lblStatus.setText("IDLE");
-            lblStatus.setStyle("-fx-text-fill: #9ca3af;"); // Gray color
+            lblStatus.setStyle("-fx-text-fill: #9ca3af;");
             lblEmergencyType.setText("No Active Incident");
             lblSeverity.setText("—");
             lblSeverityDot.setStyle("-fx-text-fill: #4b5563;");
             lblCoordinates.setText("0.000, 0.000");
             lblAffectedRadius.setText("0 m");
 
-            // 3. Clear all tables
             tblPriorityResidents.getItems().clear();
             tblMissingResidents.getItems().clear();
             tblRescueTeams.getItems().clear();
             tblEvacuationCenters.getItems().clear();
             tblResources.getItems().clear();
 
-            // 4. Reset Analytics Counters
             totalAffected = 0; rescued = 0; missing = 0; evacuated = 0;
             updateAnalytics();
 
-            // 5. Reset Class State
             this.incidentId = null;
             this.ctx = null;
 
-            // 6. Clear Map (Optional: reloads empty map)
             if (mapWebView != null) {
                 mapWebView.getEngine().executeScript("if(window.clearResidentMarkers) clearResidentMarkers();");
                 mapWebView.getEngine().executeScript("if(window.map && window.emergencyCircle) map.removeLayer(emergencyCircle);");

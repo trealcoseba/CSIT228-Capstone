@@ -11,9 +11,6 @@ import java.math.BigInteger;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-/**
- * Clean Word (.docx) exporter with completely re-arranged symmetric metadata layout grids.
- */
 public class DocxReportExporter implements ReportExporter<List<List<String>>> {
 
     private static final String TEAL  = "1D9E75";
@@ -27,7 +24,6 @@ public class DocxReportExporter implements ReportExporter<List<List<String>>> {
 
     @Override public String getFormatName() { return "DOCX"; }
 
-    // ── 1. Generic Tabular Report ────────────────────────────────────────────
     @Override
     public void export(ReportData<List<List<String>>> data, File dest) throws Exception {
         ReportFormData fd = data.getFormData() != null ? data.getFormData() : new ReportFormData();
@@ -44,7 +40,6 @@ public class DocxReportExporter implements ReportExporter<List<List<String>>> {
             }
             hRule(doc, TEAL);
 
-            // Resolve Dynamic Strings
             String formDate = fd.getDate() != null ? fd.getDate().format(DATE_FMT)
                     : (data.getGeneratedDateTime() != null ? data.getGeneratedDateTime().toLocalDate().format(DATE_FMT) : "—");
             String genOn = data.getGeneratedDateTime() != null ? data.getGeneratedDateTime().format(DT_FMT) : formDate;
@@ -61,12 +56,11 @@ public class DocxReportExporter implements ReportExporter<List<List<String>>> {
             String recContact = (fd != null && !nvl(fd.getRecorderContactInfo()).isBlank()) ? fd.getRecorderContactInfo() : "—";
             String computedType = data.getReportType() != null ? data.getReportType().getDisplayName() : "—";
 
-            // --- RE-ARRANGED STRUCTURAL MATRIX GRID ---
             twoColRow(doc, "Date:", formDate, "Report No.:", reportNo);
             twoColRow(doc, "Reported by:", reportedBy, "Recorded by:", recordedBy);
             twoColRow(doc, "Reporter Contact:", repContact, "Recorder Contact:", recContact);
             twoColRow(doc, "Classification Type:", computedType, "Generated on:", genOn);
-            twoColRow(doc, "Period Covered:", coveragePeriod, "", ""); // Aligned symmetrically inside grid structure
+            twoColRow(doc, "Period Covered:", coveragePeriod, "", "");
 
             if (data.getSummaryLines() != null && !data.getSummaryLines().isEmpty()) {
                 sectionHeader(doc, "Summary");
@@ -94,7 +88,6 @@ public class DocxReportExporter implements ReportExporter<List<List<String>>> {
         }
     }
 
-    // ── 2. Incident Report ───────────────────────────────────────────────────
     public void exportIncident(ReportData<ReportFormData> data, File dest) throws Exception {
         ReportFormData fd = data.getFormData() != null ? data.getFormData() :
                 (data.getPayload() != null ? data.getPayload() : new ReportFormData());
@@ -126,7 +119,6 @@ public class DocxReportExporter implements ReportExporter<List<List<String>>> {
             String repContact = !nvl(fd.getReporterContactInfo()).isBlank() ? fd.getReporterContactInfo() : "—";
             String recContact = !nvl(fd.getRecorderContactInfo()).isBlank() ? fd.getRecorderContactInfo() : "—";
 
-            // Compute classification string cleanly
             StringBuilder typeBuilder = new StringBuilder();
             if (fd.getIncidentTypes() != null && !fd.getIncidentTypes().isEmpty()) {
                 typeBuilder.append(String.join(", ", fd.getIncidentTypes()));
@@ -137,7 +129,6 @@ public class DocxReportExporter implements ReportExporter<List<List<String>>> {
             }
             String finalClassificationType = typeBuilder.length() > 0 ? typeBuilder.toString() : "—";
 
-            // --- RE-ARRANGED STRUCTURAL MATRIX GRID ---
             twoColRow(doc, "Date:", formDate, "Report No.:", reportNo);
             twoColRow(doc, "Reported by:", reportedBy, "Recorded by:", recordedBy);
             twoColRow(doc, "Reporter Contact:", repContact, "Recorder Contact:", recContact);
@@ -177,7 +168,6 @@ public class DocxReportExporter implements ReportExporter<List<List<String>>> {
         }
     }
 
-    // ── POI Helpers ───────────────────────────────────────────────────────────
     private void buildSignatureBlock(XWPFDocument doc, String name) {
         XWPFTable sigTable = doc.createTable(1, 2);
         sigTable.setWidth("100%");
@@ -266,7 +256,6 @@ public class DocxReportExporter implements ReportExporter<List<List<String>>> {
         XWPFTable t = doc.createTable(1, 4);
         t.setWidth("100%"); noBorders(t);
 
-        // Explicit layout column constraints
         t.getRow(0).getCell(0).getCTTc().addNewTcPr().addNewTcW().setW(BigInteger.valueOf(1800));
         t.getRow(0).getCell(1).getCTTc().addNewTcPr().addNewTcW().setW(BigInteger.valueOf(3200));
         t.getRow(0).getCell(2).getCTTc().addNewTcPr().addNewTcW().setW(BigInteger.valueOf(1800));
@@ -274,24 +263,6 @@ public class DocxReportExporter implements ReportExporter<List<List<String>>> {
 
         cellLabel(t, 0, 0, l1); cellValue(t, 0, 1, v1);
         cellLabel(t, 0, 2, l2); cellValue(t, 0, 3, v2);
-    }
-
-    private void fullRow(XWPFDocument doc, String label, String value) {
-        XWPFTable t = doc.createTable(1, 2);
-        t.setWidth("100%"); noBorders(t);
-        t.getRow(0).getCell(0).getCTTc().addNewTcPr().addNewTcW().setW(BigInteger.valueOf(1800));
-        t.getRow(0).getCell(1).getCTTc().addNewTcPr().addNewTcW().setW(BigInteger.valueOf(8200));
-
-        cellLabel(t, 0, 0, label);
-        cellValue(t, 0, 1, value);
-    }
-
-    private void threeColRow(XWPFDocument doc, String l1, String v1, String l2, String v2, String l3, String v3) {
-        XWPFTable t = doc.createTable(1, 6);
-        t.setWidth("100%"); noBorders(t);
-        cellLabel(t, 0, 0, l1); cellValue(t, 0, 1, v1);
-        cellLabel(t, 0, 2, l2); cellValue(t, 0, 3, v2);
-        cellLabel(t, 0, 4, l3); cellValue(t, 0, 5, v3);
     }
 
     private void cellLabel(XWPFTable t, int row, int col, String text) {

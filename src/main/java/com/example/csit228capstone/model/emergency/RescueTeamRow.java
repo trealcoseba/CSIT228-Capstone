@@ -5,7 +5,6 @@ import javafx.beans.property.StringProperty;
 
 import java.util.UUID;
 
-/** Observable row for the Rescue Teams TableView (backed by Responder data). */
 public class RescueTeamRow {
 
     private final UUID responderId;
@@ -30,7 +29,7 @@ public class RescueTeamRow {
 
         return switch (normalized) {
             case "available"               -> "Available";
-            case "dispatched", "on mission" -> "Dispatched"; // Now handles both!
+            case "dispatched", "on mission" -> "Dispatched";
             case "unavailable", "off duty" -> "Unavailable";
             default                        -> s;
         };
@@ -40,14 +39,8 @@ public class RescueTeamRow {
     public StringProperty availabilityProperty() { return availability; }
     public StringProperty vehicleProperty()      { return vehicle; }
     public StringProperty etaProperty()          { return eta; }
-
     public String getTeamName()     { return teamName.get(); }
     public String getAvailability() { return availability.get(); }
-    public String getVehicle()      { return vehicle.get(); }
-    public String getEta()          { return eta.get(); }
-
     public void setAvailability(String v) { availability.set(v); }
-    public void setEta(String v)          { eta.set(v); }
-
     public UUID getResponderId() { return responderId; }
 }

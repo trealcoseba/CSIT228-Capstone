@@ -9,14 +9,11 @@ public class Responder {
     private String name;
     private String contact;
     private String agency;
-    private String status; // "available", "on_mission", "off_duty"
+    private String status;
     private LocalDateTime createdAt;
 
-    // Transient / computed fields (not stored in DB)
     private int totalDispatches;
     private int activeDispatches;
-
-    // ─── Constructors ────────────────────────────────────────────────────────────
 
     public Responder() {}
 
@@ -26,8 +23,6 @@ public class Responder {
         this.agency = agency;
         this.status = status;
     }
-
-    // ─── Getters & Setters ───────────────────────────────────────────────────────
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
@@ -53,12 +48,10 @@ public class Responder {
     public int getActiveDispatches() { return activeDispatches; }
     public void setActiveDispatches(int activeDispatches) { this.activeDispatches = activeDispatches; }
 
-    /** Short ID for display (first 8 chars of UUID) */
     public String getShortId() {
         return id != null ? id.toString().substring(0, 8).toUpperCase() : "—";
     }
 
-    /** Human-readable status label */
     public String getStatusLabel() {
         if (status == null) return "Unknown";
         return switch (status.toLowerCase()) {

@@ -16,11 +16,9 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 
 public class AlertsFormController implements Initializable {
-
     @FXML private Label            lblFormTitle;
     @FXML private Button           btnSchedule;
     @FXML private Button           btnSend;
-
     @FXML private ComboBox<String> cmbType;
     @FXML private ComboBox<String> cmbPriority;
     @FXML private TextArea         txtMessage;
@@ -52,23 +50,23 @@ public class AlertsFormController implements Initializable {
     public void loadAlert(Alert alert) {
         this.existingAlert = alert;
 
-        // --- 1. CHANGE TITLE ---
+
         lblFormTitle.setText("Edit Broadcast");
 
-        // --- 2. HIDE SCHEDULE BUTTON ---
-        // setVisible(false) makes it disappear
-        // setManaged(false) stops it from taking up physical space in the HBox
+
+
+
         btnSchedule.setVisible(false);
         btnSchedule.setManaged(false);
 
-        // --- 3. CHANGE SEND BUTTON TO SAVE ---
+
         btnSend.setText("Save Changes");
 
-        // Optional: Change color to blue (qa-info) instead of orange (qa-warning)
+
         btnSend.getStyleClass().remove("qa-warning");
         btnSend.getStyleClass().add("qa-info");
 
-        // --- 4. FILL THE FIELDS ---
+
         cmbType.setValue(alert.getTitle());
 
         if (alert.getPriority() != null) {
@@ -93,7 +91,7 @@ public class AlertsFormController implements Initializable {
         if (!validateForm()) return;
         try {
             if (existingAlert != null) {
-                // If editing, use current schedule status (don't force off)
+
                 applyFormTo(existingAlert, chkSchedule.isSelected());
                 repo.update(existingAlert);
             } else {

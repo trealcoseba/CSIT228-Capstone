@@ -9,9 +9,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -19,10 +16,7 @@ import com.example.csit228capstone.model.incident.Incident;
 import com.example.csit228capstone.model.vulnerability.VulnerabilityTag;
 import com.example.csit228capstone.repository.ResidentRepository;
 import com.example.csit228capstone.service.IncidentService;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -32,42 +26,27 @@ import java.util.Map;
 
 public class DashboardController {
 
-    // ── KPI labels ──────────────────────────────────────────────────────────────
     @FXML private Label lblTotalResidents, lblActiveIncidents, lblEvacuees;
-
-    // ── Vulnerable residents labels ──────────────────────────────────────────────
     @FXML private Label lblSenior, lblPwd, lblPregnant, lblChildren;
     @FXML private Label lblIndigenous, lblSoloParent;
-
-    // ── Incident table ───────────────────────────────────────────────────────────
     @FXML private TableView<Incident> incidentTable;
     @FXML private TableColumn<Incident, String> colSeverity, colType, colLocation, colTime, colStatus;
-
-    // ── Resource status ───────────────────────────────────────────────────────────
     @FXML private Label lblRelief, lblMed, lblFund, lblEvac;
     @FXML private ProgressBar pbRelief, pbMed, pbFund, pbEvac;
-
-    // ── Weather labels ────────────────────────────────────────────────────────────
     @FXML private Label lblWeatherTemp, lblWeatherDesc, lblHumidity, lblWind;
-
-    // ── Scroll pane (kept from original) ────────────────────────────────────────
     @FXML private ScrollPane mainContent;
 
-    // ── Services / repos ─────────────────────────────────────────────────────────
     private final IncidentService incidentService     = new IncidentService();
     private final ResidentRepository residentRepo     = new ResidentRepository();
     private final EvacuationService evacuationService = new EvacuationService();
     private final ResourceRepository resourceRepo     = new ResourceRepository();
 
-    // ── Parent controller reference ───────────────────────────────────────────────
     private MainLayoutController mainLayoutController;
     private ViewIncidentController viewIncidentController;
 
-    // Weather API config (Open-Meteo: No API Key Required)
     private static final double LAT = 10.3157;
     private static final double LON = 123.8854;
 
-    /** Called by MainLayoutController right after loading this FXML. */
     public void setMainLayoutController(MainLayoutController mainLayoutController) {
         this.mainLayoutController = mainLayoutController;
     }
@@ -78,8 +57,6 @@ public class DashboardController {
         loadData();
         loadWeather();
     }
-
-    // ── Table setup ───────────────────────────────────────────────────────────────
 
     private void setupIncidentTable() {
         colSeverity.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getSeverity().name()));
@@ -118,21 +95,16 @@ public class DashboardController {
         });
     }
 
-    // ── Data loading ──────────────────────────────────────────────────────────────
-
     private void loadData() {
         try {
-            // KPIs
             lblTotalResidents.setText(String.valueOf(residentRepo.countAll()));
             lblActiveIncidents.setText(String.valueOf(incidentService.getActiveCount()));
             lblEvacuees.setText(String.valueOf(evacuationService.getTotalEvacuees()));
 
-            // Incidents — sorted newest first
             List<Incident> active = incidentService.getActiveIncidents();
             active.sort(Comparator.comparing(Incident::getReportedAt).reversed());
             incidentTable.setItems(FXCollections.observableArrayList(active));
 
-            // Vulnerable residents
             lblSenior.setText(String.valueOf(residentRepo.countByVulnerability(VulnerabilityTag.SENIOR_CITIZEN)));
             lblPwd.setText(String.valueOf(residentRepo.countByVulnerability(VulnerabilityTag.PWD)));
             lblPregnant.setText(String.valueOf(residentRepo.countByVulnerability(VulnerabilityTag.PREGNANT)));
@@ -140,7 +112,6 @@ public class DashboardController {
             lblIndigenous.setText(String.valueOf(residentRepo.countByVulnerability(VulnerabilityTag.INDIGENOUS)));
             lblSoloParent.setText(String.valueOf(residentRepo.countByVulnerability(VulnerabilityTag.SOLO_PARENT)));
 
-            // Resources
             loadResourceStatus();
 
         } catch (Exception e) {
@@ -148,21 +119,12 @@ public class DashboardController {
         }
     }
 
-    // ── Resource status ───────────────────────────────────────────────────────────
-
-    /**
-     * Reads all resources, groups them by category, and computes available/total %.
-     * Category strings must exactly match what is stored in the DB.
-     * Default categories assumed: "Relief Goods", "Medical", "Emergency Fund", "Evacuation"
-     */
     private void loadResourceStatus() {
         try {
             List<Resource> resources = resourceRepo.findAll();
 
-            // Sum totalQty and availableQty per category
             Map<String, double[]> map = new HashMap<>();
             for (Resource r : resources) {
-                // Normalize the category: trim spaces and convert to uppercase for consistent mapping
                 String cat = (r.getCategory() == null) ? "UNCATEGORIZED" : r.getCategory().trim().toUpperCase();
 
                 map.merge(cat,
@@ -170,7 +132,6 @@ public class DashboardController {
                         (a, b) -> new double[]{a[0] + b[0], a[1] + b[1]});
             }
 
-            // We use a helper that checks if the map keys CONTAIN our keyword
             updateUIForCategory(map, "RELIEF",   lblRelief, pbRelief);
             updateUIForCategory(map, "MEDICAL",  lblMed,    pbMed);
             updateUIForCategory(map, "FUND",     lblFund,   pbFund);
@@ -181,9 +142,6 @@ public class DashboardController {
         }
     }
 
-    /**
-     * Searches the map for any keys containing the 'keyword' (e.g., "MED" matches "MEDICAL SUPPLIES")
-     */
     private void updateUIForCategory(Map<String, double[]> map, String keyword, Label lbl, ProgressBar pb) {
         if (lbl == null || pb == null) return;
 
@@ -199,12 +157,10 @@ public class DashboardController {
 
         double pct = (total > 0) ? available / total : 0;
 
-        // Use Platform.runLater to ensure UI updates happen on the JavaFX thread
         javafx.application.Platform.runLater(() -> {
             lbl.setText(String.format("%.0f%%", pct * 100));
             pb.setProgress(pct);
 
-            // Optional: Change progress bar color to red if low
             if (pct < 0.20) {
                 pb.setStyle("-fx-accent: #e74c3c;");
             } else {
@@ -213,28 +169,9 @@ public class DashboardController {
         });
     }
 
-    private void setResourceRow(Map<String, double[]> map, String category,
-                                Label lbl, ProgressBar pb) {
-        if (lbl == null || pb == null) return; // guard against uninjected fx:id
-        double[] vals      = map.getOrDefault(category, new double[]{0, 0});
-        double total       = vals[0];
-        double available   = vals[1];
-        double pct         = (total > 0) ? available / total : 0;
-        lbl.setText(String.format("%.0f%%", pct * 100));
-        pb.setProgress(pct);
-    }
-
-    // ── Weather (OpenWeatherMap free tier) ────────────────────────────────────────
-
-    // ── Weather config (Open-Meteo: No API Key Required) ──────────────────────────
-
-
-    // ... (rest of your existing code) ...
-
     private void loadWeather() {
         Thread t = new Thread(() -> {
             try {
-                // Added &current=... to ensure we get the live data block
                 String url = String.format(
                         "https://api.open-meteo.com/v1/forecast?latitude=%.4f&longitude=%.4f&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m",
                         LAT, LON);
@@ -250,7 +187,6 @@ public class DashboardController {
                     body = sc.hasNext() ? sc.next() : "";
                 }
 
-                // We look for the "current" section first to avoid metadata at the top of the JSON
                 String currentSection = extractSection(body, "\"current\":{", "}");
 
                 double temp      = extractDouble(currentSection, "\"temperature_2m\":");
@@ -277,9 +213,6 @@ public class DashboardController {
         t.start();
     }
 
-    /**
-     * Translates WMO Weather Interpretation Codes (WW) used by Open-Meteo
-     */
     private String interpretWeatherCode(int code) {
         return switch (code) {
             case 0          -> "Clear sky";
@@ -294,10 +227,9 @@ public class DashboardController {
         };
     }
 
-    // Updated helper to handle negative temperatures or trailing commas
     private String extractSection(String json, String startMarker, String endMarker) {
         int start = json.indexOf(startMarker);
-        if (start < 0) return json; // fallback to full string
+        if (start < 0) return json;
         int end = json.indexOf(endMarker, start + startMarker.length());
         return json.substring(start, end + 1);
     }
@@ -307,7 +239,6 @@ public class DashboardController {
         if (i < 0) return 0.0;
 
         int start = i + key.length();
-        // Skip colon and any potential whitespace
         while (start < json.length() && (json.charAt(start) == ':' || json.charAt(start) == ' ')) {
             start++;
         }
@@ -325,8 +256,6 @@ public class DashboardController {
         }
     }
 
-    // ── Navigation ────────────────────────────────────────────────────────────────
-
     @FXML
     void viewAllIncidents(ActionEvent e) {
         if (mainLayoutController != null) {
@@ -337,7 +266,6 @@ public class DashboardController {
     @FXML
     void reportIncident(ActionEvent e) {
         if (mainLayoutController != null) {
-            // Navigate to residents tab first, then open the add form
             mainLayoutController.showIncidents(null);
             mainLayoutController.openAddIncidentForm();
 

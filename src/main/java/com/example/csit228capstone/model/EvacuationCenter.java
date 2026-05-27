@@ -13,7 +13,7 @@ public class EvacuationCenter {
     private int currentOccupancy;
     private boolean isActive;
     private LocalDateTime createdAt;
-    private String managerName;   // maps to manager_of_center in DB
+    private String managerName;
     private String contactNumber;
 
     public EvacuationCenter() {}

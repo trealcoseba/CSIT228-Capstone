@@ -19,21 +19,16 @@ public class DispatchedResponder {
     private BigDecimal latitude;
     private BigDecimal longitude;
 
-    private String status; // "dispatched", "returned", "cancelled"
+    private String status;
 
-    // ─── Joined / denormalized fields for display ─────────────────────────────
     private String responderName;
     private String responderAgency;
-    private String incidentTitle; // from incidents table if available
+    private String incidentTitle;
 
     private static final DateTimeFormatter DISPLAY_FMT =
             DateTimeFormatter.ofPattern("MMM dd, yyyy  HH:mm");
 
-    // ─── Constructors ────────────────────────────────────────────────────────────
-
     public DispatchedResponder() {}
-
-    // ─── Getters & Setters ───────────────────────────────────────────────────────
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
@@ -71,8 +66,6 @@ public class DispatchedResponder {
     public String getIncidentTitle() { return incidentTitle; }
     public void setIncidentTitle(String incidentTitle) { this.incidentTitle = incidentTitle; }
 
-    // ─── Computed / display helpers ──────────────────────────────────────────────
-
     public String getShortId() {
         return id != null ? id.toString().substring(0, 8).toUpperCase() : "—";
     }
@@ -92,10 +85,6 @@ public class DispatchedResponder {
         return "—";
     }
 
-    /**
-     * Elapsed time since dispatch (for active) or a fixed label (for returned/cancelled).
-     * e.g. "2h 14m" or "Completed" or "Cancelled"
-     */
     public String getDurationLabel() {
         if ("returned".equalsIgnoreCase(status))   return "Completed";
         if ("cancelled".equalsIgnoreCase(status))  return "Cancelled";

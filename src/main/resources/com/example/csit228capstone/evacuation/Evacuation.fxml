@@ -13,7 +13,6 @@
                 <Insets topRightBottomLeft="16" />
             </padding>
 
-            <!-- Header -->
             <HBox alignment="CENTER_LEFT" spacing="12">
                 <children>
                     <Label styleClass="page-title" text="Evacuation Management" />
@@ -21,7 +20,6 @@
                 </children>
             </HBox>
 
-            <!-- Status Card -->
             <VBox spacing="12" styleClass="panel-card">
                 <children>
                     <Label styleClass="panel-title" text="Evacuation Status" />
@@ -44,7 +42,6 @@
                 </children>
             </VBox>
 
-            <!-- Main Row (Map and Sidebar) -->
             <HBox spacing="16" VBox.vgrow="ALWAYS">
                 <VBox spacing="12" styleClass="panel-card" HBox.hgrow="ALWAYS" VBox.vgrow="ALWAYS">
                     <children>
@@ -64,7 +61,6 @@
                 </VBox>
             </HBox>
 
-            <!-- Filters -->
             <HBox alignment="CENTER_LEFT" spacing="12">
                 <ComboBox fx:id="filterStatus" prefWidth="120" promptText="Status" />
                 <ComboBox fx:id="filterAscOrDesc" prefWidth="120" />
@@ -78,15 +74,12 @@
                 </padding>
             </HBox>
 
-            <!-- Table Section -->
             <VBox spacing="12" styleClass="panel-card" VBox.vgrow="ALWAYS">
                 <children>
                     <Label styleClass="panel-title" text="Evacuation Centers Details" />
 
-                    <!-- 1. Removed CONSTRAINED_RESIZE_POLICY to allow horizontal scroll -->
                     <TableView fx:id="centersTable" prefHeight="350" styleClass="incident-table" VBox.vgrow="ALWAYS">
                         <columns>
-                            <!-- 2. Set minWidth to ensure the total width exceeds the container for scrolling -->
                             <TableColumn fx:id="colName" minWidth="180" text="Center Name" />
                             <TableColumn fx:id="colAddress" minWidth="250" text="Center Address" />
                             <TableColumn fx:id="colCapacity" minWidth="100" text="Capacity" />
@@ -96,7 +89,6 @@
                             <TableColumn fx:id="colContact" minWidth="150" text="Contact" />
                             <TableColumn fx:id="colActions" minWidth="150" text="Actions" />
                         </columns>
-                        <!-- Default policy is unconstrained, which enables scrolling -->
                     </TableView>
                 </children>
             </VBox>

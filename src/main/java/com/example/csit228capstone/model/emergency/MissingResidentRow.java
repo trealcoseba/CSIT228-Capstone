@@ -5,7 +5,6 @@ import javafx.beans.property.StringProperty;
 
 import java.util.UUID;
 
-/** Observable row for the Missing Residents TableView. */
 public class MissingResidentRow {
 
     private final UUID residentId;
@@ -24,10 +23,6 @@ public class MissingResidentRow {
     public StringProperty residentNameProperty()      { return residentName; }
     public StringProperty contactNumberProperty()     { return contactNumber; }
     public StringProperty lastKnownLocationProperty() { return lastKnownLocation; }
-
-    public String getResidentName()      { return residentName.get(); }
     public String getContactNumber()     { return contactNumber.get(); }
-    public String getLastKnownLocation() { return lastKnownLocation.get(); }
 
-    public UUID getResidentId() { return residentId; }
 }

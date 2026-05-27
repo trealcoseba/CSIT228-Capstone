@@ -63,12 +63,6 @@ public class MainLayoutController {
         }
     }
 
-    // ── Core view loader ─────────────────────────────────────────────────────────
-
-    /**
-     * Loads an FXML from /com/example/csit228capstone/{subPackage}/{fxmlName}.fxml
-     * and returns the FXMLLoader so callers can retrieve the controller if needed.
-     */
     private FXMLLoader loadView(String subPackage, String fxmlName, Button activeBtn) {
         setActiveNav(activeBtn);
         try {
@@ -78,7 +72,6 @@ public class MainLayoutController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
             Node view = loader.load();
 
-            // If the loaded controller is a DashboardController, inject ourselves
             Object controller = loader.getController();
             if (controller instanceof DashboardController dc) {
                 dc.setMainLayoutController(this);
@@ -100,9 +93,6 @@ public class MainLayoutController {
         if (active != null) active.getStyleClass().add("nav-active");
     }
 
-    // ── Navigation — called from sidebar buttons AND from DashboardController ────
-    // All are public so DashboardController can call them directly.
-
     @FXML public void showDashboard(ActionEvent e)  { loadView("dashboard",  "Dashboard", btnDashboard); }
     @FXML public void showIncidents(ActionEvent e)  { loadView("incident",   "Incidents", btnIncidents); }
     @FXML public void showResidents(ActionEvent e)  { loadView("resident",   "Residents", btnResidents); }
@@ -114,20 +104,12 @@ public class MainLayoutController {
     @FXML public void showSettings(ActionEvent e)   { loadView("settings",   "Settings",  btnSettings); }
     @FXML public void showAnalytics(ActionEvent e)  { loadView("analytics",  "Analytics", btnAnalytics); }
 
-    // ── Add-resident helper ───────────────────────────────────────────────────────
-
-    /**
-     * Opens the ResidentForm popup modal.
-     * Called by DashboardController after navigating to the residents view,
-     * and by the "Add Resident" quick-action button on the dashboard.
-     */
     public void openAddResidentForm() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/csit228capstone/resident/ResidentForm.fxml"));
             Parent root = loader.load();
 
             Stage stage = new Stage();
-            // FIX: Set Owner and prevent full screen
             if (layoutPane.getScene() != null) stage.initOwner(layoutPane.getScene().getWindow());
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setFullScreen(false);
@@ -145,7 +127,6 @@ public class MainLayoutController {
             Parent root = loader.load();
 
             Stage stage = new Stage();
-            // FIX: Set Owner and prevent full screen
             if (layoutPane.getScene() != null) stage.initOwner(layoutPane.getScene().getWindow());
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setFullScreen(false);
@@ -157,12 +138,9 @@ public class MainLayoutController {
         } catch (IOException ex) { ex.printStackTrace(); }
     }
 
-    // ── Emergency ────────────────────────────────────────────────────────────────
-
     @FXML
     void activateEmergency(ActionEvent e) {
         try {
-            // Get the current main stage
             Stage primaryStage = (Stage) layoutPane.getScene().getWindow();
 
             FXMLLoader authLoader = new FXMLLoader(getClass().getResource(
@@ -174,7 +152,6 @@ public class MainLayoutController {
             authStage.setTitle("Security Check");
             authStage.setScene(new Scene(authRoot));
 
-            // FIX 1: Set the owner so it stays on top of the main layout
             authStage.initOwner(primaryStage);
             authStage.initModality(Modality.APPLICATION_MODAL);
             authStage.setResizable(false);
@@ -189,8 +166,6 @@ public class MainLayoutController {
 
                 Stage mainStage = new Stage();
 
-                // FIX 2: If the primary stage is Full Screen, toggle it to Maximized
-                // to prevent the OS from minimizing it when the new window opens.
                 if (primaryStage.isFullScreen()) {
                     primaryStage.setFullScreen(false);
                     primaryStage.setMaximized(true);
@@ -199,7 +174,6 @@ public class MainLayoutController {
                 mainStage.setTitle("LIGTAS-BRGY — Emergency Operations Center");
                 mainStage.setScene(new Scene(mainRoot));
 
-                // FIX 3: Link the owner
                 mainStage.initOwner(primaryStage);
                 mainStage.setMaximized(true);
                 mainStage.show();
@@ -209,8 +183,6 @@ public class MainLayoutController {
             ex.printStackTrace();
         }
     }
-
-    // ── Logout ───────────────────────────────────────────────────────────────────
 
     public void handleLogout(ActionEvent actionEvent) throws Exception {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);

@@ -9,7 +9,6 @@ public class Alert {
     private String        body;
     private AlertPriority priority;
     private boolean       isBroadcast;
-
     private UUID          issuedBy;
     private String        sentByName;
 
@@ -32,9 +31,6 @@ public class Alert {
 
     public boolean isBroadcast()                         { return isBroadcast; }
     public void setBroadcast(boolean broadcast)          { isBroadcast = broadcast; }
-
-    public UUID getIssuedBy()                            { return issuedBy; }
-    public void setIssuedBy(UUID issuedBy)               { this.issuedBy = issuedBy; }
 
     public String getSentByName()                        { return sentByName; }
     public void setSentByName(String sentByName)         { this.sentByName = sentByName; }

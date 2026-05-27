@@ -5,7 +5,6 @@ import javafx.beans.property.StringProperty;
 
 import java.util.UUID;
 
-/** Observable row for the Evacuation Centers TableView. */
 public class EvacuationCenterRow {
 
     private final UUID centerId;
@@ -33,12 +32,6 @@ public class EvacuationCenterRow {
     public StringProperty statusProperty()     { return status; }
 
     public String getCenterName() { return centerName.get(); }
-    public String getCapacity()   { return capacity.get(); }
-    public String getOccupancy()  { return occupancy.get(); }
     public String getDistance()   { return distance.get(); }
     public String getStatus()     { return status.get(); }
-
-    public UUID getCenterId()     { return centerId; }
-    public int  getCapacityInt()  { return Integer.parseInt(capacity.get()); }
-    public int  getOccupancyInt() { return Integer.parseInt(occupancy.get()); }
 }

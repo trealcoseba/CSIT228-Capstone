@@ -4,15 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Carries every field collected from ReportForm.fxml.
- * Only the fields relevant to the chosen report type are filled.
- * This object is passed from ReportFormController → ReportPreviewController
- * → PdfReportExporter / DocxReportExporter.
- */
 public class ReportFormData {
 
-    // ── Universal (all report types) ─────────────────────────────────────────
     private String    reportNo;
     private LocalDate date;
     private String    reportedBy;
@@ -22,19 +15,16 @@ public class ReportFormData {
     private LocalDate startDate;
     private LocalDate endDate;
 
-    // ── Incident Report specific ──────────────────────────────────────────────
     private LocalDate    dateOfIncident;
     private String       location;
     private String       description;
     private List<String> incidentTypes      = new ArrayList<>();
     private String       incidentTypeOther;
-    private Boolean      hasInsurance;          // null = not answered
+    private Boolean      hasInsurance;
     private String       insurancePolicy;
     private String       insuranceCoverageAmt;
     private List<DamageRow>  damages  = new ArrayList<>();
     private List<InjuryRow>  injuries = new ArrayList<>();
-
-    // ── Inner row types ───────────────────────────────────────────────────────
 
     public static class DamageRow {
         public String damage = "", value = "", repairPlan = "", repairCost = "";
@@ -51,8 +41,6 @@ public class ReportFormData {
             injuredPerson = ip; position = pos; medicalCost = mc; insurance = ins;
         }
     }
-
-    // ── Getters & setters ─────────────────────────────────────────────────────
 
     public String getReportNo() { return reportNo; }
     public void setReportNo(String v) { this.reportNo = v; }

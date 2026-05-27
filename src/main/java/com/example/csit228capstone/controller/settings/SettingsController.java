@@ -36,7 +36,6 @@ public class SettingsController {
         loadProfile();
     }
 
-    // ── Profile ───────────────────────────────────────────────────────────────
     private void loadProfile() {
         String username = SessionManager.getInstance().getLoggedInUsername();
         currentProfile = userRepo.getAdminProfile(username);
@@ -74,7 +73,6 @@ public class SettingsController {
         }
     }
 
-    // ── Password ──────────────────────────────────────────────────────────────
     @FXML
     private void changePassword() {
         String oldPwd     = oldPasswordField.getText();
@@ -117,7 +115,6 @@ public class SettingsController {
         }
     }
 
-    // ── Notifications ─────────────────────────────────────────────────────────
     @FXML
     private void saveNotifications() {
         boolean incidents  = notifyIncidents.isSelected();
@@ -131,7 +128,6 @@ public class SettingsController {
                 "Notification preferences saved.");
     }
 
-    // ── Backup ────────────────────────────────────────────────────────────────
     @FXML
     private void backupNow() {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
@@ -190,7 +186,6 @@ public class SettingsController {
         });
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type, message, ButtonType.OK);
         if (firstNameField.getScene() != null && firstNameField.getScene().getWindow() != null) {

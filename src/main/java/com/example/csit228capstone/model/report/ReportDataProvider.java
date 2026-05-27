@@ -27,19 +27,16 @@ public class ReportDataProvider {
         return switch (type) {
             case RESIDENT_SUMMARY           -> buildResidentSummary(report);
             case RESOURCE_INVENTORY         -> buildResourceInventory(report);
-            case INCIDENT_REPORT            -> buildIncidentSummary(report); // Handles merged incident layouts
+            case INCIDENT_REPORT            -> buildIncidentSummary(report);
             case EVACUATION_REPORT          -> buildEvacuationReport(report);
             case MONTHLY_SUMMARY            -> buildMonthlySummary(report);
             case CUSTOM_REPORT              -> buildCustomReport(report);
         };
     }
 
-    // ── Builders ──────────────────────────────────────────────────────────────
-
     private ReportData<List<List<String>>> buildResidentSummary(Report report) {
         List<Resident> residents = residentRepo.findAll();
 
-        // Safe stream filtering that doesn't delete records if createdAt is null
         if (report.getStartDate() != null) {
             residents = residents.stream()
                     .filter(r -> r.getCreatedAt() == null ||
@@ -71,14 +68,13 @@ public class ReportDataProvider {
                 vulns = "Error loading";
             }
 
-            // Safe String formatting logic to catch silent Task crashes
             String registrationDate = "-";
             try {
                 if (r.getCreatedAt() != null) {
                     registrationDate = r.getCreatedAt().format(DT_FMT);
                 }
             } catch (Exception e) {
-                registrationDate = String.valueOf(r.getCreatedAt()); // Fallback to raw output string
+                registrationDate = String.valueOf(r.getCreatedAt());
             }
 
             rows.add(List.of(
@@ -271,8 +267,6 @@ public class ReportDataProvider {
                 List.of(List.of("No data configured for this custom report.")),
                 List.of());
     }
-
-    // ── Helper ────────────────────────────────────────────────────────────────
 
     private ReportData<List<List<String>>> base(Report report, ReportType type,
                                                 List<String> headers,

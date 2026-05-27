@@ -1,9 +1,5 @@
 package com.example.csit228capstone.model.report;
 
-/**
- * Enum for all supported report types.
- * Each entry carries a display name and a description shown in the form.
- */
 public enum ReportType {
 
     RESIDENT_SUMMARY(

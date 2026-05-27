@@ -4,10 +4,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<!--
-    ResponderFormController opens this as a modal Stage (Dialog).
-    Width ~480, Height ~380
--->
 <VBox prefWidth="480" spacing="0"
       styleClass="root-pane"
       stylesheets="@../../../../css/application.css"
@@ -15,17 +11,14 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.csit228capstone.controller.responder.ResponderFormController">
 
-    <!-- Title Bar -->
     <HBox styleClass="dialog-header" alignment="CENTER_LEFT" spacing="12">
         <padding><Insets topRightBottomLeft="16" /></padding>
         <Label fx:id="lblFormTitle" styleClass="dialog-title" text="Add Responder" />
     </HBox>
 
-    <!-- Form Body -->
     <VBox spacing="20" VBox.vgrow="ALWAYS">
         <padding><Insets top="24" right="24" bottom="8" left="24" /></padding>
 
-        <!-- Full Name -->
         <VBox spacing="6">
             <Label styleClass="form-label" text="Full Name *" />
             <TextField fx:id="tfName"
@@ -34,7 +27,6 @@
             <Label fx:id="errName" styleClass="form-error" text="" visible="false" managed="false" />
         </VBox>
 
-        <!-- Agency -->
         <VBox spacing="6">
             <Label styleClass="form-label" text="Agency *" />
             <ComboBox fx:id="cbAgency"
@@ -45,7 +37,6 @@
             <Label fx:id="errAgency" styleClass="form-error" text="" visible="false" managed="false" />
         </VBox>
 
-        <!-- Contact -->
         <VBox spacing="6">
             <Label styleClass="form-label" text="Contact Number" />
             <TextField fx:id="tfContact"
@@ -53,7 +44,6 @@
                        styleClass="form-input" />
         </VBox>
 
-        <!-- Status -->
         <VBox spacing="6">
             <Label styleClass="form-label" text="Status *" />
             <ComboBox fx:id="cbStatus"
@@ -64,7 +54,6 @@
 
     </VBox>
 
-    <!-- Action Buttons -->
     <HBox alignment="CENTER_RIGHT" spacing="12">
         <padding><Insets top="16" right="24" bottom="24" left="24" /></padding>
         <Button onAction="#handleCancel"

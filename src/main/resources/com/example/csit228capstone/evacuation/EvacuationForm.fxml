@@ -12,7 +12,6 @@
     </padding>
 
     <children>
-        <!-- Header -->
         <VBox spacing="4">
             <Label style="-fx-font-size: 18px;" styleClass="page-title" text="Add New Evacuation Center" />
             <Label style="-fx-text-fill: #666;" text="Enter the details for the new facility below." />
@@ -20,7 +19,6 @@
 
         <Separator />
 
-        <!-- Form Fields -->
         <GridPane hgap="12" vgap="16">
             <columnConstraints>
                 <ColumnConstraints prefWidth="160.0" />
@@ -48,7 +46,6 @@
                     </children>
                 </HBox>
 
-                <!-- NEW ACTIVE STATUS ROW -->
                 <Label text="Operational Status:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
                 <CheckBox fx:id="chkActive" selected="true" text="Active / Open" GridPane.columnIndex="1" GridPane.rowIndex="5" />
 

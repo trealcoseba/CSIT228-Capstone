@@ -7,13 +7,12 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane prefHeight="1200.0" prefWidth="1500.0" style="-fx-background-color: #F0F2FF;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.login.LoginController"> <!-- Force white background -->
+<StackPane prefHeight="1200.0" prefWidth="1500.0" style="-fx-background-color: #F0F2FF;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.login.LoginController">
 
     <stylesheets>
       <URL value="@../../../../css/application.css" />
     </stylesheets>
 
-    <!-- The Login Card -->
     <VBox alignment="CENTER" maxHeight="480" maxWidth="400" spacing="25" style="-fx-background-color: #1A3D6E; -fx-border-color: #0A1F42; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 15, 0, 0, 4);" styleClass="panel-card">
 
         <padding>
@@ -28,7 +27,6 @@
             <image>
                <Image url="@../../../../images/ligtas-brgy-logo.png" />
             </image></ImageView>
-            <!-- Branding using your Gold variable -->
             <Label style="bold; -fx-text-fill: #D4A017; -fx-font-size: 36px;" styleClass="page-title" text="LIGTAS - Brgy">
             <font>
                <Font name="System Bold" size="13.0" />
@@ -37,7 +35,6 @@
         </VBox>
 
         <VBox alignment="CENTER_LEFT" spacing="15">
-            <!-- Labels styled with white text to pop against Navy -->
             <VBox spacing="5">
                 <Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Username" />
                 <TextField fx:id="tfUsername" onAction="#handleFirstTF" promptText="Tre" styleClass="search-field" />
@@ -49,7 +46,6 @@
             </VBox>
         </VBox>
 
-        <!-- Login Button using your Gold/Warning variant -->
         <VBox alignment="CENTER" spacing="10">
             <Button fx:id="btnLogin" maxWidth="Infinity" onAction="#handleLogin" prefHeight="45" styleClass="quick-action-btn, qa-warning" text="SIGN IN" />
 

@@ -4,10 +4,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<!--
-    DispatchFormController opens this as a modal Stage.
-    Width ~520, Height ~500
--->
 <VBox prefWidth="520" spacing="0"
       styleClass="root-pane"
       stylesheets="@../../../../css/application.css"
@@ -15,17 +11,14 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.csit228capstone.controller.responder.DispatchedFormController">
 
-    <!-- Title Bar -->
     <HBox styleClass="dialog-header" alignment="CENTER_LEFT" spacing="12">
         <padding><Insets topRightBottomLeft="16" /></padding>
         <Label styleClass="dialog-title" text="📡 Log Dispatch Mission" />
     </HBox>
 
-    <!-- Form Body -->
     <VBox spacing="18" VBox.vgrow="ALWAYS">
         <padding><Insets top="24" right="24" bottom="8" left="24" /></padding>
 
-        <!-- Responder -->
         <VBox spacing="6">
             <Label styleClass="form-label" text="Responder *" />
             <ComboBox fx:id="cbResponder"
@@ -35,7 +28,6 @@
             <Label fx:id="errResponder" styleClass="form-error" text="" visible="false" managed="false" />
         </VBox>
 
-        <!-- Incident ID -->
         <VBox spacing="6">
             <Label styleClass="form-label" text="Incident ID *" />
             <ComboBox fx:id="cbIncident"
@@ -46,7 +38,6 @@
             <Label fx:id="errIncident" styleClass="form-error" text="" visible="false" managed="false" />
         </VBox>
 
-        <!-- Severity -->
         <VBox spacing="6">
             <Label styleClass="form-label" text="Severity" />
             <ComboBox fx:id="cbSeverity"
@@ -54,7 +45,6 @@
                       styleClass="form-input" />
         </VBox>
 
-        <!-- Deployment Location (map pin) -->
         <VBox spacing="6">
             <Label styleClass="form-label" text="Deployment Location *" />
             <HBox spacing="10">
@@ -71,7 +61,6 @@
             <Label fx:id="errLocation" styleClass="form-error" text="" visible="false" managed="false" />
         </VBox>
 
-        <!-- Time Occurred -->
         <VBox spacing="6">
             <Label styleClass="form-label" text="Time Incident Occurred" />
             <HBox spacing="12">
@@ -86,7 +75,6 @@
             </HBox>
         </VBox>
 
-        <!-- Dispatch Status -->
         <VBox spacing="6">
             <Label styleClass="form-label" text="Initial Status" />
             <ComboBox fx:id="cbDispatchStatus"
@@ -96,7 +84,6 @@
 
     </VBox>
 
-    <!-- Action Buttons -->
     <HBox alignment="CENTER_RIGHT" spacing="12">
         <padding><Insets top="16" right="24" bottom="24" left="24" /></padding>
         <Button onAction="#handleCancel"

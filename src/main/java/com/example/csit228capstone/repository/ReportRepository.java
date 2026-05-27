@@ -10,9 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Data-access layer for the {@code reports} table and its structural sub-tables.
- */
 public class ReportRepository {
 
     private static volatile boolean tableInitialized = false;
@@ -21,14 +18,11 @@ public class ReportRepository {
         return SupabaseConnectionManager.getInstance().getConnection();
     }
 
-    // ── Table bootstrap ───────────────────────────────────────────────────────
-
     public void initTable() {
         if (tableInitialized) return;
         synchronized (ReportRepository.class) {
             if (tableInitialized) return;
 
-            // FIXED: Added incident_type_other TEXT to the database layout
             String createReportsSql = """
                     CREATE TABLE IF NOT EXISTS reports (
                         id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -89,11 +83,9 @@ public class ReportRepository {
                 st.execute(createDamagesSql);
                 st.execute(createInjuriesSql);
 
-                // ALTER TABLE fallback execution check to update existing tables if they exist without column
                 try {
                     st.execute("ALTER TABLE reports ADD COLUMN IF NOT EXISTS incident_type_other TEXT;");
                 } catch (SQLException ignore) {
-                    // Safe catch block for DBMS instances that don't support ADD COLUMN IF NOT EXISTS syntax smoothly
                 }
 
                 tableInitialized = true;
@@ -102,8 +94,6 @@ public class ReportRepository {
             }
         }
     }
-
-    // ── READ SUB-TABLE DATA METHODS ──────────────────────────────────────────
 
     public List<String> findIncidentTypesByReportId(UUID reportId) {
         List<String> list = new ArrayList<>();
@@ -161,8 +151,6 @@ public class ReportRepository {
         return list;
     }
 
-    // ── WRITE SUB-TABLE DATA METHODS ─────────────────────────────────────────
-
     public void saveIncidentTypes(UUID reportId, List<String> types) {
         if (types == null || types.isEmpty()) return;
         String sql = "INSERT INTO report_incident_types (report_id, type_name) VALUES (?, ?)";
@@ -214,8 +202,6 @@ public class ReportRepository {
         }
     }
 
-    // ── CORE READ ─────────────────────────────────────────────────────────────
-
     public List<Report> findAll() {
         return findAllFiltered("", "generated_date_time", false);
     }
@@ -258,8 +244,6 @@ public class ReportRepository {
         }
     }
 
-    // ── CORE WRITE ────────────────────────────────────────────────────────────
-
     public UUID insert(Report report) {
         String sql = """
                 INSERT INTO reports
@@ -290,7 +274,6 @@ public class ReportRepository {
             ps.setString(16, report.getInsurancePolicy());
             ps.setString(17, report.getInsuranceCoverageAmt());
 
-            // FIXED: Map to column index 18
             ps.setString(18, report.getIncidentTypeOther());
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -332,7 +315,6 @@ public class ReportRepository {
             ps.setString(15, report.getInsurancePolicy());
             ps.setString(16, report.getInsuranceCoverageAmt());
 
-            // FIXED: Map incidentTypeOther to position 17
             ps.setString(17, report.getIncidentTypeOther());
 
             ps.setObject(18, report.getId());
@@ -365,8 +347,6 @@ public class ReportRepository {
             throw new RuntimeException("Could not bulk-delete reports: " + e.getMessage(), e);
         }
     }
-
-    // ── MAPPING ───────────────────────────────────────────────────────────────
 
     private Report mapRow(ResultSet rs) throws SQLException {
         Report report = new Report();
@@ -402,7 +382,6 @@ public class ReportRepository {
         report.setInsurancePolicy(rs.getString("insurance_policy"));
         report.setInsuranceCoverageAmt(rs.getString("insurance_coverage_amt"));
 
-        // FIXED: Added mapping column logic back out from Supabase row values
         report.setIncidentTypeOther(rs.getString("incident_type_other"));
 
         return report;

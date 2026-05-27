@@ -5,52 +5,30 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
-/**
- * Updated Report model — mirrors all columns in the new reports table.
- *
- * New fields vs. old:
- * reportNo, dateOfReport, recordedBy, reporterContact,
- * recorderContact, dateOfIncident, location, description,
- * hasInsurance, insurancePolicy, insuranceCoverageAmt, incidentTypeOther
- */
 public class Report {
 
     private UUID          id;
     private String        name;
     private String        type;
-
-    // ── Header fields (stored in DB) ──────────────────────────────────────────
     private String        reportNo;
     private LocalDate     dateOfReport;
-    private String        generatedBy;       // "Reported By"
+    private String        generatedBy;
     private String        recordedBy;
     private String        reporterContact;
     private String        recorderContact;
-
-    // ── Timestamps & period ───────────────────────────────────────────────────
     private LocalDateTime generatedDateTime;
     private LocalDate     startDate;
     private LocalDate     endDate;
-
-    // ── Incident-specific fields (stored for re-view) ─────────────────────────
     private LocalDate     dateOfIncident;
     private String        location;
     private String        description;
-
-    // ── FIXED: Missing Insurance Fields Added Here ───────────────────────────
     private Boolean       hasInsurance;
     private String        insurancePolicy;
     private String        insuranceCoverageAmt;
-
-    // ── FIXED: Added Missing Custom Incident Type Value ──────────────────────
     private String        incidentTypeOther;
-
-    // ── UI-only ───────────────────────────────────────────────────────────────
     private boolean       isSelected;
 
     public Report() {}
-
-    // ── Getters & setters ─────────────────────────────────────────────────────
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
@@ -97,7 +75,6 @@ public class Report {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    // ── FIXED: Getters and Setters for Insurance Data ────────────────────────
     public Boolean getHasInsurance() { return hasInsurance; }
     public void setHasInsurance(Boolean hasInsurance) { this.hasInsurance = hasInsurance; }
 
@@ -107,14 +84,12 @@ public class Report {
     public String getInsuranceCoverageAmt() { return insuranceCoverageAmt; }
     public void setInsuranceCoverageAmt(String insuranceCoverageAmt) { this.insuranceCoverageAmt = insuranceCoverageAmt; }
 
-    // ── FIXED: Getter and Setter for Custom Incident Type Field ──────────────
     public String getIncidentTypeOther() { return incidentTypeOther; }
     public void setIncidentTypeOther(String incidentTypeOther) { this.incidentTypeOther = incidentTypeOther; }
 
     public boolean isSelected() { return isSelected; }
     public void setSelected(boolean selected) { this.isSelected = selected; }
 
-    /** Formatted timestamp for the table view column. */
     public String getFormattedDate() {
         if (generatedDateTime == null) return "";
         return generatedDateTime.format(DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm"));

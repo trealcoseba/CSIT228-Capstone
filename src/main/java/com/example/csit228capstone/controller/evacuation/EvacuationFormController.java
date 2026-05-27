@@ -32,10 +32,6 @@ public class EvacuationFormController {
 
     private final EvacuationService service = EvacuationService.getInstance();
 
-    // -------------------------------------------------------------------------
-    // Map picker
-    // -------------------------------------------------------------------------
-
     @FXML
     public void handleOpenMap() {
         try {
@@ -67,10 +63,6 @@ public class EvacuationFormController {
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Save (insert or update)
-    // -------------------------------------------------------------------------
-
     @FXML
     public void handleSave(ActionEvent actionEvent) {
         String name        = txtName.getText().trim();
@@ -79,7 +71,6 @@ public class EvacuationFormController {
         String contact     = txtContact.getText().trim();
         String capacityStr = txtCapacity.getText().trim();
 
-        // --- Validation ---
         if (name.isEmpty() || address.isEmpty() || capacityStr.isEmpty()) {
             showAlert("Validation Error", "Name, location, and capacity are required.");
             return;
@@ -99,7 +90,6 @@ public class EvacuationFormController {
             return;
         }
 
-        // --- Build model ---
         EvacuationCenter center = new EvacuationCenter();
         center.setId(editingId);
         center.setName(name);
@@ -111,7 +101,6 @@ public class EvacuationFormController {
         center.setManagerName(manager.isEmpty() ? null : manager);
         center.setContactNumber(contact.isEmpty() ? null : contact);
 
-        // --- Delegate to service ---
         try {
             if (editingId == null) {
                 service.insertCenter(center);
@@ -125,18 +114,10 @@ public class EvacuationFormController {
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Cancel
-    // -------------------------------------------------------------------------
-
     @FXML
     private void handleCancel() {
         closeWindow();
     }
-
-    // -------------------------------------------------------------------------
-    // Populate for edit mode
-    // -------------------------------------------------------------------------
 
     public void populateForEdit(EvacuationCenter center) {
         editingId = center.getId();
@@ -149,10 +130,6 @@ public class EvacuationFormController {
         selectedLat = center.getLatitude() != null ? center.getLatitude() : 0.0;
         selectedLng = center.getLongitude() != null ? center.getLongitude() : 0.0;
     }
-
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

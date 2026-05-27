@@ -90,7 +90,6 @@ public class ResidentsController {
                 for (Resident r : residents) {
                     StringBuilder row = new StringBuilder();
 
-                    // Add the Created At date first
                     row.append(r.getCreatedAt().format(formatter)).append(",");
 
                     row.append(r.getId()).append(",");
@@ -120,9 +119,6 @@ public class ResidentsController {
         openForm(null);
     }
 
-
-
-    //HELPERS BELOW
     private void setupFiltering() {
         filteredData = new FilteredList<>(masterData, p -> true);
 
@@ -152,18 +148,15 @@ public class ResidentsController {
         String category = filterCategory.getValue() == null ? "All" : filterCategory.getValue();
 
         filteredData.setPredicate(resident -> {
-            // Search — matches name, address, phone, or ID
             boolean matchesSearch = search.isEmpty()
                     || resident.getFullName().toLowerCase().contains(search)
                     || (resident.getAddress() != null && resident.getAddress().toLowerCase().contains(search))
                     || (resident.getContactNumber() != null && resident.getContactNumber().toLowerCase().contains(search))
                     || resident.getId().toString().toLowerCase().contains(search);
 
-            // Status filter
             boolean matchesStatus = status.equals("All")
                     || resident.getCivilStatus().equalsIgnoreCase(status);
 
-            // Category filter
             boolean matchesCategory;
             if (category.equals("All")) {
                 matchesCategory = true;
@@ -193,7 +186,6 @@ public class ResidentsController {
 
     private void setupTableColumns() {
 
-        //FORMAT TABLE
         formatTable();
 
         colId.setCellValueFactory(cellData -> {
@@ -283,8 +275,6 @@ public class ResidentsController {
 
             Stage stage = new Stage();
 
-            // 1. CRITICAL: Link the pop-up to the main window
-            // This prevents the pop-up from inheriting the "Full Screen" state as a new window
             if (residentsTable.getScene() != null) {
                 stage.initOwner(residentsTable.getScene().getWindow());
             }
@@ -295,11 +285,9 @@ public class ResidentsController {
             Scene scene = new Scene(root);
             stage.setScene(scene);
 
-            // 2. Disable resizing and force full-screen to false
             stage.setResizable(false);
             stage.setFullScreen(false);
 
-            // 3. Ensure the window size fits the FXML content exactly
             stage.sizeToScene();
 
             stage.show();
@@ -345,7 +333,7 @@ public class ResidentsController {
             case "Name Z→A" -> Comparator.comparing(Resident::getFullName, String.CASE_INSENSITIVE_ORDER).reversed();
             case "Age ↑"    -> Comparator.comparingInt(Resident::getAge);
             case "Age ↓"    -> Comparator.comparingInt(Resident::getAge).reversed();
-            default         -> Comparator.comparing(Resident::getCreatedAt).reversed(); // "Newest"
+            default         -> Comparator.comparing(Resident::getCreatedAt).reversed();
         };
 
         sortedData.setComparator(comparator);
@@ -393,10 +381,8 @@ public class ResidentsController {
     }
 
     private void updateLabels() {
-        // Total shown (respects current filter)
         lblTotalResidents.setText(String.valueOf(filteredData.size()));
 
-        // These always reflect full dataset
         java.time.LocalDate today = java.time.LocalDate.now();
 
         long todayCount = masterData.stream()
@@ -409,7 +395,6 @@ public class ResidentsController {
                 .count();
         lblVulnerable.setText(String.valueOf(vulnerableCount));
 
-        // lblMissing — residents with no contact number and no address (unverified/incomplete)
         long missingCount = masterData.stream()
                 .filter(r -> (r.getContactNumber() == null || r.getContactNumber().isBlank())
                         && (r.getAddress() == null || r.getAddress().isBlank()))

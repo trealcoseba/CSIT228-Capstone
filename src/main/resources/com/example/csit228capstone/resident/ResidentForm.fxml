@@ -44,10 +44,8 @@
         <Label text="Contact #:" GridPane.columnIndex="2" GridPane.rowIndex="3" />
         <TextField fx:id="txtPhone" promptText="09XXXXXXXXX" GridPane.columnIndex="3" GridPane.rowIndex="3" />
 
-        <!-- Replace your Photo URL Label and TextField with this -->
         <Label text="Resident Photo:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
         <HBox alignment="CENTER_LEFT" spacing="15" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="4">
-            <!-- Preview Circle -->
             <StackPane alignment="CENTER" prefHeight="120.0" prefWidth="120.0" style="-fx-border-color: #ddd; -fx-border-radius: 50; -fx-background-radius: 50;">
                 <clip>
                     <javafx.scene.shape.Circle fx:id="imgClip" centerX="60" centerY="60" radius="60" />
@@ -69,7 +67,6 @@
             </VBox>
         </HBox>
 
-        <!-- NEW ROW FOR VULNERABILITIES -->
         <Label text="Vulnerabilities:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
         <HBox alignment="CENTER_LEFT" spacing="15" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="5">
             <CheckBox fx:id="chkSenior" text="Senior Citizen" />
@@ -80,7 +77,6 @@
             <CheckBox fx:id="chkIndigenous" text="Indigenous" />
         </HBox>
 
-        <!-- ADDRESS / MAP ROW -->
         <Label text="Home Address:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
         <HBox alignment="CENTER_LEFT" spacing="10" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="6">
             <TextField fx:id="txtAddress" editable="false" promptText="Pin location on map to get address..." HBox.hgrow="ALWAYS" />

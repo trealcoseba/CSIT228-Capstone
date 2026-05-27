@@ -23,10 +23,6 @@ public class EvacuationService {
         return instance;
     }
 
-    // -------------------------------------------------------------------------
-    // READ
-    // -------------------------------------------------------------------------
-
     public List<EvacuationCenter> fetchAllCenters() throws Exception {
         List<EvacuationCenter> centers = new ArrayList<>();
         String query = "SELECT * FROM evacuation_centers";
@@ -54,10 +50,6 @@ public class EvacuationService {
         return centers;
     }
 
-    // -------------------------------------------------------------------------
-    // CREATE
-    // -------------------------------------------------------------------------
-
 
     public void insertCenter(EvacuationCenter center) throws Exception {
         String sql = """
@@ -81,10 +73,6 @@ public class EvacuationService {
             stmt.executeUpdate();
         }
     }
-
-    // -------------------------------------------------------------------------
-    // UPDATE
-    // -------------------------------------------------------------------------
 
 
     public void updateCenter(EvacuationCenter center) throws Exception {
@@ -124,10 +112,6 @@ public class EvacuationService {
         }
     }
 
-    // -------------------------------------------------------------------------
-    // DELETE
-    // -------------------------------------------------------------------------
-
     public void deleteCenter(UUID centerId) throws Exception {
         String sql = "DELETE FROM evacuation_centers WHERE id = ?";
 
@@ -139,10 +123,6 @@ public class EvacuationService {
         }
     }
 
-    // -------------------------------------------------------------------------
-    // STATISTICS  — usable by both EvacuationController and the Dashboard
-    // -------------------------------------------------------------------------
-
     public int getTotalEvacuees() throws Exception {
         return fetchAllCenters().stream().mapToInt(EvacuationCenter::getCurrentOccupancy).sum();
     }
@@ -152,19 +132,6 @@ public class EvacuationService {
                 .filter(EvacuationCenter::isActive)
                 .count();
     }
-
-    public long getTotalActiveCentersFresh() {
-        try {
-            return getTotalActiveCenters(fetchAllCenters());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
-    // -------------------------------------------------------------------------
-    // HELPERS
-    // -------------------------------------------------------------------------
 
     private String nullIfBlank(String value) {
         return (value == null || value.isBlank()) ? null : value;

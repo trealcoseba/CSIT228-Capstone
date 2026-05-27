@@ -9,7 +9,6 @@
     <VBox alignment="TOP_CENTER" spacing="24">
         <padding><Insets topRightBottomLeft="16" /></padding>
 
-        <!-- ── KPI Cards Row ─────────────────────────────────────────────────── -->
         <HBox fx:id="kpiRow" spacing="16">
             <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
                 <Label styleClass="kpi-label" text="Total Residents" />
@@ -28,10 +27,8 @@
             </VBox>
         </HBox>
 
-        <!-- ── Middle Row: Incident Monitor + Quick Actions ─────────────────── -->
         <HBox spacing="16">
 
-            <!-- Live Incident Monitor -->
             <VBox styleClass="panel-card" HBox.hgrow="ALWAYS">
                 <HBox alignment="CENTER_LEFT" spacing="8">
                     <Label styleClass="panel-title" text="Live Incident Monitor" />
@@ -52,7 +49,6 @@
                 </TableView>
             </VBox>
 
-            <!-- Quick Actions -->
             <VBox prefWidth="200" spacing="12" styleClass="panel-card">
                 <Label styleClass="panel-title" text="Quick Actions" />
                 <Button maxWidth="Infinity" onAction="#reportIncident" styleClass="quick-action-btn, qa-danger" text="Report Incident" />
@@ -61,14 +57,11 @@
             </VBox>
         </HBox>
 
-        <!-- ── Bottom Row: Resources + Vulnerable + Weather ─────────────────── -->
         <HBox spacing="16">
 
-            <!-- Resource Status — driven by ResourceRepository -->
             <VBox spacing="12" styleClass="panel-card" HBox.hgrow="ALWAYS">
                 <Label styleClass="panel-title" text="Resource Status" />
                 <VBox spacing="8">
-                    <!-- Relief Goods -->
                     <HBox alignment="CENTER_LEFT">
                         <Label styleClass="resource-label" text="Relief Goods" />
                         <Region HBox.hgrow="ALWAYS" />
@@ -76,7 +69,6 @@
                     </HBox>
                     <ProgressBar fx:id="pbRelief" maxWidth="Infinity" progress="0" styleClass="progress-green" />
 
-                    <!-- Medical -->
                     <HBox alignment="CENTER_LEFT">
                         <Label styleClass="resource-label" text="Medical" />
                         <Region HBox.hgrow="ALWAYS" />
@@ -84,7 +76,6 @@
                     </HBox>
                     <ProgressBar fx:id="pbMed" maxWidth="Infinity" progress="0" styleClass="progress-amber" />
 
-                    <!-- Emergency Fund -->
                     <HBox alignment="CENTER_LEFT">
                         <Label styleClass="resource-label" text="Emergency Fund" />
                         <Region HBox.hgrow="ALWAYS" />
@@ -95,7 +86,6 @@
                 </VBox>
             </VBox>
 
-            <!-- Vulnerable Residents -->
             <VBox spacing="12" styleClass="panel-card" HBox.hgrow="ALWAYS">
                 <Label styleClass="panel-title" text="Vulnerable Residents" />
                 <HBox alignment="CENTER_LEFT" spacing="90.0">
@@ -137,7 +127,6 @@
                 </HBox>
             </VBox>
 
-            <!-- Weather Widget — populated by OpenWeatherMap API -->
             <VBox prefWidth="220" spacing="4" styleClass="panel-card, weather-card">
                 <Label fx:id="lblWeatherTemp" styleClass="weather-temp" text="--°C" />
                 <HBox spacing="16">

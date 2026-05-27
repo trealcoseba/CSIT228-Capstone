@@ -18,7 +18,6 @@ public class AlertsRepository {
     }
 
     public void save(Alert alert) throws SQLException {
-        // We have 8 columns and 8 question marks here
         String sql = """
                 INSERT INTO alerts
                     (id, title, body, priority, is_broadcast, expires_at, created_at, issued_by_name)
@@ -36,7 +35,6 @@ public class AlertsRepository {
                     ? Timestamp.valueOf(alert.getExpiresAt()) : null);
             ps.setTimestamp(7, Timestamp.valueOf(
                     alert.getCreatedAt() != null ? alert.getCreatedAt() : LocalDateTime.now()));
-            // Slot 8 matches 'issued_by_name'
             ps.setString(8, alert.getSentByName());
 
             ps.executeUpdate();
@@ -44,7 +42,6 @@ public class AlertsRepository {
     }
 
     public void update(Alert alert) throws SQLException {
-        // 6 parameters needed (title, body, priority, expires_at, issued_by_name, and id)
         String sql = """
                 UPDATE alerts
                 SET title = ?, body = ?, priority = ?, expires_at = ?, issued_by_name = ?
@@ -59,7 +56,7 @@ public class AlertsRepository {
             ps.setTimestamp(4, alert.getExpiresAt() != null
                     ? Timestamp.valueOf(alert.getExpiresAt()) : null);
             ps.setString(5, alert.getSentByName());
-            ps.setObject(6, alert.getId()); // This matches the WHERE id = ?
+            ps.setObject(6, alert.getId());
 
             ps.executeUpdate();
         }
@@ -76,7 +73,6 @@ public class AlertsRepository {
 
     public List<Alert> findAll() throws SQLException {
         List<Alert> results = new ArrayList<>();
-        // Make sure issued_by_name is included in the SELECT
         String sql = "SELECT * FROM alerts ORDER BY created_at DESC";
         try (Connection conn = getConn();
              Statement stmt = conn.createStatement();
@@ -118,7 +114,6 @@ public class AlertsRepository {
 
         a.setBroadcast(rs.getBoolean("is_broadcast"));
 
-        // Map the name from the database column 'issued_by_name'
         a.setSentByName(rs.getString("issued_by_name"));
 
         Timestamp expiresAt = rs.getTimestamp("expires_at");

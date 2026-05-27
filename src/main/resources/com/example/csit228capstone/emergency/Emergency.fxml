@@ -13,13 +13,9 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.example.csit228capstone.controller.emergency.EmergencyController">
 
-    <!-- ============================================================ -->
-    <!-- TOP: INCIDENT OVERVIEW PANEL                                  -->
-    <!-- ============================================================ -->
     <top>
         <VBox style="-fx-background-color: #161b22; -fx-border-color: #ff4757; -fx-border-width: 0 0 2 0;">
 
-            <!-- Command Bar -->
             <HBox alignment="CENTER_LEFT" spacing="12"
                   style="-fx-padding: 9 16 9 16; -fx-background-color: #ff4757;">
                 <Label style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"
@@ -32,7 +28,6 @@
                 <Label style="-fx-text-fill: #00ff88; -fx-font-size: 11px; -fx-font-weight: bold;"
                        text="LIVE" />
 
-                <!-- ── Declare Incident button lives here in the red bar ── -->
                 <Button fx:id="btnDeclareIncident" onAction="#handleDeclareIncident"
                         text="＋ Declare Incident"
                         style="-fx-background-color: white; -fx-text-fill: #dc2626;
@@ -41,7 +36,6 @@
                                -fx-cursor: hand;" />
             </HBox>
 
-            <!-- KPI Cards Row -->
             <HBox fx:id="incidentKpiRow" alignment="CENTER_LEFT" spacing="12"
                   style="-fx-padding: 12 16 12 16;">
 
@@ -148,9 +142,6 @@
         </VBox>
     </top>
 
-    <!-- ============================================================ -->
-    <!-- LEFT: RESIDENTS PRIORITY PANEL                                -->
-    <!-- ============================================================ -->
     <left>
         <VBox prefWidth="315" spacing="0"
               style="-fx-background-color: #161b22; -fx-border-color: #21262d; -fx-border-width: 0 1 0 0;">
@@ -167,7 +158,6 @@
                               -fx-padding: 2 8 2 8;" text="0" />
             </HBox>
 
-            <!-- Priority legend -->
             <HBox spacing="10" style="-fx-padding: 6 14 2 14; -fx-background-color: #161b22;">
                 <HBox alignment="CENTER_LEFT" spacing="4"
                       style="-fx-background-color: rgba(192,57,43,0.12); -fx-background-radius: 10;
@@ -231,9 +221,6 @@
         </VBox>
     </left>
 
-    <!-- ============================================================ -->
-    <!-- CENTER: LIVE MAP PANEL                                        -->
-    <!-- ============================================================ -->
     <center>
         <StackPane style="-fx-background-color: #0d1117;">
             <AnchorPane style="-fx-background-color: #0d1117;">
@@ -260,14 +247,10 @@
         </StackPane>
     </center>
 
-    <!-- ============================================================ -->
-    <!-- RIGHT: EVACUATION + RESCUE TEAMS + RESOURCES PANEL           -->
-    <!-- ============================================================ -->
     <right>
         <VBox prefWidth="325" spacing="0"
               style="-fx-background-color: #161b22; -fx-border-color: #21262d; -fx-border-width: 0 0 0 1;">
 
-            <!-- SECTION 1: Evacuation Centers -->
             <VBox VBox.vgrow="ALWAYS">
                 <HBox alignment="CENTER_LEFT" spacing="8"
                       style="-fx-padding: 10 14 10 14; -fx-background-color: #1f2937;
@@ -297,7 +280,6 @@
                 </TableView>
             </VBox>
 
-            <!-- SECTION 2: Rescue Teams -->
             <VBox VBox.vgrow="ALWAYS">
                 <HBox alignment="CENTER_LEFT" spacing="8"
                       style="-fx-padding: 10 14 10 14; -fx-background-color: #1f2937;
@@ -326,7 +308,6 @@
                 </TableView>
             </VBox>
 
-            <!-- SECTION 3: Resources -->
             <VBox VBox.vgrow="ALWAYS">
                 <HBox alignment="CENTER_LEFT" spacing="8"
                       style="-fx-padding: 10 14 10 14; -fx-background-color: #1f2937;
@@ -388,9 +369,6 @@
         </VBox>
     </right>
 
-    <!-- ============================================================ -->
-    <!-- BOTTOM: LOGS + ANALYTICS + STAT CARDS PANEL                  -->
-    <!-- ============================================================ -->
     <bottom>
         <HBox prefHeight="225"
               style="-fx-background-color: #161b22; -fx-border-color: #21262d; -fx-border-width: 1 0 0 0;">

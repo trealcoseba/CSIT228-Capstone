@@ -16,8 +16,6 @@ public class ResidentRepository {
         return SupabaseConnectionManager.getInstance().getConnection();
     }
 
-    // ─── READ ─────────────────────────────────────────────────────────────────
-
     public List<Resident> findAll() {
         List<Resident> list = new ArrayList<>();
 
@@ -75,8 +73,6 @@ public class ResidentRepository {
         }
     }
 
-    // ─── WRITE ────────────────────────────────────────────────────────────────
-
     public UUID insert(Resident r) {
         UUID locationId = null;
         if (r.getAddress() != null && !r.getAddress().isBlank()) {
@@ -127,7 +123,6 @@ public class ResidentRepository {
             locationId = null;
         }
 
-        // ✅ FIXED: correct UPDATE sql
         String sql = "UPDATE residents SET " +
                 "resident_locations_id = ?, " +
                 "first_name = ?, middle_name = ?, last_name = ?, suffix = ?, " +
@@ -158,7 +153,6 @@ public class ResidentRepository {
     public void delete(UUID residentId) {
         UUID locationId = getLocationId(residentId);
 
-        // 1. Delete resident first to remove the FK reference
         try (Connection c = getConn();
              PreparedStatement ps = c.prepareStatement("DELETE FROM residents WHERE id=?")) {
             ps.setObject(1, residentId);
@@ -167,13 +161,10 @@ public class ResidentRepository {
             throw new RuntimeException(e);
         }
 
-        // 2. Only delete the location row if no other resident still uses it
         if (locationId != null && !isLocationShared(locationId, null)) {
             deleteLocation(locationId);
         }
     }
-
-    // ─── LOCATION HELPERS ─────────────────────────────────────────────────────
 
     private UUID findOrInsertLocation(String address, double latitude, double longitude) {
         String sql = "SELECT id FROM resident_locations WHERE LOWER(address) = LOWER(?) LIMIT 1";
@@ -258,8 +249,6 @@ public class ResidentRepository {
         }
     }
 
-    // ─── VULNERABILITIES ──────────────────────────────────────────────────────
-
     public void addVulnerability(UUID residentId, VulnerabilityTag tag) {
         String sql = "INSERT INTO resident_vulnerabilities (resident_id, tag) " +
                 "VALUES (?, ?::vulnerability_tag)";
@@ -281,8 +270,6 @@ public class ResidentRepository {
             throw new RuntimeException("Error clearing vulnerabilities", e);
         }
     }
-
-    // ─── COUNTS ───────────────────────────────────────────────────────────────
 
     public int countAll() {
         try (Connection c = getConn();
@@ -308,8 +295,6 @@ public class ResidentRepository {
         }
     }
 
-    // ─── MAPPING ──────────────────────────────────────────────────────────────
-
     private Resident mapRow(ResultSet rs) throws SQLException {
         Resident r = new Resident();
         r.setId(rs.getObject("id", UUID.class));
@@ -326,8 +311,8 @@ public class ResidentRepository {
         r.setHouseholdHead(rs.getBoolean("is_household_head"));
         r.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         r.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-        r.setLatitude(rs.getDouble("latitude"));   //
-        r.setLongitude(rs.getDouble("longitude")); //
+        r.setLatitude(rs.getDouble("latitude"));
+        r.setLongitude(rs.getDouble("longitude"));
         return r;
     }
 }

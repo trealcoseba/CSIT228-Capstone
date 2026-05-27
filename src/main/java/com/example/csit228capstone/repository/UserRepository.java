@@ -14,7 +14,6 @@ public class UserRepository {
         return SupabaseConnectionManager.getInstance().getConnection();
     }
 
-    // ── Auth ──────────────────────────────────────────────────────────────────
     public boolean authenticate(String username, String password) {
         String query = "SELECT * FROM admin WHERE username = ? AND password = ?";
         try (Connection conn = getConn();
@@ -31,7 +30,6 @@ public class UserRepository {
         }
     }
 
-    // ── Fetch profile ─────────────────────────────────────────────────────────
     public AdminProfile getAdminProfile(String username) {
         String query = "SELECT id, username, first_name, last_name FROM admin WHERE username = ?";
         try (Connection conn = getConn();
@@ -54,7 +52,6 @@ public class UserRepository {
         return null;
     }
 
-    // ── Update profile ────────────────────────────────────────────────────────
     public boolean updateProfile(String id, String firstName, String lastName) {
         String query = "UPDATE admin SET first_name = ?, last_name = ? WHERE id = ?::uuid";
         try (Connection conn = getConn();
@@ -70,7 +67,6 @@ public class UserRepository {
         }
     }
 
-    // ── Change password ───────────────────────────────────────────────────────
     public boolean changePassword(String id, String oldPassword, String newPassword) {
         String verify = "SELECT id FROM admin WHERE id = ?::uuid AND password = ?";
         try (Connection conn = getConn();

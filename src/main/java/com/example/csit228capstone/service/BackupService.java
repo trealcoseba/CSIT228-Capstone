@@ -13,12 +13,6 @@ import java.util.List;
 
 public class BackupService {
 
-    /**
-     * Auto-discovers all tables in the public schema and dumps them.
-     *
-     * @param outputPath full path to the .sql file to write
-     * @throws Exception on DB or IO error
-     */
     public void backup(String outputPath) throws Exception {
         try (Connection conn = SupabaseConnectionManager.getInstance().getConnection();
              BufferedWriter writer = new BufferedWriter(new FileWriter(outputPath))) {
@@ -49,9 +43,6 @@ public class BackupService {
         }
     }
 
-    /**
-     * Discovers all user tables in the public schema automatically.
-     */
     private List<String> getAllTables(Connection conn) throws SQLException {
         List<String> tables = new ArrayList<>();
         DatabaseMetaData meta = conn.getMetaData();
@@ -65,9 +56,6 @@ public class BackupService {
         return tables;
     }
 
-    /**
-     * Dumps all rows of a single table as INSERT statements.
-     */
     private void dumpTable(Connection conn, BufferedWriter writer, String table)
             throws SQLException, IOException {
 
@@ -81,7 +69,6 @@ public class BackupService {
             ResultSetMetaData meta = rs.getMetaData();
             int colCount = meta.getColumnCount();
 
-            // Build column name list once
             StringBuilder colNames = new StringBuilder("(");
             for (int i = 1; i <= colCount; i++) {
                 colNames.append("\"").append(meta.getColumnName(i)).append("\"");

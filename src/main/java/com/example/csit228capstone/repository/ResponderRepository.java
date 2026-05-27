@@ -43,8 +43,6 @@ public class ResponderRepository {
         return list;
     }
 
-    // ─── READ: Find by ID ─────────────────────────────────────────────────────────
-
     public Responder findById(UUID id) throws SQLException {
         String sql = """
             SELECT
@@ -67,8 +65,6 @@ public class ResponderRepository {
         }
         return null;
     }
-
-    // ─── CREATE ───────────────────────────────────────────────────────────────────
 
     public Responder save(Responder r) throws SQLException {
         String sql = """
@@ -96,8 +92,6 @@ public class ResponderRepository {
         return r;
     }
 
-    // ─── UPDATE ───────────────────────────────────────────────────────────────────
-
     public void update(Responder r) throws SQLException {
         String sql = """
             UPDATE responders
@@ -117,8 +111,6 @@ public class ResponderRepository {
         }
     }
 
-    // ─── UPDATE STATUS ONLY ───────────────────────────────────────────────────────
-
     public void updateStatus(UUID id, String status) throws SQLException {
         String sql = "UPDATE responders SET status = ? WHERE id = ?";
         try (Connection conn = getConn();
@@ -129,15 +121,12 @@ public class ResponderRepository {
         }
     }
 
-    // ─── DELETE ───────────────────────────────────────────────────────────────────
-
     public void delete(UUID id) throws SQLException {
-        // Must delete child records first before deleting the responder
         String deleteDispatches = "DELETE FROM dispatched_responders WHERE responder_id = ?";
         String deleteResponder  = "DELETE FROM responders WHERE id = ?";
 
         try (Connection conn = getConn()) {
-            conn.setAutoCommit(false); // wrap both in a transaction
+            conn.setAutoCommit(false);
             try (PreparedStatement ps1 = conn.prepareStatement(deleteDispatches);
                  PreparedStatement ps2 = conn.prepareStatement(deleteResponder)) {
 
@@ -157,8 +146,6 @@ public class ResponderRepository {
         }
     }
 
-    // ─── AGENCIES (for ComboBox) ──────────────────────────────────────────────────
-
     public List<String> findDistinctAgencies() throws SQLException {
         String sql = "SELECT DISTINCT agency FROM responders WHERE agency IS NOT NULL ORDER BY agency";
         List<String> list = new ArrayList<>();
@@ -169,8 +156,6 @@ public class ResponderRepository {
         }
         return list;
     }
-
-    // ─── ROW MAPPER ───────────────────────────────────────────────────────────────
 
     private Responder mapRow(ResultSet rs) throws SQLException {
         Responder r = new Responder();
@@ -187,7 +172,6 @@ public class ResponderRepository {
             r.setTotalDispatches(rs.getInt("total_dispatches"));
             r.setActiveDispatches(rs.getInt("active_dispatches"));
         } catch (SQLException ignored) {
-            // columns may not exist in every query variant
         }
         return r;
     }

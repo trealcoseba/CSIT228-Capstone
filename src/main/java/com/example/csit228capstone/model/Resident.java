@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public class Resident {
     private UUID id;
-    private UUID residentLocationsId;   // replaces householdId — FK to resident_locations.id
+    private UUID residentLocationsId;
     private String firstName;
     private String middleName;
     private String lastName;
@@ -27,12 +27,9 @@ public class Resident {
     private double longitude;
     private List<VulnerabilityTag> vulnerabilities = new ArrayList<>();
 
-    // Joined field — not a DB column on residents, comes from resident_locations
     private String address;
 
     public Resident() {}
-
-    // --- Getters & Setters ---
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
@@ -86,8 +83,6 @@ public class Resident {
     public void setLatitude(double latitude) { this.latitude = latitude; }
     public double getLongitude() { return longitude; }
     public void setLongitude(double longitude) { this.longitude = longitude; }
-
-    // --- Computed ---
 
     public String getFullName() {
         StringBuilder sb = new StringBuilder();

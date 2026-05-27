@@ -11,18 +11,10 @@ import java.util.UUID;
 
 public class DispatchedResponderRepository {
 
-    // ─── Connection ──────────────────────────────────────────────────────────────
-
     private Connection getConn() throws SQLException {
         return SupabaseConnectionManager.getInstance().getConnection();
     }
 
-    // ─── READ: All dispatches (joined with responders) ────────────────────────────
-
-    /**
-     * Fetches ALL dispatch records (all statuses) ordered by dispatched_at DESC.
-     * Joins responders so we get the name/agency for display.
-     */
     public List<DispatchedResponder> findAll() throws SQLException {
         String sql = """
             SELECT
@@ -44,8 +36,6 @@ public class DispatchedResponderRepository {
 
         return executeQuery(sql);
     }
-
-    // ─── READ: Filter by responder ────────────────────────────────────────────────
 
     public List<DispatchedResponder> findByResponderId(UUID responderId) throws SQLException {
         String sql = """
@@ -71,8 +61,6 @@ public class DispatchedResponderRepository {
         return list;
     }
 
-    // ─── READ: Filter by incident ─────────────────────────────────────────────────
-
     public List<DispatchedResponder> findByIncidentId(UUID incidentId) throws SQLException {
         String sql = """
             SELECT
@@ -97,8 +85,6 @@ public class DispatchedResponderRepository {
         return list;
     }
 
-    // ─── READ: Active only ────────────────────────────────────────────────────────
-
     public List<DispatchedResponder> findActive() throws SQLException {
         String sql = """
             SELECT
@@ -114,8 +100,6 @@ public class DispatchedResponderRepository {
         return executeQuery(sql);
     }
 
-    // ─── READ: Distinct incident IDs for ComboBox ────────────────────────────────
-
     public List<String> findDistinctIncidentIds() throws SQLException {
         String sql = """
             SELECT DISTINCT incident_id::text
@@ -128,14 +112,11 @@ public class DispatchedResponderRepository {
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 String raw = rs.getString(1);
-                // Show short version in combo, full UUID as value via tag
                 list.add(raw.substring(0, 8).toUpperCase());
             }
         }
         return list;
     }
-
-    // ─── CREATE ───────────────────────────────────────────────────────────────────
 
     public DispatchedResponder save(DispatchedResponder dr) throws SQLException {
         String sql = """
@@ -177,8 +158,6 @@ public class DispatchedResponderRepository {
         return dr;
     }
 
-    // ─── UPDATE STATUS ────────────────────────────────────────────────────────────
-
     public void updateStatus(UUID id, String status) throws SQLException {
         String sql = "UPDATE dispatched_responders SET status = ? WHERE id = ?";
         try (Connection conn = getConn();
@@ -189,8 +168,6 @@ public class DispatchedResponderRepository {
         }
     }
 
-    // ─── DELETE ───────────────────────────────────────────────────────────────────
-
     public void delete(UUID id) throws SQLException {
         String sql = "DELETE FROM dispatched_responders WHERE id = ?";
         try (Connection conn = getConn();
@@ -199,8 +176,6 @@ public class DispatchedResponderRepository {
             ps.executeUpdate();
         }
     }
-
-    // ─── Helpers ──────────────────────────────────────────────────────────────────
 
     private List<DispatchedResponder> executeQuery(String sql) throws SQLException {
         List<DispatchedResponder> list = new ArrayList<>();
@@ -235,8 +210,6 @@ public class DispatchedResponderRepository {
 
         return dr;
     }
-
-    // ─── UPDATE STATUS BY INCIDENT ────────────────────────────────────────────────
 
     public void updateStatusByIncidentId(UUID incidentId, String status) throws SQLException {
         String sql = "UPDATE dispatched_responders SET status = ? WHERE incident_id = ?";

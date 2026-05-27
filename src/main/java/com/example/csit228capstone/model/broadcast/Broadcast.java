@@ -17,7 +17,6 @@ public class Broadcast {
         this.scheduledDate = scheduledDate;
     }
 
-    // Getters and Setters
     public String getTitle() { return title; }
     public String getMessage() { return message; }
     public String getCategory() { return category; }

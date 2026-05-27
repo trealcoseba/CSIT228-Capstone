@@ -5,10 +5,6 @@ import javafx.beans.property.StringProperty;
 
 import java.util.UUID;
 
-/**
- * Observable row for the Priority Residents TableView.
- * Priority = vulnerable residents first, then sorted by distance.
- */
 public class PriorityResidentRow {
 
     private final UUID   residentId;
@@ -29,21 +25,17 @@ public class PriorityResidentRow {
         rescueStatus.set("Pending");
     }
 
-    // ─── Property accessors (required by PropertyValueFactory) ───────────────
-
     public StringProperty residentNameProperty()         { return residentName; }
     public StringProperty vulnerabilityTypeProperty()    { return vulnerabilityType; }
     public StringProperty distanceFromIncidentProperty() { return distanceFromIncident; }
     public StringProperty rescueStatusProperty()         { return rescueStatus; }
 
     public String getResidentName()          { return residentName.get(); }
-    public String getVulnerabilityType()     { return vulnerabilityType.get(); }
     public String getDistanceFromIncident()  { return distanceFromIncident.get(); }
     public String getRescueStatus()          { return rescueStatus.get(); }
 
     public void setRescueStatus(String v)    { rescueStatus.set(v); }
 
-    // ─── Raw accessors ───────────────────────────────────────────────────────
     public UUID    getResidentId()  { return residentId; }
     public boolean isVulnerable()   { return vulnerable; }
 }

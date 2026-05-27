@@ -73,7 +73,6 @@
                                             <TableColumn fx:id="colUnit"        prefWidth="70"  text="Unit" />
                                             <TableColumn fx:id="colStatus"      prefWidth="80"  text="Status" />
                                             <TableColumn fx:id="colLocation"    prefWidth="120" text="Location" />
-                                            <!-- Last Updated now shows date + log-count badge via cell factory -->
                                             <TableColumn fx:id="colLastUpdated" prefWidth="140" text="Last Updated" />
                                             <TableColumn fx:id="colActions"     prefWidth="130" text="Actions" />
                                         </columns>
@@ -113,7 +112,6 @@
                             <VBox spacing="16">
                                 <padding><Insets topRightBottomLeft="16" /></padding>
 
-                                <!-- Header row: title | sort label + combo | reset | Use/Transfer button -->
                                 <HBox alignment="CENTER_LEFT" spacing="12">
                                     <Label styleClass="page-title" text="Resource Usage Log" />
                                     <Region HBox.hgrow="ALWAYS" />

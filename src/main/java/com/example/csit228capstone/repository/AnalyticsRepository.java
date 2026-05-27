@@ -13,10 +13,6 @@ public class AnalyticsRepository {
         return SupabaseConnectionManager.getInstance().getConnection();
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // INCIDENT COUNTS  (table: incidents)
-    // ─────────────────────────────────────────────────────────────────────────
-
     public int countIncidentsThisMonth() {
         String sql = """
                 SELECT COUNT(*) FROM incidents
@@ -54,10 +50,6 @@ public class AnalyticsRepository {
         }
         return result;
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // RESOLUTION TIME  (hours between reported_at and resolved_at)
-    // ─────────────────────────────────────────────────────────────────────────
 
 
     public double avgResolutionHoursThisMonth() {
@@ -107,10 +99,6 @@ public class AnalyticsRepository {
         return result;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // SHELTER UTILISATION  (evacuation_centers)
-    // ─────────────────────────────────────────────────────────────────────────
-
 
     public double currentShelterUtilizationPct() {
         String sql = """
@@ -136,7 +124,6 @@ public class AnalyticsRepository {
         try {
             return querySingleDouble(sql);
         } catch (RuntimeException e) {
-            // Table doesn't exist – swallow and return 0
             return 0.0;
         }
     }
@@ -163,7 +150,6 @@ public class AnalyticsRepository {
                         new double[]{rs.getDouble("used_qty"), rs.getDouble("avail_qty")});
             }
         } catch (SQLException e) {
-            // resource_allocations may not exist – fall through to global fallback
         }
 
         if (result.isEmpty()) {
@@ -186,10 +172,6 @@ public class AnalyticsRepository {
         }
         return result;
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // VULNERABILITY RATIO  (resident_vulnerabilities)
-    // ─────────────────────────────────────────────────────────────────────────
 
     public double vulnerabilityRatioPct() {
         String sql = """
@@ -244,10 +226,6 @@ public class AnalyticsRepository {
         }
         return result;
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // PRIVATE HELPERS
-    // ─────────────────────────────────────────────────────────────────────────
 
     private int querySingleInt(String sql) {
         try (Connection c = getConn();

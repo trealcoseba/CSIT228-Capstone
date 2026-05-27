@@ -3,7 +3,7 @@ package com.example.csit228capstone.controller.reports;
 import com.example.csit228capstone.model.report.*;
 import com.example.csit228capstone.repository.ReportRepository;
 import com.example.csit228capstone.service.ReportService;
-import com.example.csit228capstone.service.report.DocxReportExporter; // Added explicit import
+import com.example.csit228capstone.service.report.DocxReportExporter;
 
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -38,9 +38,6 @@ public class ReportPreviewController {
     private static final DateTimeFormatter DT_FMT =
             DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
 
-    // ── Load paths ────────────────────────────────────────────────────────────
-
-
     public void loadReport(Report report, ReportFormData fd) {
         this.currentReport   = report;
         this.currentFormData = fd;
@@ -51,7 +48,6 @@ public class ReportPreviewController {
             fetchGenericDataThenRender(report);
         }
     }
-
 
     public void loadSavedReport(Report report) {
         this.currentReport = report;
@@ -131,8 +127,6 @@ public class ReportPreviewController {
         reportService.execute(task);
     }
 
-    // ── Render ────────────────────────────────────────────────────────────────
-
     private void renderDocument() {
         Platform.runLater(() -> {
             vboxDocument.getChildren().clear();
@@ -163,8 +157,6 @@ public class ReportPreviewController {
             addSignature(sigName);
         });
     }
-
-    // ── Incident body ─────────────────────────────────────────────────────────
 
     private void renderIncidentBodyTables() {
         ReportFormData fd = currentFormData;
@@ -206,8 +198,6 @@ public class ReportPreviewController {
         addDocTable(List.of("Injured Person", "Position", "Medical Cost", "Insurance"), injuryRows);
     }
 
-    // ── Generic body ──────────────────────────────────────────────────────────
-
     private void renderGenericBody() {
         ReportData<List<List<String>>> data = currentGenericData;
         if (data == null) {
@@ -228,8 +218,6 @@ public class ReportPreviewController {
             addDocTable(data.getHeaders(), rows);
         }
     }
-
-    // ── Export  ─
 
     @FXML private void handleExportPdf()  { doExport("pdf");  }
     @FXML private void handleExportWord() { doExport("docx"); }
@@ -258,7 +246,7 @@ public class ReportPreviewController {
                     incidentWrapper.setReportType(ReportType.fromDisplayName(currentReport.getType()));
                     incidentWrapper.setStartDate(currentReport.getStartDate());
                     incidentWrapper.setEndDate(currentReport.getEndDate());
-                    incidentWrapper.setPayload(currentFormData); // Directly pass live data
+                    incidentWrapper.setPayload(currentFormData);
 
                     if ("docx".equalsIgnoreCase(format)) {
                         DocxReportExporter exporter = new DocxReportExporter();
@@ -316,8 +304,6 @@ public class ReportPreviewController {
         ((Stage) btnClose.getScene().getWindow()).close();
     }
 
-    // ── JavaFX building blocks ────────────────────────────────────────────────
-
     private void addCentered(String text, double size, boolean bold, String color) {
         Label l = new Label(text);
         l.setStyle(String.format("-fx-font-size:%.0f;%s-fx-text-fill:%s;",
@@ -352,12 +338,10 @@ public class ReportPreviewController {
     private void addDocumentMetadataSection(ReportFormData fd, Report report) {
         GridPane grid = new GridPane();
         grid.setMaxWidth(Double.MAX_VALUE);
-        grid.setHgap(12); // Elegant horizontal spacing between columns
-        grid.setVgap(8);  // Balanced vertical padding matching layout parameters
+        grid.setHgap(12);
+        grid.setVgap(8);
         grid.setPadding(new Insets(10, 0, 10, 0));
 
-        // ── STRICT 4-COLUMN MATRIX GRID STRUCTURE (Matches Export Layout Split) ──
-        // Col 0: Label (18%), Col 1: Value (32%), Col 2: Label (18%), Col 3: Value (32%)
         ColumnConstraints c0_lbl = new ColumnConstraints(); c0_lbl.setPercentWidth(18);
         ColumnConstraints c1_val = new ColumnConstraints(); c1_val.setPercentWidth(32); c1_val.setHgrow(Priority.ALWAYS);
         ColumnConstraints c2_lbl = new ColumnConstraints(); c2_lbl.setPercentWidth(18);
@@ -367,7 +351,6 @@ public class ReportPreviewController {
 
         int currentRow = 0;
 
-        // Resolve Core String Displays
         String formDate = (fd != null && fd.getDate() != null) ? fd.getDate().format(DATE_FMT)
                 : (report.getGeneratedDateTime() != null ? report.getGeneratedDateTime().toLocalDate().format(DATE_FMT) : "—");
         String genOn = report.getGeneratedDateTime() != null ? report.getGeneratedDateTime().format(DT_FMT) : formDate;
@@ -382,7 +365,6 @@ public class ReportPreviewController {
 
         String computedType = report.getType() != null ? report.getType() : "—";
 
-        // ── POPULATE CORE SYSTEM META ROWS ──
         grid.add(lbl("Date:"), 0, currentRow);
         grid.add(val(formDate), 1, currentRow);
         grid.add(lbl("Report No.:"), 2, currentRow);
@@ -409,13 +391,11 @@ public class ReportPreviewController {
 
         grid.add(lbl("Period Covered:"), 0, currentRow);
         grid.add(val(coveragePeriod), 1, currentRow);
-        grid.add(lbl(""), 2, currentRow); // Clean empty placeholder cells to maintain strict symmetry
+        grid.add(lbl(""), 2, currentRow);
         grid.add(val(""), 3, currentRow);
         currentRow++;
 
-        // ── POPULATE EXTENDED INCIDENT DETAILS IF APPLICABLE ──
         if (isIncident(report) && fd != null) {
-            // Section Divider
             Region separatorSpace = new Region();
             separatorSpace.setPrefHeight(12);
             grid.add(separatorSpace, 0, currentRow++, 4, 1);
@@ -430,12 +410,10 @@ public class ReportPreviewController {
             grid.add(val(nvl(fd.getLocation())), 3, currentRow);
             currentRow++;
 
-            // Description spanned completely across the full bottom width
             grid.add(lbl("Description:"), 0, currentRow);
             grid.add(val(nvl(fd.getDescription())), 1, currentRow, 3, 1);
             currentRow++;
 
-            // Context section divider for insurance data mapping
             Region insSeparator = new Region();
             insSeparator.setPrefHeight(6);
             grid.add(insSeparator, 0, currentRow++, 4, 1);
@@ -577,8 +555,6 @@ public class ReportPreviewController {
         l.setWrapText(true);
         return l;
     }
-
-    // ── Helpers ───────────────────────────────────────────────────────────────
 
     private boolean isIncident(Report r) {
         if (r == null || r.getType() == null) return false;

@@ -18,7 +18,6 @@ import java.util.concurrent.Executors;
 
 public class AnalyticsController implements Initializable {
 
-    // ── KPI labels ────────────────────────────────────────────────────────────
     @FXML private Label lblGrowthRate;
     @FXML private Label lblPrevMonthCount;
     @FXML private Label lblAvgResolution;
@@ -28,7 +27,6 @@ public class AnalyticsController implements Initializable {
     @FXML private Label lblVulnerabilityRatio;
     @FXML private Label lblPrevVulnerability;
 
-    // ── Charts ────────────────────────────────────────────────────────────────
     @FXML private BarChart<String, Number>        chartIncidentFrequency;
     @FXML private CategoryAxis                    axisIncidentX;
     @FXML private NumberAxis                      axisIncidentY;
@@ -43,7 +41,6 @@ public class AnalyticsController implements Initializable {
 
     @FXML private PieChart                        chartDemographic;
 
-    // ── Internals ─────────────────────────────────────────────────────────────
     private final AnalyticsRepository repo = new AnalyticsRepository();
     private final ExecutorService executor  = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "analytics-loader");
@@ -51,20 +48,12 @@ public class AnalyticsController implements Initializable {
         return t;
     });
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // INIT
-    // ─────────────────────────────────────────────────────────────────────────
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         configureChartAxes();
         loadDataAsync();
     }
 
-    /**
-     * Set sensible defaults so axes don't show ugly floating-point tick marks
-     * before data arrives.
-     */
     private void configureChartAxes() {
         double max = 250;
         axisIncidentY.setUpperBound(Math.ceil(max / 25.0) * 25);
@@ -76,7 +65,6 @@ public class AnalyticsController implements Initializable {
         axisResourceY.setUpperBound(Math.ceil(max / 25.0) * 25);
         axisResourceY.setTickUnit(25);
 
-        // Remove gray backgrounds
         chartIncidentFrequency.setAlternativeRowFillVisible(false);
         chartIncidentFrequency.setAlternativeColumnFillVisible(false);
         chartIncidentFrequency.setHorizontalGridLinesVisible(true);
@@ -97,16 +85,11 @@ public class AnalyticsController implements Initializable {
         chartResourceUsage.setVerticalGridLinesVisible(false);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // ASYNC DATA LOAD
-    // ─────────────────────────────────────────────────────────────────────────
-
     private void loadDataAsync() {
 
 
         executor.submit(() -> {
             try {
-                // --- KPI data ---
                 int thisMonth  = repo.countIncidentsThisMonth();
                 int prevMonth  = repo.countIncidentsPrevMonth();
                 double avgRes  = repo.avgResolutionHoursThisMonth();
@@ -116,13 +99,11 @@ public class AnalyticsController implements Initializable {
                 double vulnRat = repo.vulnerabilityRatioPct();
                 double prevVuln= repo.vulnerabilityRatioPrevMonthPct();
 
-                // --- Chart data ---
                 Map<String, Integer> freqMap   = repo.incidentFrequencyByCategory();
                 Map<String, Double>  resMap    = repo.avgResolutionByCategory();
                 Map<String, double[]>resUsage  = repo.resourceUsagePerCenter();
                 Map<String, Integer> vulnBreak = repo.vulnerabilityTagBreakdown();
 
-                // Push everything to the JavaFX thread
                 Platform.runLater(() -> {
                     populateKpis(thisMonth, prevMonth, avgRes, prevRes,
                             util, prevUtil, vulnRat, prevVuln);
@@ -140,16 +121,11 @@ public class AnalyticsController implements Initializable {
         });
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // KPI POPULATION
-    // ─────────────────────────────────────────────────────────────────────────
-
     private void populateKpis(int thisMonth, int prevMonth,
                               double avgRes,  double prevRes,
                               double util,    double prevUtil,
                               double vulnRat, double prevVuln) {
 
-        // 1. Incident Growth
         String growthText;
         if (prevMonth == 0) {
             growthText = thisMonth > 0 ? "+100%" : "0%";
@@ -160,24 +136,16 @@ public class AnalyticsController implements Initializable {
         lblGrowthRate.setText(growthText);
         lblPrevMonthCount.setText(String.valueOf(prevMonth));
 
-        // 2. Avg Resolution
         lblAvgResolution.setText(String.format("%.1fh", avgRes));
         lblPrevAvgResolution.setText(String.format("%.1fh", prevRes));
 
-        // 3. Shelter Utilisation
         lblUtilization.setText(String.format("%.1f%%", util));
         lblPrevUtilization.setText(String.format("%.1f%%", prevUtil));
 
-        // 4. Vulnerability Ratio
         lblVulnerabilityRatio.setText(String.format("%.1f%%", vulnRat));
         lblPrevVulnerability.setText(String.format("%.1f%%", prevVuln));
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // CHART POPULATION
-    // ─────────────────────────────────────────────────────────────────────────
-
-    /** Bar chart – incidents per disaster category. */
     private void populateIncidentFrequencyChart(Map<String, Integer> data) {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Incidents");
@@ -191,12 +159,10 @@ public class AnalyticsController implements Initializable {
         chartIncidentFrequency.getData().clear();
         chartIncidentFrequency.getData().add(series);
 
-        // Expand chart width dynamically so bars don't squash
         int barCount = Math.max(data.size(), 4);
         chartIncidentFrequency.setPrefWidth(Math.max(520, barCount * 80));
     }
 
-    /** Bar chart – average resolution hours per disaster category. */
     private void populateAvgResolutionChart(Map<String, Double> data) {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Avg Hours");
@@ -214,10 +180,6 @@ public class AnalyticsController implements Initializable {
         chartAvgResolution.setPrefWidth(Math.max(520, barCount * 80));
     }
 
-    /**
-     * Stacked bar chart – used vs available resources per evacuation center.
-     * Each center is a category; the two series are "Used" and "Available".
-     */
     private void populateResourceUsageChart(Map<String, double[]> data) {
         XYChart.Series<String, Number> usedSeries  = new XYChart.Series<>();
         XYChart.Series<String, Number> availSeries = new XYChart.Series<>();
@@ -239,7 +201,6 @@ public class AnalyticsController implements Initializable {
         chartResourceUsage.setPrefWidth(Math.max(520, centerCount * 100));
     }
 
-    /** Pie chart – vulnerability tag distribution. */
     private void populateDemographicChart(Map<String, Integer> data) {
         ObservableList<PieChart.Data> pieData = FXCollections.observableArrayList();
         for (Map.Entry<String, Integer> entry : data.entrySet()) {
@@ -249,27 +210,12 @@ public class AnalyticsController implements Initializable {
         }
         chartDemographic.setData(pieData);
 
-        // Show a placeholder slice when there's nothing to display
         if (pieData.isEmpty()) {
             chartDemographic.setData(FXCollections.observableArrayList(
                     new PieChart.Data("No Data", 1)));
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // ACTIONS
-    // ─────────────────────────────────────────────────────────────────────────
-
-    @FXML
-    public void export(ActionEvent actionEvent) {
-        // Intentionally left blank – handled separately.
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // HELPERS
-    // ─────────────────────────────────────────────────────────────────────────
-
-    /** Truncate a label to `maxLen` chars with "…" so axes stay readable. */
     private static String truncateLabel(String text, int maxLen) {
         if (text == null) return "Unknown";
         return text.length() > maxLen ? text.substring(0, maxLen - 1) + "…" : text;

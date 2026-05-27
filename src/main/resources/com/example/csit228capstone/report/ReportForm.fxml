@@ -24,11 +24,9 @@
     <content>
         <VBox spacing="14" style="-fx-padding:28 32 32 32;">
 
-            <!-- Title -->
             <Label style="-fx-font-size:20;-fx-font-weight:bold;-fx-text-fill:#2c3e50;" text="Generate New Report" />
             <Separator />
 
-            <!-- ── Report Type & Name ────────────────────────────────────── -->
             <Label style="-fx-font-size:13;-fx-font-weight:bold;-fx-text-fill:#1d9e75;" text="Report Type &amp; Name" />
             <GridPane hgap="12" vgap="10">
                 <columnConstraints>
@@ -46,12 +44,10 @@
             </rowConstraints>
             </GridPane>
 
-            <!-- Type description card -->
             <Label fx:id="lblTypeDescription" managed="false" style="-fx-font-size:11;-fx-text-fill:#555;-fx-background-color:#f0f9f5;                           -fx-border-color:#1d9e75;-fx-border-radius:4;-fx-background-radius:4;                           -fx-padding:8 12;" visible="false" wrapText="true" />
 
             <Separator />
 
-            <!-- ── Universal Header Fields ───────────────────────────────── -->
             <Label style="-fx-font-size:13;-fx-font-weight:bold;-fx-text-fill:#1d9e75;" text="Report Header" />
 
             <GridPane hgap="12" vgap="10">
@@ -68,29 +64,23 @@
                     <RowConstraints minHeight="36" />
                 </rowConstraints>
 
-                <!-- Row 0: Date | Report No. (both editable) -->
                 <Label text="Date:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                 <DatePicker fx:id="dpDate" prefWidth="9999" GridPane.columnIndex="1" GridPane.rowIndex="0" />
                 <Label text="Report No.:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
                 <TextField fx:id="tfReportNo" promptText="e.g. 2025-001" GridPane.columnIndex="3" GridPane.rowIndex="0" />
 
-                <!-- Row 1: Reported By | Recorded By (BOTH editable) -->
                 <Label text="Reported By:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                 <TextField fx:id="tfReportedBy" promptText="Full name" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                 <Label text="Recorded By:" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                <!-- tfRecordedBy is now a plain TextField — editable by default -->
                 <TextField fx:id="tfRecordedBy" promptText="Full name" GridPane.columnIndex="3" GridPane.rowIndex="1" />
 
-                <!-- Row 2: Reporter Contact -->
                 <Label text="Reporter Contact:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
                 <TextField fx:id="tfReporterContact" promptText="Phone or email" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="2" />
 
-                <!-- Row 3: Recorder Contact -->
                 <Label text="Recorder Contact:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
                 <TextField fx:id="tfRecorderContact" promptText="Phone or email" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="3" />
             </GridPane>
 
-            <!-- Date Range (non-incident types only) -->
             <HBox fx:id="hboxDateRange" alignment="CENTER_LEFT" managed="false" spacing="12" visible="false">
                 <Label style="-fx-font-weight:bold;" text="Period Covered:" />
                 <DatePicker fx:id="dpStart" promptText="Start Date" />
@@ -98,15 +88,11 @@
                 <DatePicker fx:id="dpEnd" promptText="End Date" />
             </HBox>
 
-            <!-- ══════════════════════════════════════════════════════════════ -->
-            <!-- INCIDENT-ONLY SECTION                                          -->
-            <!-- ══════════════════════════════════════════════════════════════ -->
             <VBox fx:id="vboxIncidentSection" managed="false" spacing="12" visible="false">
 
                 <Separator />
                 <Label style="-fx-font-size:13;-fx-font-weight:bold;-fx-text-fill:#1d9e75;" text="Incident Details" />
 
-                <!-- Date of Incident + Location -->
                 <GridPane hgap="12" vgap="10">
                     <columnConstraints>
                         <ColumnConstraints prefWidth="150" />
@@ -128,7 +114,6 @@
                     <TextArea fx:id="taDescription" prefRowCount="3" promptText="Describe what happened..." wrapText="true" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="1" />
                 </GridPane>
 
-                <!-- Disaster Type Checkboxes -->
                 <Label style="-fx-font-weight:bold;" text="Type of Disaster:" />
                 <FlowPane hgap="14" vgap="8">
                     <CheckBox fx:id="cbFire" text="Fire" />
@@ -148,7 +133,6 @@
                     </HBox>
                 </FlowPane>
 
-                <!-- Insurance -->
                 <HBox alignment="CENTER_LEFT" spacing="14">
                     <Label style="-fx-font-weight:bold;" text="Insurance?" />
                     <RadioButton fx:id="rbInsYes" text="Yes" />
@@ -159,18 +143,12 @@
                     <TextField fx:id="tfInsCoverage" prefWidth="130" promptText="e.g. ₱500,000" />
                 </HBox>
 
-                <!-- ── Damages ─────────────────────────────────────────────── -->
                 <Separator />
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <Label style="-fx-font-size:13;-fx-font-weight:bold;-fx-text-fill:#1d9e75;" text="Damages" />
                     <Region HBox.hgrow="ALWAYS" />
                     <Button onAction="#addDamageRow" style="-fx-font-size:11;-fx-padding:4 12;" styleClass="quick-action-btn" text="+ Add Row" />
                 </HBox>
-                <!--
-                    KEY FIX: fx:id is bound to the ObservableList in the controller
-                    which is pre-seeded with 6 DamageRow objects.
-                    editable="true" is required for TextFieldTableCell to work.
-                -->
                 <TableView fx:id="tblDamages" editable="true" prefHeight="190" style="-fx-border-color:#ddd;-fx-border-radius:4;">
                     <columns>
                         <TableColumn fx:id="colDamage" prefWidth="180" text="Damages" />
@@ -183,7 +161,6 @@
                     </columnResizePolicy>
                 </TableView>
 
-                <!-- ── Injuries ────────────────────────────────────────────── -->
                 <Separator />
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <Label style="-fx-font-size:13;-fx-font-weight:bold;-fx-text-fill:#1d9e75;" text="Injuries" />
@@ -203,11 +180,9 @@
                 </TableView>
 
             </VBox>
-            <!-- END INCIDENT SECTION -->
 
             <Separator />
 
-            <!-- Footer Buttons -->
             <HBox alignment="CENTER_RIGHT" spacing="12">
                 <Button onAction="#handleCancel" prefWidth="120" styleClass="quick-action-btn, qa-danger" text="Cancel" />
                 <Button fx:id="btnGenerate" onAction="#handleGenerate" prefWidth="180" styleClass="quick-action-btn" text="Preview &amp; Generate" />

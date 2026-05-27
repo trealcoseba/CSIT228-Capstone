@@ -13,7 +13,6 @@
                 <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
             </padding>
 
-            <!-- ── Page Header ──────────────────────────────────────────── -->
             <HBox alignment="CENTER_LEFT" spacing="12">
                 <Label styleClass="page-title" text="Reports" />
                 <Region HBox.hgrow="ALWAYS" />
@@ -21,11 +20,6 @@
                 <Button onAction="#generateReport" styleClass="quick-action-btn, qa-warning" text="Generate New Report" />
             </HBox>
 
-            <!-- ── Actions Row ──────────────────────────────────────────── -->
-            <!--
-                filterType ComboBox has been REMOVED per requirement.
-                filterAscOrDesc now handles all sort options (name, generated_by, date).
-            -->
             <HBox alignment="CENTER_LEFT" spacing="12.0">
                 <ComboBox fx:id="filterAscOrDesc" prefWidth="200" promptText="Filter by..." />
                 <Region HBox.hgrow="ALWAYS" />
@@ -36,7 +30,6 @@
                </styleClass></Button>
             </HBox>
 
-            <!-- ── Reports Table ────────────────────────────────────────── -->
             <VBox spacing="12" styleClass="panel-card" VBox.vgrow="ALWAYS">
                 <Label styleClass="panel-title" text="Generated Reports" />
                 <TableView fx:id="reportsTable" VBox.vgrow="ALWAYS">

@@ -10,7 +10,6 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.csit228capstone.controller.reports.ReportPreviewController">
 
-    <!-- ── Toolbar ────────────────────────────────────────────────────────── -->
     <HBox alignment="CENTER_LEFT" spacing="10"
           style="-fx-background-color:#F0F9F5;
                  -fx-border-color:#1D9E75;
@@ -19,15 +18,12 @@
         <Label text="Report Preview"
                style="-fx-font-size:15;-fx-font-weight:bold;-fx-text-fill:#1A2E44;"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <!-- PDF export -->
-        <Button fx:id="btnPdf"  text="⬇  Export PDF"
+        <Button fx:id="btnPdf" text="⬇  Export PDF"
                 styleClass="quick-action-btn, qa-danger"
-                onAction="#handleExportPdf"  prefWidth="140"/>
-        <!-- Word export -->
+                onAction="#handleExportPdf" prefWidth="140"/>
         <Button fx:id="btnWord" text="⬇  Export Word"
                 styleClass="quick-action-btn, qa-navy"
                 onAction="#handleExportWord" prefWidth="140"/>
-        <!-- Close -->
         <Button fx:id="btnClose" text="✕  Close"
                 onAction="#handleClose" prefWidth="90"
                 style="-fx-background-color:#E5E7EB;-fx-text-fill:#374151;
@@ -35,18 +31,15 @@
                        -fx-font-weight:600;"/>
     </HBox>
 
-    <!-- ── Paper area ─────────────────────────────────────────────────────── -->
     <ScrollPane fx:id="scrollPreview" fitToWidth="true" VBox.vgrow="ALWAYS"
                 style="-fx-background-color:#D1D5DB;-fx-background:transparent;">
         <content>
             <HBox alignment="TOP_CENTER" style="-fx-padding:28 0 28 0;">
-                <!-- White paper card -->
                 <VBox fx:id="vboxDocument" spacing="6" prefWidth="700"
                       style="-fx-background-color:white;
                              -fx-padding:44 52 44 52;
                              -fx-effect:dropshadow(gaussian,rgba(0,0,0,0.13),14,0,0,3);
                              -fx-background-radius:3;">
-                    <!-- Populated dynamically by ReportPreviewController -->
                 </VBox>
             </HBox>
         </content>

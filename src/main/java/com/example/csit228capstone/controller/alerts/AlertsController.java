@@ -16,10 +16,10 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import javafx.scene.layout.VBox;           // For VBox
-import javafx.scene.control.Label;         // For Label
-import javafx.scene.shape.SVGPath;         // For SVGPath
-import javafx.geometry.Pos;                // For Pos.CENTER
+import javafx.scene.layout.VBox;
+import javafx.scene.control.Label;
+import javafx.scene.shape.SVGPath;
+import javafx.geometry.Pos;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -50,7 +50,7 @@ public class AlertsController implements Initializable {
     @FXML private ComboBox<String> cmbFilterType;
     @FXML private ComboBox<String> cmbFilterPriority;
 
-    // Holds the raw data from DB
+
     private final ObservableList<Alert> masterData = FXCollections.observableArrayList();
 
     private final AlertsRepository repo = new AlertsRepository();
@@ -60,30 +60,27 @@ public class AlertsController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         setupTable();
-        setupFilters(); // New method
+        setupFilters();
         refresh();
     }
 
     private void setupFilters() {
-        // 1. Populate Filter Dropdowns
         cmbFilterType.getItems().addAll("All Types", "Weather Advisory", "Flood Warning", "Evacuation Order", "Security Alert");
         cmbFilterPriority.getItems().addAll("All Priorities", "CRITICAL", "HIGH", "MEDIUM", "LOW");
 
-        // 2. Add Listeners to trigger filtering when user types or selects
         txtSearch.textProperty().addListener((obs, old, val) -> applyFilters());
         cmbFilterType.valueProperty().addListener((obs, old, val) -> applyFilters());
         cmbFilterPriority.valueProperty().addListener((obs, old, val) -> applyFilters());
     }
 
     private void setupTable() {
-        // 1. Value Factories
+
         colType.setCellValueFactory(new PropertyValueFactory<>("title"));
         colPriority.setCellValueFactory(new PropertyValueFactory<>("priority"));
         colMessage.setCellValueFactory(new PropertyValueFactory<>("body"));
         colSentBy.setCellValueFactory(new PropertyValueFactory<>("sentByName"));
         colSentDate.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
 
-        // Center align "Type" and "Sent By" (Plain Text Columns)
         colType.setCellFactory(tc -> new TableCell<>() {
             @Override protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -100,7 +97,6 @@ public class AlertsController implements Initializable {
             }
         });
 
-        // 2. Priority Badge Factory (Already centered)
         colPriority.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(com.example.csit228capstone.model.alert.AlertPriority item, boolean empty) {
@@ -124,7 +120,6 @@ public class AlertsController implements Initializable {
             }
         });
 
-        // 3. Message Truncation & Tooltip (Centered + Double Click to open)
         colMessage.setCellFactory(column -> new TableCell<>() {
             private final Tooltip tooltip = new Tooltip();
             {
@@ -138,19 +133,19 @@ public class AlertsController implements Initializable {
                 if (empty || item == null) {
                     setText(null);
                     setTooltip(null);
-                    setOnMouseClicked(null); // Clear the click event for empty rows
+                    setOnMouseClicked(null);
                 } else {
                     setText(item);
                     setTextOverrun(OverrunStyle.ELLIPSIS);
                     setAlignment(Pos.CENTER);
 
-                    // Tooltip logic
+
                     tooltip.setText(item);
                     setTooltip(tooltip);
 
-                    // --- NUMBER 2: Double Click Logic ---
+
                     setOnMouseClicked(e -> {
-                        if (e.getClickCount() == 2) { // Detects double-click
+                        if (e.getClickCount() == 2) {
                             javafx.scene.control.Alert alertPopup = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
 
                             if (getTableView().getScene() != null) {
@@ -160,19 +155,16 @@ public class AlertsController implements Initializable {
                             alertPopup.setTitle("Full Message");
                             alertPopup.setHeaderText(null);
                             alertPopup.setContentText(item);
-
-                            // Optional: This makes the popup wider for long messages
                             alertPopup.getDialogPane().setPrefWidth(500);
-
                             alertPopup.showAndWait();
                         }
                     });
-                    // ------------------------------------
+
                 }
             }
         });
 
-        // 4. Date Factory (Centered)
+
         colSentDate.setCellFactory(column -> new TableCell<>() {
             @Override
             protected void updateItem(LocalDateTime item, boolean empty) {
@@ -186,31 +178,30 @@ public class AlertsController implements Initializable {
             }
         });
 
-        // --- EMPTY STATE ILLUSTRATION ---
-        // --- REFINED EMPTY STATE ---
-        VBox emptyState = new VBox(20); // Slightly more spacing
+
+
+        VBox emptyState = new VBox(20);
         emptyState.setAlignment(Pos.CENTER);
 
-// 1. Modern Notification Bell Icon
         javafx.scene.shape.SVGPath emptyIcon = new javafx.scene.shape.SVGPath();
-// Clean, rounded Bell icon path
+
         emptyIcon.setContent("M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0");
         emptyIcon.setScaleX(5.0);
         emptyIcon.setScaleY(5.0);
         emptyIcon.getStyleClass().add("empty-state-icon");
 
-// 2. Main Text (Clean and modern)
+
         Label emptyTitle = new Label("All Quiet Here");
         emptyTitle.getStyleClass().add("empty-state-title");
 
-// 3. Sub-text (Helpful instruction)
+
         Label emptySubtitle = new Label("There are no broadcasts to display right now.\nSent alerts will appear here.");
         emptySubtitle.getStyleClass().add("empty-state-subtitle");
         emptySubtitle.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
 
         emptyState.getChildren().addAll(emptyIcon, emptyTitle, emptySubtitle);
 
-// Set the placeholder
+
         alertsTable.setPlaceholder(emptyState);
         formatTableColumns();
         setupActionColumn();
@@ -219,10 +210,10 @@ public class AlertsController implements Initializable {
     private void formatTableColumns() {
         alertsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        // UI Tip: To center the Header Text as well as the cells:
+
         alertsTable.getColumns().forEach(column -> {
             column.setReorderable(false);
-            // This CSS trick centers the header labels
+
             column.setStyle("-fx-alignment: CENTER;");
         });
 
@@ -329,8 +320,8 @@ public class AlertsController implements Initializable {
     private void loadTableData() {
         try {
             List<Alert> alerts = repo.findAll();
-            masterData.setAll(alerts); // Update the master list
-            applyFilters();            // Apply current filters to the new data
+            masterData.setAll(alerts);
+            applyFilters();
         } catch (SQLException e) {
             showError("Load failed", e);
         }
@@ -360,19 +351,19 @@ public class AlertsController implements Initializable {
         String typeFilter = cmbFilterType.getValue();
         String priorityFilter = cmbFilterPriority.getValue();
 
-        // Make sure <Alert> is included here
+
         FilteredList<Alert> filteredData = new FilteredList<>(masterData, alert -> {
 
-            // 1. Search Filter
+
             boolean matchesSearch = searchText.isEmpty() ||
                     alert.getBody().toLowerCase().contains(searchText) ||
                     (alert.getSentByName() != null && alert.getSentByName().toLowerCase().contains(searchText));
 
-            // 2. Type Filter
+
             boolean matchesType = typeFilter == null || typeFilter.equals("All Types") ||
                     alert.getTitle().equalsIgnoreCase(typeFilter);
 
-            // 3. Priority Filter
+
             boolean matchesPriority = priorityFilter == null || priorityFilter.equals("All Priorities") ||
                     alert.getPriority().name().equalsIgnoreCase(priorityFilter);
 

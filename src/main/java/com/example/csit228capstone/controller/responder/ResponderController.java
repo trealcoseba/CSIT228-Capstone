@@ -17,7 +17,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -33,15 +32,9 @@ import java.util.function.Predicate;
 
 public class ResponderController implements Initializable {
 
-    // ══════════════════════════════════════════════════════════════
-    // FXML — Header
-    // ══════════════════════════════════════════════════════════════
     @FXML private TextField  tfSearch;
     @FXML private TabPane    mainTabPane;
 
-    // ══════════════════════════════════════════════════════════════
-    // FXML — Registry Tab
-    // ══════════════════════════════════════════════════════════════
     @FXML private Label      lblAvailable;
     @FXML private Label      lblTotal;
     @FXML private Label      lblOnMission;
@@ -55,13 +48,10 @@ public class ResponderController implements Initializable {
     @FXML private TableColumn<Responder, String> colName;
     @FXML private TableColumn<Responder, String> colAgency;
     @FXML private TableColumn<Responder, String> colContact;
-    @FXML private TableColumn<Responder, Void>   colDispatches; // custom card
-    @FXML private TableColumn<Responder, Void>   colStatus;     // badge
+    @FXML private TableColumn<Responder, Void>   colDispatches;
+    @FXML private TableColumn<Responder, Void>   colStatus;
     @FXML private TableColumn<Responder, Void>   colAction;
 
-    // ══════════════════════════════════════════════════════════════
-    // FXML — Mission Log Tab
-    // ══════════════════════════════════════════════════════════════
     @FXML private Label      lblTotalMissions;
     @FXML private Label      lblActiveMissions;
     @FXML private Label      lblCompletedMissions;
@@ -82,9 +72,6 @@ public class ResponderController implements Initializable {
     @FXML private TableColumn<DispatchedResponder, Void>   colMissionStatus;
     @FXML private TableColumn<DispatchedResponder, Void>   colDispatchActions;
 
-    // ══════════════════════════════════════════════════════════════
-    // State
-    // ══════════════════════════════════════════════════════════════
     private final ResponderRepository           responderRepo  = new ResponderRepository();
     private final DispatchedResponderRepository dispatchRepo   = new DispatchedResponderRepository();
 
@@ -94,12 +81,7 @@ public class ResponderController implements Initializable {
     private ObservableList<DispatchedResponder> missionList    = FXCollections.observableArrayList();
     private FilteredList<DispatchedResponder>   filteredMissions;
 
-    /** When non-null, Mission Log is filtered to this responder */
     private UUID missionFilterResponderId = null;
-
-    // ══════════════════════════════════════════════════════════════
-    // Initialise
-    // ══════════════════════════════════════════════════════════════
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -112,15 +94,10 @@ public class ResponderController implements Initializable {
         formatTable();
     }
 
-    // ══════════════════════════════════════════════════════════════
-    // DATA LOADING
-    // ══════════════════════════════════════════════════════════════
-
     private void loadAll() {
         loadResponders();
         loadMissions();
 
-        // Click on empty row area to deselect
         tblDispatched.setRowFactory(tv -> {
             TableRow<DispatchedResponder> row = new TableRow<>();
             row.setOnMouseClicked(e -> {
@@ -159,10 +136,6 @@ public class ResponderController implements Initializable {
         }
     }
 
-    // ══════════════════════════════════════════════════════════════
-    // KPI UPDATES
-    // ══════════════════════════════════════════════════════════════
-
     private void updateRegistryKPIs(List<Responder> all) {
         long available = all.stream()
                 .filter(r -> "available".equalsIgnoreCase(r.getStatus()))
@@ -184,10 +157,6 @@ public class ResponderController implements Initializable {
         lblCompletedMissions.setText(String.valueOf(completed));
     }
 
-    // ══════════════════════════════════════════════════════════════
-    // REGISTRY TABLE SETUP
-    // ══════════════════════════════════════════════════════════════
-
     private void setupRegistryTable() {
         colId.setCellValueFactory(c ->
                 new SimpleStringProperty(c.getValue().getShortId()));
@@ -201,7 +170,6 @@ public class ResponderController implements Initializable {
         colContact.setCellValueFactory(c ->
                 new SimpleStringProperty(c.getValue().getContact()));
 
-        // ── DISPATCH CARD COLUMN ──────────────────────────────────────────────────
         colDispatches.setCellFactory(col -> new TableCell<>() {
 
 
@@ -302,10 +270,10 @@ public class ResponderController implements Initializable {
 
         colStatus.setCellFactory(col -> new TableCell<>() {
             private final Label badge = new Label();
-            private final HBox  box   = new HBox(badge); // ← wrap in HBox
+            private final HBox  box   = new HBox(badge);
 
             {
-                box.setAlignment(Pos.CENTER); // ← center here, not on the cell
+                box.setAlignment(Pos.CENTER);
             }
 
             @Override
@@ -338,7 +306,7 @@ public class ResponderController implements Initializable {
                 );
 
                 setStyle("-fx-background-color: transparent;");
-                setGraphic(box); // ← set the HBox, not the bare badge
+                setGraphic(box);
             }
         });
 
@@ -406,29 +374,9 @@ public class ResponderController implements Initializable {
             }
         });
 
-        // Wrap in FilteredList
         filteredResponders = new FilteredList<>(responderList, p -> true);
         tblResponders.setItems(filteredResponders);
-
-
     }
-
-    private void styleActionButton(Button btn, String bg, String fg) {
-        btn.setStyle(
-                "-fx-background-color: " + bg + ";" +
-                        "-fx-text-fill: " + fg + ";" +
-                        "-fx-border-color: " + fg + ";" +
-                        "-fx-border-radius: 5;" +
-                        "-fx-background-radius: 5;" +
-                        "-fx-font-size: 11px;" +
-                        "-fx-cursor: hand;" +
-                        "-fx-padding: 3 7;"
-        );
-    }
-
-    // ══════════════════════════════════════════════════════════════
-    // MISSION LOG TABLE SETUP
-    // ══════════════════════════════════════════════════════════════
 
     private void setupMissionTable() {
         colDispatchId.setCellValueFactory(c ->
@@ -452,7 +400,6 @@ public class ResponderController implements Initializable {
         colDuration.setCellValueFactory(c ->
                 new SimpleStringProperty(c.getValue().getDurationLabel()));
 
-        // ── STATUS BADGE ──────────────────────────────────────────────────────────
         colMissionStatus.setCellFactory(col -> new TableCell<>() {
             private final Label badge = new Label();
             {
@@ -486,12 +433,11 @@ public class ResponderController implements Initializable {
             }
         });
 
-        // ── OPERATIONS COLUMN ─────────────────────────────────────────────────────
         colDispatchActions.setCellFactory(col -> new TableCell<>() {
             private final Button btnReturn  = new Button("Return");
             private final Button btnCancel  = new Button("Cancel");
-            private final Button btnDelete  = new Button("Delete");                          // ✅ new
-            private final HBox   box        = new HBox(6, btnReturn, btnCancel, btnDelete); // ✅ added
+            private final Button btnDelete  = new Button("Delete");
+            private final HBox   box        = new HBox(6, btnReturn, btnCancel, btnDelete);
 
             {
                 box.setAlignment(Pos.CENTER);
@@ -513,7 +459,6 @@ public class ResponderController implements Initializable {
             -fx-cursor: hand;
             """);
 
-                // ✅ Style for delete button
                 btnDelete.setStyle("""
             -fx-background-color: #4b1c1c;
             -fx-text-fill: #ff6b6b;
@@ -533,7 +478,6 @@ public class ResponderController implements Initializable {
                     updateMissionStatus(dr, "cancelled");
                 });
 
-                // ✅ Delete action
                 btnDelete.setOnAction(e -> {
                     DispatchedResponder dr = getTableView().getItems().get(getIndex());
                     confirmDeleteMission(dr);
@@ -560,17 +504,12 @@ public class ResponderController implements Initializable {
         filteredMissions = new FilteredList<>(missionList, p -> true);
         tblDispatched.setItems(filteredMissions);
 
-        // At the end, after filteredMissions setup
         tblDispatched.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
                 Platform.runLater(() -> tblDispatched.getSelectionModel().clearSelection());
             }
         });
     }
-
-    // ══════════════════════════════════════════════════════════════
-    // FILTER SETUP
-    // ══════════════════════════════════════════════════════════════
 
     private void setupRegistryFilters() {
         filterStatus.setItems(FXCollections.observableArrayList(
@@ -581,7 +520,6 @@ public class ResponderController implements Initializable {
                 "Name (A–Z)", "Name (Z–A)", "Most Missions", "Least Missions"));
         sortOrder.getSelectionModel().select("Name (A–Z)");
 
-        // Apply filter on any change
         filterAgency.setOnAction(e -> applyRegistryFilter());
         filterStatus.setOnAction(e -> applyRegistryFilter());
         sortOrder.setOnAction(e -> applyRegistrySort());
@@ -607,8 +545,6 @@ public class ResponderController implements Initializable {
             applyMissionFilter();
         });
     }
-
-    // ─── Apply registry filter ─────────────────────────────────────────────────
 
     private void applyRegistryFilter() {
         String search = tfSearch.getText() == null ? "" : tfSearch.getText().toLowerCase();
@@ -645,8 +581,6 @@ public class ResponderController implements Initializable {
         }
         responderList.setAll(sorted);
     }
-
-    // ─── Apply mission filter ─────────────────────────────────────────────────
 
     private void applyMissionFilter() {
         String search   = tfSearch.getText() == null ? "" : tfSearch.getText().toLowerCase();
@@ -688,14 +622,6 @@ public class ResponderController implements Initializable {
         filterAgency.setValue(current);
     }
 
-    // ══════════════════════════════════════════════════════════════
-    // DISPATCH CARD → JUMP TO MISSION LOG
-    // ══════════════════════════════════════════════════════════════
-
-    /**
-     * Called when clicking a responder's dispatch-card in the Registry table.
-     * Switches to Mission Log tab and highlights rows for that responder.
-     */
     private void jumpToMissionLog(Responder r) {
         missionFilterResponderId = r.getId();
 
@@ -712,7 +638,7 @@ public class ResponderController implements Initializable {
                 protected void updateItem(DispatchedResponder item, boolean empty) {
                     super.updateItem(item, empty);
                     if (item != null && r.getId().equals(item.getResponderId())) {
-                        setStyle("-fx-background-color: #aac8f0;"); // dark blue fits dark theme better
+                        setStyle("-fx-background-color: #aac8f0;");
                     } else {
                         setStyle("");
                     }
@@ -721,10 +647,6 @@ public class ResponderController implements Initializable {
             tblDispatched.refresh();
         });
     }
-
-    // ══════════════════════════════════════════════════════════════
-    // FORM DIALOGS
-    // ══════════════════════════════════════════════════════════════
 
     @FXML
     public void handleRegisterResponder(ActionEvent event) {
@@ -778,7 +700,6 @@ public class ResponderController implements Initializable {
 
             Stage stage = new Stage();
 
-            // FIX: Set Owner and prevent full screen
             if (mainTabPane.getScene() != null) {
                 stage.initOwner(mainTabPane.getScene().getWindow());
             }
@@ -787,7 +708,6 @@ public class ResponderController implements Initializable {
             stage.setScene(new Scene(root));
             stage.initModality(Modality.APPLICATION_MODAL);
 
-            // FIX: Force floating window behavior
             stage.setResizable(false);
             stage.setFullScreen(false);
 
@@ -797,10 +717,6 @@ public class ResponderController implements Initializable {
             showError("Could not open dispatch form: " + ex.getMessage());
         }
     }
-
-    // ══════════════════════════════════════════════════════════════
-    // DELETE / STATUS UPDATES
-    // ══════════════════════════════════════════════════════════════
 
     private void confirmDelete(Responder r) {
         String warningLine = r.getTotalDispatches() > 0
@@ -813,7 +729,6 @@ public class ResponderController implements Initializable {
                 ButtonType.YES, ButtonType.CANCEL
         );
 
-        // FIX: Set Owner
         if (mainTabPane.getScene() != null) {
             alert.initOwner(mainTabPane.getScene().getWindow());
         }
@@ -835,7 +750,6 @@ public class ResponderController implements Initializable {
         try {
             dispatchRepo.updateStatus(dr.getId(), newStatus);
 
-            // If returned/cancelled → check if responder has any remaining active dispatches
             if ("returned".equals(newStatus) || "cancelled".equals(newStatus)) {
                 List<DispatchedResponder> active = dispatchRepo.findByResponderId(dr.getResponderId())
                         .stream().filter(d -> "dispatched".equals(d.getStatus())).toList();
@@ -848,10 +762,6 @@ public class ResponderController implements Initializable {
             showError("Failed to update mission: " + ex.getMessage());
         }
     }
-
-    // ══════════════════════════════════════════════════════════════
-    // CLEAR FILTERS
-    // ══════════════════════════════════════════════════════════════
 
     @FXML
     public void clearRegistryFilters(ActionEvent event) {
@@ -872,25 +782,14 @@ public class ResponderController implements Initializable {
         filterMissionIncident.getSelectionModel().select(null);
         tfSearch.clear();
 
-        // Reset row highlighting
         tblDispatched.setRowFactory(null);
         tblDispatched.refresh();
         applyMissionFilter();
     }
 
-    // ══════════════════════════════════════════════════════════════
-    // HELPERS
-    // ══════════════════════════════════════════════════════════════
-
-    @FXML
-    public void clearDispatchFilters(ActionEvent event) {
-        clearMissionFilters(event);
-    }
-
     private void showError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
 
-        // FIX: Set Owner
         if (mainTabPane.getScene() != null) {
             alert.initOwner(mainTabPane.getScene().getWindow());
         }
@@ -899,8 +798,6 @@ public class ResponderController implements Initializable {
     }
 
     private void formatTable() {
-        // ── REGISTRY TABLE PERCENTAGES ──────────────────────────────────────────
-        // Total should equal 1.0 (100%)
         colId.prefWidthProperty().bind(tblResponders.widthProperty().multiply(0.08));
         colName.prefWidthProperty().bind(tblResponders.widthProperty().multiply(0.15));
         colAgency.prefWidthProperty().bind(tblResponders.widthProperty().multiply(0.10));
@@ -909,16 +806,13 @@ public class ResponderController implements Initializable {
         colStatus.prefWidthProperty().bind(tblResponders.widthProperty().multiply(0.10));
         colAction.prefWidthProperty().bind(tblResponders.widthProperty().multiply(0.20));
 
-        // Apply constraints to Registry Columns
         for (TableColumn<Responder, ?> col : List.of(
                 colId, colName, colAgency, colContact, colDispatches, colStatus, colAction)) {
             col.setResizable(false);
             col.setReorderable(false);
-            // Style alignment handled here
             col.setStyle("-fx-alignment: CENTER;");
         }
 
-        // ── MISSION LOG TABLE PERCENTAGES ────────────────────────────────────────
         colDispatchId.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.08));
         colDispatchName.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.14));
         colIncidentId.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.08));
@@ -929,7 +823,6 @@ public class ResponderController implements Initializable {
         colMissionStatus.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.10));
         colDispatchActions.prefWidthProperty().bind(tblDispatched.widthProperty().multiply(0.21));
 
-        // Apply constraints to Mission Log Columns
         for (TableColumn<DispatchedResponder, ?> col : List.of(
                 colDispatchId, colDispatchName, colIncidentId, colSeverity,
                 colLocation, colDispatchTime, colDuration, colMissionStatus, colDispatchActions)) {

@@ -18,7 +18,6 @@
         <VBox fillWidth="true" spacing="16">
             <padding><Insets bottom="16" left="16" right="16" top="16"/></padding>
 
-            <!-- Header -->
             <HBox alignment="CENTER_LEFT" spacing="12">
                 <Label styleClass="page-title" text="Broadcasts"/>
                 <Region HBox.hgrow="ALWAYS"/>
@@ -27,9 +26,7 @@
                         text="Create Broadcast"/>
             </HBox>
 
-            <!-- KPI Cards -->
             <HBox spacing="16">
-                <!-- Broadcasts Card -->
                 <StackPane prefHeight="106" prefWidth="250" styleClass="kpi-card, kpi-info" HBox.hgrow="ALWAYS">
                     <VBox alignment="CENTER_LEFT" spacing="5">
                         <padding><Insets left="20"/></padding>
@@ -37,7 +34,6 @@
                         <Label fx:id="lblBroadcasts" styleClass="kpi-value" text="0"/>
                     </VBox>
 
-                    <!-- Icon moved to TOP_RIGHT and made slightly smaller for the corner -->
                     <SVGPath content="M21 7L21 14M12 21L14 21C15.1046 21 16 20.1046 16 19L16 16M3 9H7L12 4V20L7 15H3C2.44772 15 2 14.5523 2 14V10C2 9.44772 2.44772 9 3 9Z"
                              scaleX="1.8" scaleY="1.8" styleClass="kpi-icon, icon-broadcast"
                              StackPane.alignment="TOP_RIGHT">
@@ -45,7 +41,6 @@
                     </SVGPath>
                 </StackPane>
 
-                <!-- Scheduled Card -->
                 <StackPane prefHeight="106" prefWidth="250" styleClass="kpi-card, kpi-warning" HBox.hgrow="ALWAYS">
                     <VBox alignment="CENTER_LEFT" spacing="5">
                         <padding><Insets left="20"/></padding>
@@ -53,7 +48,6 @@
                         <Label fx:id="lblScheduled" styleClass="kpi-value" text="0"/>
                     </VBox>
 
-                    <!-- Icon moved to TOP_RIGHT -->
                     <SVGPath content="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
                              scaleX="1.8" scaleY="1.8" styleClass="kpi-icon, icon-scheduled"
                              StackPane.alignment="TOP_RIGHT">
@@ -64,7 +58,6 @@
                 <Region prefWidth="200" HBox.hgrow="ALWAYS"/>
             </HBox>
 
-            <!-- Search & Filter Bar -->
             <HBox spacing="12" alignment="CENTER_LEFT" styleClass="panel-card" style="-fx-padding: 10 16;">
                 <TextField fx:id="txtSearch" prefWidth="300" promptText="Search by message or sender..." styleClass="search-field" />
 
@@ -75,7 +68,6 @@
                 <Button onAction="#handleClearFilters" styleClass="quick-action-btn" text="Clear" />
             </HBox>
 
-            <!-- Table -->
             <HBox spacing="16" VBox.vgrow="ALWAYS">
                 <VBox spacing="12" styleClass="panel-card" HBox.hgrow="ALWAYS">
                     <Label styleClass="panel-title" text="Recent Alerts &amp; Broadcasts"/>

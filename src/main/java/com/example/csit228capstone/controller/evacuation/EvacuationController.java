@@ -34,7 +34,6 @@ public class EvacuationController {
 
     @FXML private Label lblTotalEvacuees;
     @FXML private Label lblCentersActive;
-
     @FXML private TableColumn<EvacuationCenter, String> colAddress;
     @FXML private WebView mapWebView;
     @FXML private TableView<EvacuationCenter> centersTable;
@@ -61,10 +60,6 @@ public class EvacuationController {
 
     private final EvacuationService service = EvacuationService.getInstance();
 
-    // -------------------------------------------------------------------------
-    // Initialization
-    // -------------------------------------------------------------------------
-
     @FXML
     public void initialize() {
         setUpMap();
@@ -73,24 +68,14 @@ public class EvacuationController {
         setUpTables();
     }
 
-    // -------------------------------------------------------------------------
-    // Refresh Logic
-    // -------------------------------------------------------------------------
-
     @FXML
     private void handleRefresh(ActionEvent event) {
-        // Reset Filter UI
         tfSearch.clear();
         filterStatus.setValue("All");
         filterAscOrDesc.setValue("Name A→Z");
 
-        // Reload fresh data from database/service
         loadCentersData();
     }
-
-    // -------------------------------------------------------------------------
-    // Add / Activate
-    // -------------------------------------------------------------------------
 
     @FXML
     private void addCenter(ActionEvent event) {
@@ -100,7 +85,6 @@ public class EvacuationController {
             Parent root = loader.load();
             Stage stage = new Stage();
 
-            // FIX: Set Owner to prevent the dialog from inheriting full-screen state
             if (centersTable.getScene() != null) {
                 stage.initOwner(centersTable.getScene().getWindow());
             }
@@ -109,7 +93,6 @@ public class EvacuationController {
             stage.setTitle("Add Center");
             stage.setScene(new Scene(root));
 
-            // FIX: Disable resizing and force full-screen off
             stage.setResizable(false);
             stage.setFullScreen(false);
 
@@ -119,15 +102,6 @@ public class EvacuationController {
             e.printStackTrace();
         }
     }
-
-    @FXML
-    public void activateEvacuation(ActionEvent actionEvent) {
-        System.out.println("Evacuation activated");
-    }
-
-    // -------------------------------------------------------------------------
-    // Table setup
-    // -------------------------------------------------------------------------
 
     private void setUpTables() {
         formatTables();
@@ -143,10 +117,6 @@ public class EvacuationController {
         loadCentersData();
         centersTable.setEditable(false);
     }
-
-    // -------------------------------------------------------------------------
-    // Map
-    // -------------------------------------------------------------------------
 
     private void setUpMap() {
         if (mapWebView == null) return;
@@ -219,10 +189,6 @@ public class EvacuationController {
             e.printStackTrace();
         }
     }
-
-    // -------------------------------------------------------------------------
-    // Centers list (sidebar)
-    // -------------------------------------------------------------------------
 
     private void setupCentersList() {
         centersList.setCellFactory(lv -> new ListCell<>() {
@@ -300,10 +266,6 @@ public class EvacuationController {
         });
     }
 
-    // -------------------------------------------------------------------------
-    // Edit / Delete / Manage dialogs
-    // -------------------------------------------------------------------------
-
     private void openEditForm(EvacuationCenter center) {
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -315,7 +277,6 @@ public class EvacuationController {
 
             Stage stage = new Stage();
 
-            // FIX: Set Owner
             if (centersTable.getScene() != null) {
                 stage.initOwner(centersTable.getScene().getWindow());
             }
@@ -324,7 +285,6 @@ public class EvacuationController {
             stage.setTitle("Edit Center");
             stage.setScene(new Scene(root));
 
-            // FIX: Disable resizing and force full-screen off
             stage.setResizable(false);
             stage.setFullScreen(false);
 
@@ -338,7 +298,6 @@ public class EvacuationController {
     private void confirmAndDelete(EvacuationCenter center) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
 
-        // FIX: Set the owner so the alert stays on top in full-screen mode
         if (centersTable.getScene() != null && centersTable.getScene().getWindow() != null) {
             confirm.initOwner(centersTable.getScene().getWindow());
         }
@@ -353,7 +312,6 @@ public class EvacuationController {
                     service.deleteCenter(center.getId());
                     loadCentersData();
                 } catch (Exception e) {
-                    // If deletion fails, show an error alert (also with an owner)
                     Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Delete failed: " + e.getMessage());
                     if (centersTable.getScene() != null) errorAlert.initOwner(centersTable.getScene().getWindow());
                     errorAlert.show();
@@ -404,10 +362,6 @@ public class EvacuationController {
             }
         });
     }
-
-    // -------------------------------------------------------------------------
-    // Filters & sort
-    // -------------------------------------------------------------------------
 
     private void setupFiltersAndSearch() {
         filterStatus.getItems().setAll("All", "Available", "Full", "Inactive");
@@ -474,10 +428,6 @@ public class EvacuationController {
 
         sortedData.setComparator(comparator);
     }
-
-    // -------------------------------------------------------------------------
-    // Action buttons (table column)
-    // -------------------------------------------------------------------------
 
     private void setupActionButtons() {
         colActions.setCellFactory(new Callback<>() {
@@ -550,10 +500,6 @@ public class EvacuationController {
         });
     }
 
-    // -------------------------------------------------------------------------
-    // Data loading & stats
-    // -------------------------------------------------------------------------
-
     private void loadCentersData() {
         centersData.clear();
         try {
@@ -575,24 +521,6 @@ public class EvacuationController {
 
         lblCentersActive.setText(String.valueOf(service.getTotalActiveCenters(centersData)));
     }
-
-    // -------------------------------------------------------------------------
-    // Public accessors for the Dashboard
-    // -------------------------------------------------------------------------
-
-
-    public int getTotalEvacuees() {
-        try { return service.getTotalEvacuees(); } catch (Exception e) { e.printStackTrace(); return 0; }
-    }
-
-
-    public long getTotalActiveCenters() {
-        return service.getTotalActiveCenters(centersData);
-    }
-
-    // -------------------------------------------------------------------------
-    // UI helpers
-    // -------------------------------------------------------------------------
 
     private void applyCardStyle(HBox card, Label lblName, Label lblAddress,
                                 Label lblAvailable, Label lblEvacuees, boolean selected) {
@@ -620,18 +548,15 @@ public class EvacuationController {
     }
 
     private void formatTables() {
-        // Total should add up to 1.0 (100%)
-        // Adjust these percentages if you want specific columns to be wider/narrower
-        colName.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.15));      // 15%
-        colAddress.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.20));   // 20%
-        colManager.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.12));   // 12%
-        colContact.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.12));   // 12%
-        colCapacity.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.08));  // 8%
-        colOccupancy.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.08)); // 8%
-        colStatus.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.10));    // 10%
-        colActions.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.25));   // 15%
+        colName.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.15));
+        colAddress.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.20));
+        colManager.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.12));
+        colContact.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.12));
+        colCapacity.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.08));
+        colOccupancy.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.08));
+        colStatus.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.10));
+        colActions.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.25));
 
-        // Apply constraints and alignment to all columns
         for (TableColumn<EvacuationCenter, ?> col : List.of(
                 colName, colAddress, colCapacity, colOccupancy,
                 colStatus, colManager, colContact, colActions)) {
@@ -639,7 +564,6 @@ public class EvacuationController {
             col.setResizable(false);
             col.setReorderable(false);
 
-            // This ensures text is centered within the column
             col.setStyle("-fx-alignment: CENTER;");
         }
     }
