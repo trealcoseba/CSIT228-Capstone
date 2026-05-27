@@ -91,13 +91,6 @@ At the barangay level, disaster response is often reactive — fragmented record
 - Visual charts and statistics on incidents by type, resource levels, resident demographics, and evacuation data
 - Month-over-month incident comparisons pulled directly from the database
 
-### AI Chatbot (LIGTAS-AI)
-- Resident-facing chatbot powered by the **Anthropic Claude API**
-- Handles document request inquiries, general barangay service questions, and emergency guidance
-- Responds in Filipino or English based on the resident's message
-- Automatically detects emergency keywords (fire, flood, rescue, baha, sunog, tulong, bagyo, lindol, etc.) and auto-creates a draft incident for admin review
-- Full session and message history stored in the database
-
 ### Settings
 - User account and system configuration management
 
