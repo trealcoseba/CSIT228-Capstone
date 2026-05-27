@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefHeight="800.0" prefWidth="1100.0" spacing="16" styleClass="root-pane" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.responder.ResponderController">
+    <padding><Insets topRightBottomLeft="16" /></padding>
+
+    <!-- ══════════════ HEADER ══════════════ -->
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <VBox>
+            <Label styleClass="page-title" text="Responder Management" />
+            <Label style="-fx-text-fill: #6b7280; -fx-font-size: 12px;" text="Manage personnel and track mission history." />
+        </VBox>
+        <Region HBox.hgrow="ALWAYS" />
+        <TextField fx:id="tfSearch" prefWidth="260" promptText="🔍 Search by name or ID…" styleClass="search-field" />
+        <Button onAction="#handleRegisterResponder" styleClass="quick-action-btn" text="➕ Add Responder" />
+    </HBox>
+
+    <!-- ══════════════ TABS ══════════════ -->
+    <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+
+        <!-- ─────────────── TAB 1 : RESPONDER REGISTRY ─────────────── -->
+        <Tab text="Responders Registry">
+            <VBox spacing="16" style="-fx-padding: 16 0 0 0;">
+
+                <!-- KPI Row -->
+                <HBox spacing="16">
+                    <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label styleClass="kpi-label" text="Available Personnel" />
+                        <Label fx:id="lblAvailable" styleClass="kpi-value" text="0" />
+                    </VBox>
+                    <VBox styleClass="kpi-card, kpi-info" HBox.hgrow="ALWAYS">
+                        <Label styleClass="kpi-label" text="Total Strength" />
+                        <Label fx:id="lblTotal" styleClass="kpi-value" text="0" />
+                    </VBox>
+                    <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label styleClass="kpi-label" text="On Mission" />
+                        <Label fx:id="lblOnMission" styleClass="kpi-value" text="0" />
+                    </VBox>
+                </HBox>
+
+                <!-- Filter Row -->
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <ComboBox fx:id="filterAgency" prefWidth="160" promptText="Agency (BFP, PNP…)" />
+                    <ComboBox fx:id="filterStatus" prefWidth="140" promptText="Status" />
+                    <ComboBox fx:id="sortOrder" prefWidth="140" promptText="Sort By" />
+                    <Button onAction="#clearRegistryFilters" styleClass="btn-outline" text="Clear Filters" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <!-- Legend -->
+                    <HBox alignment="CENTER_RIGHT" spacing="10">
+                        <Label style="-fx-text-fill: #00ff88; -fx-font-size: 10px;" text="● Available" />
+                        <Label style="-fx-text-fill: #ffb300; -fx-font-size: 10px;" text="● On Mission" />
+                        <Label style="-fx-text-fill: #6b7280; -fx-font-size: 10px;" text="● Off Duty" />
+                    </HBox>
+                </HBox>
+
+                <!-- Table -->
+                <VBox spacing="12" styleClass="panel-card" VBox.vgrow="ALWAYS">
+                    <Label styleClass="panel-title" text="Personnel Registry" />
+                    <TableView fx:id="tblResponders" styleClass="incident-table" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colId" prefWidth="90" text="ID" />
+                            <TableColumn fx:id="colName" prefWidth="190" text="Team Name" />
+                            <TableColumn fx:id="colAgency" prefWidth="130" text="Agency" />
+                            <TableColumn fx:id="colContact" prefWidth="130" text="Contact" />
+                           
+                            <TableColumn fx:id="colDispatches" prefWidth="140" text="Missions" />
+                            <TableColumn fx:id="colStatus" prefWidth="130" text="Status" />
+                            <TableColumn fx:id="colAction" prefWidth="160" text="Actions" />
+                        </columns>
+                        <placeholder>
+                            <Label style="-fx-text-fill: #4b5563;" text="No responders found." />
+                        </placeholder>
+                    </TableView>
+                </VBox>
+
+            </VBox>
+        </Tab>
+
+        <!-- ─────────────── TAB 2 : MISSION LOG ─────────────── -->
+        <Tab text="Mission Log">
+            <VBox spacing="16" style="-fx-padding: 16 0 0 0;">
+
+                <!-- Mission KPIs -->
+                <HBox spacing="16">
+                    <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                        <Label styleClass="kpi-label" text="Total Missions" />
+                        <Label fx:id="lblTotalMissions" styleClass="kpi-value" text="0" />
+                    </VBox>
+                    <VBox styleClass="kpi-card, kpi-warn" HBox.hgrow="ALWAYS">
+                        <Label styleClass="kpi-label" text="Active / Dispatched" />
+                        <Label fx:id="lblActiveMissions" styleClass="kpi-value" text="0" />
+                    </VBox>
+                    <VBox styleClass="kpi-card, kpi-info" HBox.hgrow="ALWAYS">
+                        <Label styleClass="kpi-label" text="Completed" />
+                        <Label fx:id="lblCompletedMissions" styleClass="kpi-value" text="0" />
+                    </VBox>
+                </HBox>
+
+                <!-- Filter Row for Mission Log -->
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <!-- highlight banner when filtered by a responder from Registry -->
+                    <Label fx:id="lblMissionFilter" managed="false" style="-fx-text-fill: #60a5fa; -fx-font-size: 11px; -fx-font-weight: bold;" text="" visible="false" />
+                    <ComboBox fx:id="filterMissionStatus" prefWidth="150" promptText="Mission Status" />
+                    <ComboBox fx:id="filterMissionSeverity" prefWidth="140" promptText="Severity" />
+                    <ComboBox fx:id="filterMissionIncident" prefWidth="190" promptText="Incident ID" />
+                    <Button onAction="#clearMissionFilters" styleClass="btn-outline" text="Reset Filters / Refresh" />
+                    <Button fx:id="btnNewDispatch" onAction="#handleNewDispatch" styleClass="quick-action-btn" text=" Log Dispatch" />
+                </HBox>
+
+                <!-- Mission Table -->
+                <VBox spacing="12" styleClass="panel-card" VBox.vgrow="ALWAYS">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label styleClass="panel-title" text="Mission Log" />
+                    </HBox>
+
+                    <TableView fx:id="tblDispatched" styleClass="incident-table" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colDispatchId" prefWidth="90" text="Mission ID" />
+                            <TableColumn fx:id="colDispatchName" prefWidth="170" text="Responder" />
+                            <TableColumn fx:id="colIncidentId" prefWidth="120" text="Incident" />
+                            <TableColumn fx:id="colSeverity" prefWidth="100" text="Severity" />
+                            <TableColumn fx:id="colLocation" prefWidth="170" text="Site (lat, lng)" />
+                            <TableColumn fx:id="colDispatchTime" prefWidth="155" text="Dispatched At" />
+                            <TableColumn fx:id="colDuration" prefWidth="100" text="Duration" />
+                            <TableColumn fx:id="colMissionStatus" prefWidth="110" text="Status" />
+                            <TableColumn fx:id="colDispatchActions" prefWidth="150" text="Operations" />
+                        </columns>
+                        <placeholder>
+                            <Label style="-fx-text-fill: #4b5563;" text="No missions logged yet." />
+                        </placeholder>
+                    </TableView>
+                </VBox>
+
+            </VBox>
+        </Tab>
+
+    </TabPane>
+</VBox>

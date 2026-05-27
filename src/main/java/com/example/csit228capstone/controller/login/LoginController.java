@@ -1,6 +1,7 @@
 package com.example.csit228capstone.controller.login;
 
 import com.example.csit228capstone.repository.UserRepository;
+import com.example.csit228capstone.util.SessionManager;
 import com.example.csit228capstone.util.SupabaseConnectionManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -9,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -23,6 +25,7 @@ public class LoginController {
 
     @FXML private TextField tfUsername;
     @FXML private PasswordField tfPassword;
+    @FXML private Button btnLogin;
     private final UserRepository repository = new UserRepository();
 
     @FXML
@@ -36,17 +39,26 @@ public class LoginController {
     }
 
     @FXML
+    private void handleFirstTF() {
+        tfPassword.requestFocus();
+    }
+
+    @FXML
+    private void handleSecondTF() {
+        btnLogin.fire();
+    }
+
+    @FXML
     public void handleLogin(ActionEvent actionEvent) {
         String username = tfUsername.getText();
         String password = tfPassword.getText();
 
         if(repository.authenticate(username, password)) {
+            SessionManager.getInstance().setLoggedInUsername(username);
             navigateToDashboard(actionEvent);
         } else {
             showError("Login Failed", "Invalid username or password.");
         }
-
-
 
     }
 
@@ -54,10 +66,13 @@ public class LoginController {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("/com/example/csit228capstone/mainlayout/MainLayout.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("LIGTAS-Brgy");
-            stage.centerOnScreen();
-            stage.show();
+
+            stage.setFullScreenExitHint("");
+
+            stage.getScene().setRoot(root);
+            
+            stage.setFullScreen(true);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -65,6 +80,11 @@ public class LoginController {
 
     private void showError(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+
+        if (btnLogin.getScene() != null && btnLogin.getScene().getWindow() != null) {
+            alert.initOwner(btnLogin.getScene().getWindow());
+        }
+
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);

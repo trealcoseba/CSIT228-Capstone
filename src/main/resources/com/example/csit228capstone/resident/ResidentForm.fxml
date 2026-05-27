@@ -12,7 +12,7 @@
     <Label fx:id="lblTitle" style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="Resident Registration" />
     <Separator />
 
-    <GridPane hgap="20" vgap="19.0" >
+    <GridPane hgap="20" vgap="19.0">
         <columnConstraints>
             <ColumnConstraints minWidth="100" />
             <ColumnConstraints hgrow="ALWAYS" />
@@ -48,20 +48,18 @@
         <Label text="Resident Photo:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
         <HBox alignment="CENTER_LEFT" spacing="15" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="4">
             <!-- Preview Circle -->
-            <StackPane prefHeight="120.0" prefWidth="120.0"
-                       alignment="CENTER" style="-fx-border-color: #ddd; -fx-border-radius: 50; -fx-background-radius: 50;">
+            <StackPane alignment="CENTER" prefHeight="120.0" prefWidth="120.0" style="-fx-border-color: #ddd; -fx-border-radius: 50; -fx-background-radius: 50;">
                 <clip>
-                    <javafx.scene.shape.Circle fx:id="imgClip" centerX="60" centerY="60" radius="60"/>
+                    <javafx.scene.shape.Circle fx:id="imgClip" centerX="60" centerY="60" radius="60" />
                 </clip>
-                <ImageView fx:id="ivAvatar" fitWidth="120.0" fitHeight="120.0" preserveRatio="false" pickOnBounds="true" StackPane.alignment="CENTER">
-                    <Image url="@../../../../images/default-avatar.jpg"/>
+                <ImageView fx:id="ivAvatar" fitHeight="120.0" fitWidth="120.0" pickOnBounds="true" preserveRatio="false" StackPane.alignment="CENTER">
+                    <Image url="@../../../../images/default-avatar.jpg" />
                 </ImageView>
 
             </StackPane>
             <VBox spacing="8">
                 <HBox spacing="10">
                     <Button onAction="#handleChooseFile" styleClass="quick-action-btn, qa-warning" text="Choose File" />
-                    <Button onAction="#handleTakePhoto" styleClass="quick-action-btn, qa-warning" text="Take Photo" />
                     <Button onAction="#handleDeletePhoto" styleClass="quick-action-btn, qa-danger" text="Clear Photo" />
                     <padding>
                         <Insets top="15.0" />
@@ -111,4 +109,3 @@
         <Button onAction="#handleSave" prefWidth="150" styleClass="quick-action-btn" text="Save Resident" />
     </HBox>
 </VBox>
-

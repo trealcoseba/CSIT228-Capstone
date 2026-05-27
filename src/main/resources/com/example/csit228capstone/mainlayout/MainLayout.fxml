@@ -5,7 +5,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane fx:id="layoutPane" prefHeight="800.0" prefWidth="1000.0" styleClass="root-pane" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.mainlayout.MainLayoutController">
+<BorderPane fx:id="layoutPane" styleClass="root-pane" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.mainlayout.MainLayoutController">
 
     <!-- SIDEBAR -->
     <left>
@@ -38,19 +38,18 @@
             <Button fx:id="btnDashboard" maxWidth="Infinity" onAction="#showDashboard" styleClass="nav-button, nav-active" text="Dashboard" />
             <Button fx:id="btnIncidents" maxWidth="Infinity" onAction="#showIncidents" styleClass="nav-button" text="Incidents" />
             <Button fx:id="btnResidents" maxWidth="Infinity" onAction="#showResidents" styleClass="nav-button" text="Residents" />
-            <Button fx:id="btnDocuments" maxWidth="Infinity" onAction="#showDocuments" styleClass="nav-button" text="Documents" />
 
             <!-- DISASTER OPS Section -->
             <Label styleClass="section-label" text="DISASTER OPS" />
             <Button fx:id="btnEvacuation" maxWidth="Infinity" onAction="#showEvacuation" styleClass="nav-button" text="Evacuation Map" />
             <Button fx:id="btnResources" maxWidth="Infinity" onAction="#showResources" styleClass="nav-button" text="Resources" />
-            <Button fx:id="btnAlerts" maxWidth="Infinity" onAction="#showAlerts" styleClass="nav-button" text="Alerts &amp; Broadcast" />
+            <Button fx:id="btnResponder" maxWidth="Infinity" onAction="#showResponders" styleClass="nav-button" text="Responders" />
+            <Button fx:id="btnAlerts" maxWidth="Infinity" onAction="#showAlerts" styleClass="nav-button" text="Broadcast" />
 
             <!-- ADMIN Section -->
             <Label styleClass="section-label" text="ADMIN" />
             <Button fx:id="btnReports" maxWidth="Infinity" onAction="#showReports" styleClass="nav-button" text="Reports" />
             <Button fx:id="btnAnalytics" layoutX="18.0" layoutY="573.0" maxWidth="Infinity" onAction="#showAnalytics" styleClass="nav-button" text="Analytics" />
-            <Button fx:id="btnChatbot" maxWidth="Infinity" onAction="#showChatbot" styleClass="nav-button" text="AI Chatbot Logs" />
             <Button fx:id="btnSettings" maxWidth="Infinity" onAction="#showSettings" styleClass="nav-button" text="Settings" />
          <Region prefHeight="300.0" prefWidth="200.0" />
 

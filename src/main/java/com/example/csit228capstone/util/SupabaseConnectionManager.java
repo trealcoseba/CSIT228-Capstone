@@ -6,12 +6,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-/**
- * Singleton — manages the JDBC connection pool to Supabase PostgreSQL.
- * Configure via environment variables or a .env file:
- *   SUPABASE_DB_HOST, SUPABASE_DB_PORT, SUPABASE_DB_NAME,
- *   SUPABASE_DB_USER, SUPABASE_DB_PASSWORD
- */
+
 public class SupabaseConnectionManager {
 
     private static SupabaseConnectionManager instance;

@@ -16,6 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -80,23 +81,23 @@ public class ResidentFormController {
 
     @FXML
     public void handleTakePhoto(ActionEvent actionEvent) {
-        try {
-            Webcam webcam = Webcam.getWebcams().getFirst();
-            if (webcam != null) {
-                webcam.setViewSize(WebcamResolution.VGA.getSize());
-                webcam.open();
-                BufferedImage image = webcam.getImage();
-                File tempFile = new File("temp_capture.jpg");
-                ImageIO.write(image, "JPG", tempFile);
-                this.selectedImageFile = tempFile;
-                ivAvatar.setImage(new Image(tempFile.toURI().toString()));
-                lblFilePath.setText("Captured: " + tempFile.getName());
-                webcam.close();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Camera Error", "Hardware busy or not found: " + e.getMessage());
-        }
+//        try {
+//            Webcam webcam = Webcam.getWebcams().getFirst();
+//            if (webcam != null) {
+//                webcam.setViewSize(WebcamResolution.VGA.getSize());
+//                webcam.open();
+//                BufferedImage image = webcam.getImage();
+//                File tempFile = new File("temp_capture.jpg");
+//                ImageIO.write(image, "JPG", tempFile);
+//                this.selectedImageFile = tempFile;
+//                ivAvatar.setImage(new Image(tempFile.toURI().toString()));
+//                lblFilePath.setText("Captured: " + tempFile.getName());
+//                webcam.close();
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            showAlert("Camera Error", "Hardware busy or not found: " + e.getMessage());
+//        }
     }
 
     @FXML
@@ -118,19 +119,33 @@ public class ResidentFormController {
             MapPickerController mapController = loader.getController();
 
             Stage stage = new Stage();
+
+            if (txtFirstName.getScene() != null) {
+                stage.initOwner(txtFirstName.getScene().getWindow());
+            }
+
+            stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("Pin Resident Location");
             stage.setScene(new Scene(root));
-            stage.showAndWait();
+
+            // FIX: Move these BEFORE showAndWait()
+            stage.setResizable(false);
+            stage.setFullScreen(false);
+
+            stage.showAndWait(); // The code pauses here until the map window is closed
 
             String pinnedAddress = mapController.getSelectedAddress();
-            double lat = mapController.getSelectedLatitude();   // ← add this
-            double lng = mapController.getSelectedLongitude();  // ← add this
+            double lat = mapController.getSelectedLatitude();
+            double lng = mapController.getSelectedLongitude();
 
-            if (pinnedAddress != null && !pinnedAddress.isEmpty()) {
-                txtAddress.setText(pinnedAddress);
+            // Check for 0.0 specifically to avoid overwriting with bad data
+            // if the user just closed the map without pinning
+            if (lat != 0.0 && lng != 0.0) {
                 this.pendingLatitude = lat;
                 this.pendingLongitude = lng;
-
+                if (pinnedAddress != null && !pinnedAddress.isEmpty()) {
+                    txtAddress.setText(pinnedAddress);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -154,8 +169,9 @@ public class ResidentFormController {
         txtPhone.setText(r.getContactNumber());
         chkIsHead.setSelected(r.isHouseholdHead());
 
-        // ✅ Restore address — comes from the joined resident_locations row
         txtAddress.setText(r.getAddress() != null ? r.getAddress() : "");
+        this.pendingLatitude = r.getLatitude();
+        this.pendingLongitude = r.getLongitude();
 
         // Restore photo
         this.existingPhotoPath = r.getPhotoUrl();
@@ -279,6 +295,11 @@ public class ResidentFormController {
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+
+        if (txtFirstName.getScene() != null && txtFirstName.getScene().getWindow() != null) {
+            alert.initOwner(txtFirstName.getScene().getWindow());
+        }
+
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);

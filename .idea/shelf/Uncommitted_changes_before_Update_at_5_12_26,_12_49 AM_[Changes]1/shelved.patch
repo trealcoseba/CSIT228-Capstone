@@ -1,0 +1,875 @@
+Index: src/main/resources/com/example/csit228capstone/evacuation/Evacuation.fxml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<?import javafx.geometry.Insets?>\n<?import javafx.scene.control.Button?>\n<?import javafx.scene.control.ComboBox?>\n<?import javafx.scene.control.Label?>\n<?import javafx.scene.control.ListView?>\n<?import javafx.scene.control.ScrollPane?>\n<?import javafx.scene.control.TableColumn?>\n<?import javafx.scene.control.TableView?>\n<?import javafx.scene.control.TextField?>\n<?import javafx.scene.layout.HBox?>\n<?import javafx.scene.layout.Region?>\n<?import javafx.scene.layout.StackPane?>\n<?import javafx.scene.layout.VBox?>\n<?import javafx.scene.web.WebView?>\n\n<ScrollPane fitToWidth=\"true\" prefHeight=\"800.0\" prefWidth=\"1000.0\" styleClass=\"dashboard-scroll\" stylesheets=\"@../../../../css/application.css\" xmlns=\"http://javafx.com/javafx/25\" xmlns:fx=\"http://javafx.com/fxml/1\" fx:controller=\"com.example.csit228capstone.controller.evacuation.EvacuationController\">\n\n    <content>\n        <VBox fillWidth=\"true\" spacing=\"16\">\n            <padding>\n                <Insets topRightBottomLeft=\"16\" />\n            </padding>\n\n            <!-- Header -->\n            <HBox alignment=\"CENTER_LEFT\" spacing=\"12\">\n                <children>\n                    <Label styleClass=\"page-title\" text=\"Evacuation Management\" />\n                    <Region HBox.hgrow=\"ALWAYS\" />\n                </children>\n            </HBox>\n\n            <!-- Status Card -->\n            <VBox spacing=\"12\" styleClass=\"panel-card\">\n                <children>\n                    <Label styleClass=\"panel-title\" text=\"Evacuation Status\" />\n                    <HBox alignment=\"CENTER_LEFT\" spacing=\"16\">\n                        <children>\n                            <VBox prefHeight=\"56.0\" prefWidth=\"50.0\" HBox.hgrow=\"ALWAYS\">\n                                <children>\n                                    <Label styleClass=\"resource-label\" text=\"Total Evacuees:\" />\n                                    <Label fx:id=\"lblTotalEvacuees\" styleClass=\"kpi-value\" text=\"0\" />\n                                </children>\n                            </VBox>\n                            <VBox HBox.hgrow=\"ALWAYS\">\n                                <children>\n                                    <Label styleClass=\"resource-label\" text=\"Centers Active:\" />\n                                    <Label fx:id=\"lblCentersActive\" styleClass=\"kpi-value\" text=\"0\" />\n                                </children>\n                            </VBox>\n                        </children>\n                    </HBox>\n                </children>\n            </VBox>\n\n            <!-- Main Row (Map and Sidebar) -->\n            <HBox spacing=\"16\" VBox.vgrow=\"ALWAYS\">\n                <VBox spacing=\"12\" styleClass=\"panel-card\" HBox.hgrow=\"ALWAYS\" VBox.vgrow=\"ALWAYS\">\n                    <children>\n                        <Label styleClass=\"panel-title\" text=\"Evacuation Map\" />\n                        <StackPane maxHeight=\"500\" minHeight=\"500\" prefHeight=\"500\" VBox.vgrow=\"ALWAYS\">\n                            <WebView fx:id=\"mapWebView\" maxHeight=\"498.0\" maxWidth=\"545.0\" minHeight=\"400\" minWidth=\"400\" prefHeight=\"498.0\" prefWidth=\"505.0\" StackPane.alignment=\"CENTER\" />\n                        </StackPane>\n                    </children>\n                </VBox>\n\n                <VBox prefWidth=\"350\" spacing=\"12\" styleClass=\"panel-card\">\n                    <children>\n                        <Label styleClass=\"panel-title\" text=\"Evacuation Centers\" />\n                        <ListView fx:id=\"centersList\" prefHeight=\"250\" VBox.vgrow=\"ALWAYS\" />\n                        <Button maxWidth=\"Infinity\" onAction=\"#addCenter\" styleClass=\"quick-action-btn\" text=\"Add Center\" />\n                    </children>\n                </VBox>\n            </HBox>\n\n            <!-- Filters -->\n            <HBox spacing=\"12\">\n                <ComboBox fx:id=\"filterStatus\" prefWidth=\"120\" promptText=\"Status\" />\n                <ComboBox fx:id=\"filterAscOrDesc\" prefWidth=\"120\" />\n                <Region HBox.hgrow=\"ALWAYS\" />\n                <TextField fx:id=\"tfSearch\" prefWidth=\"200\" promptText=\"\uD83D\uDD0D Search residents...\" styleClass=\"search-field\" />\n                <padding>\n                    <Insets top=\"30.0\" />\n                </padding>\n            </HBox>\n\n            <!-- Table Section -->\n            <VBox spacing=\"12\" styleClass=\"panel-card\" VBox.vgrow=\"ALWAYS\">\n                <children>\n                    <Label styleClass=\"panel-title\" text=\"Evacuation Centers Details\" />\n\n                    <!-- 1. Removed CONSTRAINED_RESIZE_POLICY to allow horizontal scroll -->\n                    <TableView fx:id=\"centersTable\" prefHeight=\"350\" styleClass=\"incident-table\" VBox.vgrow=\"ALWAYS\">\n                        <columns>\n                            <!-- 2. Set minWidth to ensure the total width exceeds the container for scrolling -->\n                            <TableColumn fx:id=\"colName\" minWidth=\"180\" text=\"Center Name\" />\n                            <TableColumn fx:id=\"colAddress\" minWidth=\"250\" text=\"Center Address\" />\n                            <TableColumn fx:id=\"colCapacity\" minWidth=\"100\" text=\"Capacity\" />\n                            <TableColumn fx:id=\"colOccupancy\" minWidth=\"120\" text=\"Current Count\" />\n                            <TableColumn fx:id=\"colStatus\" minWidth=\"120\" text=\"Status\" />\n                            <TableColumn fx:id=\"colManager\" minWidth=\"150\" text=\"Manager\" />\n                            <TableColumn fx:id=\"colContact\" minWidth=\"150\" text=\"Contact\" />\n                            <TableColumn fx:id=\"colActions\" minWidth=\"150\" text=\"Actions\" />\n                        </columns>\n                        <!-- Default policy is unconstrained, which enables scrolling -->\n                    </TableView>\n                </children>\n            </VBox>\n        </VBox>\n    </content>\n</ScrollPane>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/com/example/csit228capstone/evacuation/Evacuation.fxml b/src/main/resources/com/example/csit228capstone/evacuation/Evacuation.fxml
+--- a/src/main/resources/com/example/csit228capstone/evacuation/Evacuation.fxml	(revision 80475a7ef34330c0284bb4c14d1f8c714ef3a406)
++++ b/src/main/resources/com/example/csit228capstone/evacuation/Evacuation.fxml	(date 1778518133130)
+@@ -75,10 +75,13 @@
+             </HBox>
+ 
+             <!-- Filters -->
+-            <HBox spacing="12">
++            <HBox spacing="12" alignment="CENTER_LEFT">
+                 <ComboBox fx:id="filterStatus" prefWidth="120" promptText="Status" />
+                 <ComboBox fx:id="filterAscOrDesc" prefWidth="120" />
+                 <Region HBox.hgrow="ALWAYS" />
++
++                <Button onAction="#handleRefresh" styleClass="quick-action-btn" text="Reset Filters" />
++
+                 <TextField fx:id="tfSearch" prefWidth="200" promptText="🔍 Search residents..." styleClass="search-field" />
+                 <padding>
+                     <Insets top="30.0" />
+Index: src/main/java/com/example/csit228capstone/controller/dashboard/DashboardController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.csit228capstone.controller.dashboard;\n\nimport com.example.csit228capstone.service.EvacuationService;\nimport javafx.beans.property.SimpleStringProperty;\nimport javafx.collections.FXCollections;\nimport javafx.event.ActionEvent;\nimport javafx.fxml.FXML;\nimport javafx.fxml.FXMLLoader;\nimport javafx.scene.Parent;\nimport javafx.scene.Scene;\nimport javafx.scene.control.*;\nimport javafx.scene.paint.Color;\nimport javafx.scene.shape.Circle;\nimport com.example.csit228capstone.model.incident.Incident;\nimport com.example.csit228capstone.model.vulnerability.VulnerabilityTag;\nimport com.example.csit228capstone.repository.ResidentRepository;\nimport com.example.csit228capstone.service.IncidentService;\nimport javafx.stage.Modality;\nimport javafx.stage.Stage;\n\nimport java.io.IOException;\nimport java.time.format.DateTimeFormatter;\nimport java.util.List;\n\npublic class DashboardController {\n\n    @FXML private Label lblTotalResidents, lblActiveIncidents, lblPendingDocs, lblEvacuees;\n    @FXML private Label lblSenior, lblPwd, lblPregnant, lblChildren;\n    @FXML private TableView<Incident> incidentTable;\n    @FXML private TableColumn<Incident, String> colSeverity, colType, colLocation, colTime, colStatus;\n    @FXML private ScrollPane mainContent;\n\n    private final IncidentService incidentService = new IncidentService();\n    private final ResidentRepository residentRepo = new ResidentRepository();\n    private final EvacuationService evacuationService = new EvacuationService();\n\n    @FXML\n    public void initialize() {\n        setupIncidentTable();\n        loadData();\n    }\n\n    private void setupIncidentTable() {\n        colSeverity.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getSeverity().name()));\n        colSeverity.setCellFactory(col -> new TableCell<>() {\n            @Override\n            protected void updateItem(String item, boolean empty) {\n                super.updateItem(item, empty);\n                if (empty || item == null) { setGraphic(null); return; }\n                Circle dot = new Circle(6);\n                dot.setFill(switch (item) {\n                    case \"CRITICAL\" -> Color.web(\"#C0392B\");\n                    case \"MAJOR\" -> Color.web(\"#BA7517\");\n                    default -> Color.web(\"#3498DB\");\n                });\n                setGraphic(dot);\n            }\n        });\n\n        colType.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getTitle()));\n        colLocation.setCellValueFactory(cd -> new SimpleStringProperty(\n                cd.getValue().getLocationPurok() +\n                (cd.getValue().getLocationDetail() != null ? \", \" + cd.getValue().getLocationDetail() : \"\")));\n        colTime.setCellValueFactory(cd -> new SimpleStringProperty(\n                cd.getValue().getReportedAt().format(DateTimeFormatter.ofPattern(\"HH:mm\"))));\n        colStatus.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getStatus().getDisplayName()));\n        colStatus.setCellFactory(col -> new TableCell<>() {\n            @Override\n            protected void updateItem(String item, boolean empty) {\n                super.updateItem(item, empty);\n                if (empty || item == null) { setText(null); setGraphic(null); return; }\n                Label badge = new Label(item);\n                badge.getStyleClass().addAll(\"status-badge\", \"status-\" + item.toLowerCase());\n                setGraphic(badge);\n            }\n        });\n    }\n\n    private void loadData() {\n        try {\n            lblTotalResidents.setText(String.valueOf(residentRepo.countAll()));\n            lblActiveIncidents.setText(String.valueOf(incidentService.getActiveCount()));\n            lblEvacuees.setText(String.valueOf(evacuationService.getTotalEvacuees()));\n\n\n            List<Incident> active = incidentService.getActiveIncidents();\n            incidentTable.setItems(FXCollections.observableArrayList(active));\n\n            lblSenior.setText(String.valueOf(residentRepo.countByVulnerability(VulnerabilityTag.SENIOR_CITIZEN)));\n            lblPwd.setText(String.valueOf(residentRepo.countByVulnerability(VulnerabilityTag.PWD)));\n            lblPregnant.setText(String.valueOf(residentRepo.countByVulnerability(VulnerabilityTag.PREGNANT)));\n            lblChildren.setText(String.valueOf(residentRepo.countByVulnerability(VulnerabilityTag.CHILD_0_5)));\n        } catch (Exception e) {\n            System.err.println(\"Dashboard load error: \" + e.getMessage());\n        }\n    }\n\n    @FXML void viewAllIncidents(ActionEvent e) {\n\n    }\n\n    @FXML void reportIncident(ActionEvent e)  {\n\n    }\n\n    @FXML void evacuationCenter(ActionEvent e) {\n\n    }\n\n    @FXML\n    void addResident(ActionEvent e) throws Exception {\n        try {\n            // 1. Load the FXML for the pop-up\n            FXMLLoader loader = new FXMLLoader(getClass().getResource(\"/com/example/csit228capstone/resident/ResidentForm.fxml\"));\n            Parent root = loader.load();\n\n            // 2. Create a new Stage (Window)\n            Stage stage = new Stage();\n            stage.setTitle(\"Resident Registration\");\n\n            // 3. Set the Scene with the loaded FXML\n            Scene scene = new Scene(root);\n            stage.setScene(scene);\n\n            // 4. Set Modality (Optional: Prevents clicking the dashboard until this is closed)\n            stage.initModality(Modality.APPLICATION_MODAL);\n\n            // 5. Show the window\n            stage.show();\n\n        } catch (IOException ex) {\n            ex.printStackTrace();\n        }\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/example/csit228capstone/controller/dashboard/DashboardController.java b/src/main/java/com/example/csit228capstone/controller/dashboard/DashboardController.java
+--- a/src/main/java/com/example/csit228capstone/controller/dashboard/DashboardController.java	(revision 80475a7ef34330c0284bb4c14d1f8c714ef3a406)
++++ b/src/main/java/com/example/csit228capstone/controller/dashboard/DashboardController.java	(date 1778514648836)
+@@ -1,5 +1,8 @@
+ package com.example.csit228capstone.controller.dashboard;
+ 
++import com.example.csit228capstone.controller.mainlayout.MainLayoutController;
++import com.example.csit228capstone.model.Resource;
++import com.example.csit228capstone.repository.ResourceRepository;
+ import com.example.csit228capstone.service.EvacuationService;
+ import javafx.beans.property.SimpleStringProperty;
+ import javafx.collections.FXCollections;
+@@ -19,26 +22,62 @@
+ import javafx.stage.Stage;
+ 
+ import java.io.IOException;
++import java.net.HttpURLConnection;
+ import java.time.format.DateTimeFormatter;
++import java.util.Comparator;
++import java.util.HashMap;
+ import java.util.List;
++import java.util.Map;
+ 
+ public class DashboardController {
+ 
+-    @FXML private Label lblTotalResidents, lblActiveIncidents, lblPendingDocs, lblEvacuees;
++    // ── KPI labels ──────────────────────────────────────────────────────────────
++    @FXML private Label lblTotalResidents, lblActiveIncidents, lblEvacuees;
++
++    // ── Vulnerable residents labels ──────────────────────────────────────────────
+     @FXML private Label lblSenior, lblPwd, lblPregnant, lblChildren;
++    @FXML private Label lblIndigenous, lblSoloParent;
++
++    // ── Incident table ───────────────────────────────────────────────────────────
+     @FXML private TableView<Incident> incidentTable;
+     @FXML private TableColumn<Incident, String> colSeverity, colType, colLocation, colTime, colStatus;
++
++    // ── Resource status ───────────────────────────────────────────────────────────
++    @FXML private Label lblRelief, lblMed, lblFund, lblEvac;
++    @FXML private ProgressBar pbRelief, pbMed, pbFund, pbEvac;
++
++    // ── Weather labels ────────────────────────────────────────────────────────────
++    @FXML private Label lblWeatherTemp, lblWeatherDesc, lblHumidity, lblWind;
++
++    // ── Scroll pane (kept from original) ────────────────────────────────────────
+     @FXML private ScrollPane mainContent;
+ 
+-    private final IncidentService incidentService = new IncidentService();
+-    private final ResidentRepository residentRepo = new ResidentRepository();
++    // ── Services / repos ─────────────────────────────────────────────────────────
++    private final IncidentService incidentService     = new IncidentService();
++    private final ResidentRepository residentRepo     = new ResidentRepository();
+     private final EvacuationService evacuationService = new EvacuationService();
++    private final ResourceRepository resourceRepo     = new ResourceRepository();
++
++    // ── Parent controller reference ───────────────────────────────────────────────
++    private MainLayoutController mainLayoutController;
++
++    // Weather API config (Open-Meteo: No API Key Required)
++    private static final double LAT = 10.3157;
++    private static final double LON = 123.8854;
++
++    /** Called by MainLayoutController right after loading this FXML. */
++    public void setMainLayoutController(MainLayoutController mainLayoutController) {
++        this.mainLayoutController = mainLayoutController;
++    }
+ 
+     @FXML
+     public void initialize() {
+         setupIncidentTable();
+         loadData();
++        loadWeather();
+     }
++
++    // ── Table setup ───────────────────────────────────────────────────────────────
+ 
+     private void setupIncidentTable() {
+         colSeverity.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getSeverity().name()));
+@@ -50,8 +89,8 @@
+                 Circle dot = new Circle(6);
+                 dot.setFill(switch (item) {
+                     case "CRITICAL" -> Color.web("#C0392B");
+-                    case "MAJOR" -> Color.web("#BA7517");
+-                    default -> Color.web("#3498DB");
++                    case "MAJOR"    -> Color.web("#BA7517");
++                    default         -> Color.web("#3498DB");
+                 });
+                 setGraphic(dot);
+             }
+@@ -60,7 +99,8 @@
+         colType.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getTitle()));
+         colLocation.setCellValueFactory(cd -> new SimpleStringProperty(
+                 cd.getValue().getLocationPurok() +
+-                (cd.getValue().getLocationDetail() != null ? ", " + cd.getValue().getLocationDetail() : "")));
++                        (cd.getValue().getLocationDetail() != null
++                                ? ", " + cd.getValue().getLocationDetail() : "")));
+         colTime.setCellValueFactory(cd -> new SimpleStringProperty(
+                 cd.getValue().getReportedAt().format(DateTimeFormatter.ofPattern("HH:mm"))));
+         colStatus.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getStatus().getDisplayName()));
+@@ -76,60 +116,208 @@
+         });
+     }
+ 
++    // ── Data loading ──────────────────────────────────────────────────────────────
++
+     private void loadData() {
+         try {
++            // KPIs
+             lblTotalResidents.setText(String.valueOf(residentRepo.countAll()));
+             lblActiveIncidents.setText(String.valueOf(incidentService.getActiveCount()));
+             lblEvacuees.setText(String.valueOf(evacuationService.getTotalEvacuees()));
+ 
+-
++            // Incidents — sorted newest first
+             List<Incident> active = incidentService.getActiveIncidents();
++            active.sort(Comparator.comparing(Incident::getReportedAt).reversed());
+             incidentTable.setItems(FXCollections.observableArrayList(active));
+ 
++            // Vulnerable residents
+             lblSenior.setText(String.valueOf(residentRepo.countByVulnerability(VulnerabilityTag.SENIOR_CITIZEN)));
+             lblPwd.setText(String.valueOf(residentRepo.countByVulnerability(VulnerabilityTag.PWD)));
+             lblPregnant.setText(String.valueOf(residentRepo.countByVulnerability(VulnerabilityTag.PREGNANT)));
+             lblChildren.setText(String.valueOf(residentRepo.countByVulnerability(VulnerabilityTag.CHILD_0_5)));
++            lblIndigenous.setText(String.valueOf(residentRepo.countByVulnerability(VulnerabilityTag.INDIGENOUS)));
++            lblSoloParent.setText(String.valueOf(residentRepo.countByVulnerability(VulnerabilityTag.SOLO_PARENT)));
++
++            // Resources
++            loadResourceStatus();
++
+         } catch (Exception e) {
+             System.err.println("Dashboard load error: " + e.getMessage());
+         }
+     }
+ 
+-    @FXML void viewAllIncidents(ActionEvent e) {
++    // ── Resource status ───────────────────────────────────────────────────────────
++
++    /**
++     * Reads all resources, groups them by category, and computes available/total %.
++     * Category strings must exactly match what is stored in the DB.
++     * Default categories assumed: "Relief Goods", "Medical", "Emergency Fund", "Evacuation"
++     */
++    private void loadResourceStatus() {
++        try {
++            List<Resource> resources = resourceRepo.findAll();
+ 
+-    }
++            // Sum totalQty and availableQty per category
++            Map<String, double[]> map = new HashMap<>(); // category → [totalQty, availableQty]
++            for (Resource r : resources) {
++                String cat = r.getCategory() == null ? "Uncategorised" : r.getCategory();
++                map.merge(cat,
++                        new double[]{r.getTotalQty(), r.getAvailableQty()},
++                        (a, b) -> new double[]{a[0] + b[0], a[1] + b[1]});
++            }
+ 
+-    @FXML void reportIncident(ActionEvent e)  {
++            setResourceRow(map, "Relief Goods",   lblRelief, pbRelief);
++            setResourceRow(map, "Medical",         lblMed,    pbMed);
++            setResourceRow(map, "Emergency Fund",  lblFund,   pbFund);
++            setResourceRow(map, "Evacuation",      lblEvac,   pbEvac);
++
++        } catch (Exception e) {
++            System.err.println("Resource status load error: " + e.getMessage());
++        }
++    }
+ 
++    private void setResourceRow(Map<String, double[]> map, String category,
++                                Label lbl, ProgressBar pb) {
++        if (lbl == null || pb == null) return; // guard against uninjected fx:id
++        double[] vals      = map.getOrDefault(category, new double[]{0, 0});
++        double total       = vals[0];
++        double available   = vals[1];
++        double pct         = (total > 0) ? available / total : 0;
++        lbl.setText(String.format("%.0f%%", pct * 100));
++        pb.setProgress(pct);
+     }
+ 
+-    @FXML void evacuationCenter(ActionEvent e) {
++    // ── Weather (OpenWeatherMap free tier) ────────────────────────────────────────
++
++    // ── Weather config (Open-Meteo: No API Key Required) ──────────────────────────
++
++
++    // ... (rest of your existing code) ...
+ 
++    private void loadWeather() {
++        Thread t = new Thread(() -> {
++            try {
++                // Added &current=... to ensure we get the live data block
++                String url = String.format(
++                        "https://api.open-meteo.com/v1/forecast?latitude=%.4f&longitude=%.4f&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m",
++                        LAT, LON);
++
++                HttpURLConnection conn = (HttpURLConnection) new java.net.URL(url).openConnection();
++                conn.setConnectTimeout(5_000);
++                conn.setReadTimeout(5_000);
++
++                String body;
++                try (java.io.InputStream is = conn.getInputStream();
++                     java.util.Scanner sc = new java.util.Scanner(is, "UTF-8")) {
++                    sc.useDelimiter("\\A");
++                    body = sc.hasNext() ? sc.next() : "";
++                }
++
++                // We look for the "current" section first to avoid metadata at the top of the JSON
++                String currentSection = extractSection(body, "\"current\":{", "}");
++
++                double temp      = extractDouble(currentSection, "\"temperature_2m\":");
++                double windKph   = extractDouble(currentSection, "\"wind_speed_10m\":");
++                int humidity     = (int) extractDouble(currentSection, "\"relative_humidity_2m\":");
++                int code         = (int) extractDouble(currentSection, "\"weather_code\":");
++
++                String desc = interpretWeatherCode(code);
++
++                javafx.application.Platform.runLater(() -> {
++                    if (lblWeatherTemp != null) lblWeatherTemp.setText(String.format("%.0f°C", temp));
++                    if (lblWeatherDesc != null) lblWeatherDesc.setText(desc + " · Cebu City");
++                    if (lblHumidity != null)    lblHumidity.setText(humidity + "%");
++                    if (lblWind != null)        lblWind.setText(String.format("%.0f kph", windKph));
++                });
++
++            } catch (Exception ex) {
++                javafx.application.Platform.runLater(() -> {
++                    if (lblWeatherDesc != null) lblWeatherDesc.setText("Weather unavailable");
++                });
++            }
++        });
++        t.setDaemon(true);
++        t.start();
+     }
++
++    /**
++     * Translates WMO Weather Interpretation Codes (WW) used by Open-Meteo
++     */
++    private String interpretWeatherCode(int code) {
++        return switch (code) {
++            case 0          -> "Clear sky";
++            case 1, 2, 3    -> "Mainly clear";
++            case 45, 48     -> "Fog";
++            case 51, 53, 55 -> "Drizzle";
++            case 61, 63, 65 -> "Rain";
++            case 71, 73, 75 -> "Snow fall";
++            case 80, 81, 82 -> "Rain showers";
++            case 95, 96, 99 -> "Thunderstorm";
++            default         -> "Cloudy";
++        };
++    }
++
++    // Updated helper to handle negative temperatures or trailing commas
++    private String extractSection(String json, String startMarker, String endMarker) {
++        int start = json.indexOf(startMarker);
++        if (start < 0) return json; // fallback to full string
++        int end = json.indexOf(endMarker, start + startMarker.length());
++        return json.substring(start, end + 1);
++    }
++
++    private double extractDouble(String json, String key) {
++        int i = json.indexOf(key);
++        if (i < 0) return 0.0;
++
++        int start = i + key.length();
++        // Skip colon and any potential whitespace
++        while (start < json.length() && (json.charAt(start) == ':' || json.charAt(start) == ' ')) {
++            start++;
++        }
++
++        int end = start;
++        while (end < json.length() &&
++                (Character.isDigit(json.charAt(end)) || json.charAt(end) == '.' || json.charAt(end) == '-')) {
++            end++;
++        }
++
++        try {
++            return Double.parseDouble(json.substring(start, end));
++        } catch (Exception e) {
++            return 0.0;
++        }
++    }
++
++    // ── Navigation ────────────────────────────────────────────────────────────────
+ 
+     @FXML
+-    void addResident(ActionEvent e) throws Exception {
+-        try {
+-            // 1. Load the FXML for the pop-up
+-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/csit228capstone/resident/ResidentForm.fxml"));
+-            Parent root = loader.load();
++    void viewAllIncidents(ActionEvent e) {
++        if (mainLayoutController != null) {
++            mainLayoutController.showIncidents(null);
++        }
++    }
+ 
+-            // 2. Create a new Stage (Window)
+-            Stage stage = new Stage();
+-            stage.setTitle("Resident Registration");
++    @FXML
++    void reportIncident(ActionEvent e) {
++        if (mainLayoutController != null) {
++            // Navigate to residents tab first, then open the add form
++            mainLayoutController.showResidents(null);
++            mainLayoutController.openAddResidentForm();
++        }
++    }
+ 
+-            // 3. Set the Scene with the loaded FXML
+-            Scene scene = new Scene(root);
+-            stage.setScene(scene);
+-
+-            // 4. Set Modality (Optional: Prevents clicking the dashboard until this is closed)
+-            stage.initModality(Modality.APPLICATION_MODAL);
+-
+-            // 5. Show the window
+-            stage.show();
+-
+-        } catch (IOException ex) {
+-            ex.printStackTrace();
++    @FXML
++    void evacuationCenter(ActionEvent e) {
++        if (mainLayoutController != null) {
++            mainLayoutController.showEvacuation(null);
+         }
+     }
+-}
++
++    @FXML
++    void addResident(ActionEvent e) {
++        if (mainLayoutController != null) {
++            mainLayoutController.showResidents(null);
++            mainLayoutController.openAddResidentForm();
++        }
++    }
++}
+\ No newline at end of file
+Index: src/main/java/com/example/csit228capstone/controller/mainlayout/MainLayoutController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.csit228capstone.controller.mainlayout;\n\nimport com.example.csit228capstone.controller.emergency.EmergencyAuthController;\nimport javafx.event.ActionEvent;\nimport javafx.fxml.FXML;\nimport javafx.fxml.FXMLLoader;\nimport javafx.scene.Node;\nimport javafx.scene.Parent;\nimport javafx.scene.Scene;\nimport javafx.scene.control.Button;\nimport javafx.scene.control.Label;\nimport javafx.scene.layout.BorderPane;\nimport javafx.scene.layout.StackPane;\nimport javafx.scene.layout.VBox;\nimport com.example.csit228capstone.service.IncidentService;\nimport com.example.csit228capstone.util.AlertEventBus;\nimport javafx.stage.Modality;\nimport javafx.stage.Stage;\n\nimport java.io.IOException;\nimport java.sql.Connection;\nimport java.util.List;\n\npublic class MainLayoutController {\n\n\n    @FXML private StackPane contentPane;\n    @FXML private BorderPane layoutPane;\n    @FXML private Label lblActiveIncidents;\n    @FXML private VBox sidebar;\n\n    @FXML private Button btnDashboard, btnIncidents, btnResidents, btnResponder;\n    @FXML private Button btnEvacuation, btnResources, btnAlerts;\n    @FXML private Button btnReports, btnSettings;\n    @FXML private Button btnAnalytics;\n    @FXML private Button btnLogout;\n\n    private List<Button> navButtons;\n    private final IncidentService incidentService = new IncidentService();\n\n    @FXML\n    public void initialize() {\n        navButtons = List.of(btnDashboard, btnIncidents, btnResidents, btnResponder,\n                btnEvacuation, btnResources, btnAlerts, btnReports, btnSettings, btnAnalytics);\n\n        // Subscribe to events for live badge updates\n        AlertEventBus.getInstance().subscribe(event -> javafx.application.Platform.runLater(this::refreshBadge));\n\n        // Default view\n        showDashboard(null);\n        refreshBadge();\n    }\n\n    private void refreshBadge() {\n        try {\n            int count = incidentService.getActiveCount();\n            lblActiveIncidents.setText(\"● \" + count + \" Active Incidents\");\n            lblActiveIncidents.getStyleClass().removeAll(\"badge-ok\", \"badge-alert\");\n            lblActiveIncidents.getStyleClass().add(count > 0 ? \"badge-alert\" : \"badge-ok\");\n        } catch (Exception ignored) {\n            lblActiveIncidents.setText(\"● -- Active Incidents\");\n        }\n    }\n\n    /**\n     * MODIFIED: Now accepts a sub-package (folder) and the fxml filename.\n     */\n    private void loadView(String subPackage, String fxmlName, Button activeBtn) {\n        setActiveNav(activeBtn);\n        try {\n            // Construct path dynamically: /com/example/csit228capstone/SUBPACKAGE/FILENAME.fxml\n            String path = String.format(\"/com/example/csit228capstone/%s/%s.fxml\", subPackage, fxmlName);\n\n            FXMLLoader loader = new FXMLLoader(getClass().getResource(path));\n            Node view = loader.load();\n\n            contentPane.getChildren().setAll(view);\n        } catch (IOException e) {\n            e.printStackTrace();\n            contentPane.getChildren().setAll(new Label(\"Error loading \" + fxmlName + \" in \" + subPackage + \": \" + e.getMessage()));\n        }\n    }\n\n    private void setActiveNav(Button active) {\n        navButtons.forEach(b -> b.getStyleClass().remove(\"nav-active\"));\n        if (active != null) active.getStyleClass().add(\"nav-active\");\n    }\n\n    // UPDATED NAVIGATION CALLS\n    @FXML void showDashboard(ActionEvent e)  { loadView(\"dashboard\", \"Dashboard\", btnDashboard); }\n    @FXML void showIncidents(ActionEvent e)  { loadView(\"incident\", \"Incidents\", btnIncidents); }\n    @FXML void showResidents(ActionEvent e)  { loadView(\"resident\", \"Residents\", btnResidents); }\n\n    // Example calls for other potential sub-packages\n    @FXML void showResponders(ActionEvent e)  { loadView(\"responder\", \"Responder\", btnResponder); }\n    @FXML void showEvacuation(ActionEvent e) { loadView(\"evacuation\", \"Evacuation\", btnEvacuation); }\n    @FXML void showResources(ActionEvent e)  { loadView(\"resource\", \"Resources\", btnResources); }\n    @FXML void showAlerts(ActionEvent e)     { loadView(\"alerts\", \"Alerts\", btnAlerts); }\n    @FXML void showReports(ActionEvent e)    { loadView(\"report\", \"Reports\", btnReports); }\n    @FXML void showSettings(ActionEvent e)   { loadView(\"settings\", \"Settings\", btnSettings); }\n    @FXML void showAnalytics(ActionEvent e)  { loadView(\"analytics\", \"Analytics\", btnAnalytics); }\n\n    @FXML\n    void activateEmergency(ActionEvent e) {\n        try {\n            FXMLLoader authLoader = new FXMLLoader(getClass().getResource(\n                    \"/com/example/csit228capstone/emergency/EmergencyAuth.fxml\"\n            ));\n            Parent authRoot = authLoader.load();\n\n            EmergencyAuthController authController = authLoader.getController();\n\n            Stage authStage = new Stage();\n            authStage.setTitle(\"Security Check\");\n            authStage.setScene(new Scene(authRoot));\n\n            authStage.initModality(Modality.APPLICATION_MODAL);\n            authStage.setResizable(false);\n            authStage.initStyle(javafx.stage.StageStyle.UTILITY);\n\n            authStage.showAndWait();\n\n            if (authController.isAuthorized()) {\n                FXMLLoader mainLoader = new FXMLLoader(getClass().getResource(\n                        \"/com/example/csit228capstone/emergency/Emergency.fxml\"\n                ));\n                Parent mainRoot = mainLoader.load();\n\n                Stage mainStage = new Stage();\n                mainStage.setTitle(\"LIGTAS-BRGY — Emergency Operations Center\");\n                mainStage.setScene(new Scene(mainRoot));\n                mainStage.setMaximized(true);\n                mainStage.show();\n            }\n\n        } catch (IOException ex) {\n            ex.printStackTrace();\n        }\n    }\n\n    public void handleLogout(ActionEvent actionEvent) throws Exception {\n        FXMLLoader loader = new FXMLLoader(\n                getClass().getResource(\"/com/example/csit228capstone/login/Login.fxml\")\n        );\n        Parent root = loader.load();\n\n        Scene scene = new Scene(root, 1440, 900);\n        scene.getStylesheets().add(\n                getClass().getResource(\"/css/application.css\").toExternalForm()\n        );\n\n        Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();\n\n        stage.setScene(scene);\n        stage.centerOnScreen();\n        stage.setMinWidth(1200);\n        stage.setMinHeight(800);\n        stage.show();\n    }\n\n\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/example/csit228capstone/controller/mainlayout/MainLayoutController.java b/src/main/java/com/example/csit228capstone/controller/mainlayout/MainLayoutController.java
+--- a/src/main/java/com/example/csit228capstone/controller/mainlayout/MainLayoutController.java	(revision 80475a7ef34330c0284bb4c14d1f8c714ef3a406)
++++ b/src/main/java/com/example/csit228capstone/controller/mainlayout/MainLayoutController.java	(date 1778513859778)
+@@ -1,5 +1,6 @@
+ package com.example.csit228capstone.controller.mainlayout;
+ 
++import com.example.csit228capstone.controller.dashboard.DashboardController;
+ import com.example.csit228capstone.controller.emergency.EmergencyAuthController;
+ import javafx.event.ActionEvent;
+ import javafx.fxml.FXML;
+@@ -18,12 +19,10 @@
+ import javafx.stage.Stage;
+ 
+ import java.io.IOException;
+-import java.sql.Connection;
+ import java.util.List;
+ 
+ public class MainLayoutController {
+ 
+-
+     @FXML private StackPane contentPane;
+     @FXML private BorderPane layoutPane;
+     @FXML private Label lblActiveIncidents;
+@@ -43,10 +42,9 @@
+         navButtons = List.of(btnDashboard, btnIncidents, btnResidents, btnResponder,
+                 btnEvacuation, btnResources, btnAlerts, btnReports, btnSettings, btnAnalytics);
+ 
+-        // Subscribe to events for live badge updates
+-        AlertEventBus.getInstance().subscribe(event -> javafx.application.Platform.runLater(this::refreshBadge));
++        AlertEventBus.getInstance().subscribe(event ->
++                javafx.application.Platform.runLater(this::refreshBadge));
+ 
+-        // Default view
+         showDashboard(null);
+         refreshBadge();
+     }
+@@ -62,22 +60,35 @@
+         }
+     }
+ 
++    // ── Core view loader ─────────────────────────────────────────────────────────
++
+     /**
+-     * MODIFIED: Now accepts a sub-package (folder) and the fxml filename.
++     * Loads an FXML from /com/example/csit228capstone/{subPackage}/{fxmlName}.fxml
++     * and returns the FXMLLoader so callers can retrieve the controller if needed.
+      */
+-    private void loadView(String subPackage, String fxmlName, Button activeBtn) {
++    private FXMLLoader loadView(String subPackage, String fxmlName, Button activeBtn) {
+         setActiveNav(activeBtn);
+         try {
+-            // Construct path dynamically: /com/example/csit228capstone/SUBPACKAGE/FILENAME.fxml
+-            String path = String.format("/com/example/csit228capstone/%s/%s.fxml", subPackage, fxmlName);
++            String path = String.format("/com/example/csit228capstone/%s/%s.fxml",
++                    subPackage, fxmlName);
+ 
+             FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
+             Node view = loader.load();
+ 
++            // If the loaded controller is a DashboardController, inject ourselves
++            Object controller = loader.getController();
++            if (controller instanceof DashboardController dc) {
++                dc.setMainLayoutController(this);
++            }
++
+             contentPane.getChildren().setAll(view);
++            return loader;
++
+         } catch (IOException e) {
+             e.printStackTrace();
+-            contentPane.getChildren().setAll(new Label("Error loading " + fxmlName + " in " + subPackage + ": " + e.getMessage()));
++            contentPane.getChildren().setAll(
++                    new Label("Error loading " + fxmlName + ": " + e.getMessage()));
++            return null;
+         }
+     }
+ 
+@@ -86,44 +97,65 @@
+         if (active != null) active.getStyleClass().add("nav-active");
+     }
+ 
+-    // UPDATED NAVIGATION CALLS
+-    @FXML void showDashboard(ActionEvent e)  { loadView("dashboard", "Dashboard", btnDashboard); }
+-    @FXML void showIncidents(ActionEvent e)  { loadView("incident", "Incidents", btnIncidents); }
+-    @FXML void showResidents(ActionEvent e)  { loadView("resident", "Residents", btnResidents); }
++    // ── Navigation — called from sidebar buttons AND from DashboardController ────
++    // All are public so DashboardController can call them directly.
++
++    @FXML public void showDashboard(ActionEvent e)  { loadView("dashboard",  "Dashboard", btnDashboard); }
++    @FXML public void showIncidents(ActionEvent e)  { loadView("incident",   "Incidents", btnIncidents); }
++    @FXML public void showResidents(ActionEvent e)  { loadView("resident",   "Residents", btnResidents); }
++    @FXML public void showResponders(ActionEvent e) { loadView("responder",  "Responder", btnResponder); }
++    @FXML public void showEvacuation(ActionEvent e) { loadView("evacuation", "Evacuation", btnEvacuation); }
++    @FXML public void showResources(ActionEvent e)  { loadView("resource",   "Resources", btnResources); }
++    @FXML public void showAlerts(ActionEvent e)     { loadView("alerts",     "Alerts",    btnAlerts); }
++    @FXML public void showReports(ActionEvent e)    { loadView("report",     "Reports",   btnReports); }
++    @FXML public void showSettings(ActionEvent e)   { loadView("settings",   "Settings",  btnSettings); }
++    @FXML public void showAnalytics(ActionEvent e)  { loadView("analytics",  "Analytics", btnAnalytics); }
+ 
+-    // Example calls for other potential sub-packages
+-    @FXML void showResponders(ActionEvent e)  { loadView("responder", "Responder", btnResponder); }
+-    @FXML void showEvacuation(ActionEvent e) { loadView("evacuation", "Evacuation", btnEvacuation); }
+-    @FXML void showResources(ActionEvent e)  { loadView("resource", "Resources", btnResources); }
+-    @FXML void showAlerts(ActionEvent e)     { loadView("alerts", "Alerts", btnAlerts); }
+-    @FXML void showReports(ActionEvent e)    { loadView("report", "Reports", btnReports); }
+-    @FXML void showSettings(ActionEvent e)   { loadView("settings", "Settings", btnSettings); }
+-    @FXML void showAnalytics(ActionEvent e)  { loadView("analytics", "Analytics", btnAnalytics); }
++    // ── Add-resident helper ───────────────────────────────────────────────────────
++
++    /**
++     * Opens the ResidentForm popup modal.
++     * Called by DashboardController after navigating to the residents view,
++     * and by the "Add Resident" quick-action button on the dashboard.
++     */
++    public void openAddResidentForm() {
++        try {
++            FXMLLoader loader = new FXMLLoader(getClass().getResource(
++                    "/com/example/csit228capstone/resident/ResidentForm.fxml"));
++            Parent root = loader.load();
++
++            Stage stage = new Stage();
++            stage.setTitle("Resident Registration");
++            stage.setScene(new Scene(root));
++            stage.initModality(Modality.APPLICATION_MODAL);
++            stage.show();
++
++        } catch (IOException ex) {
++            ex.printStackTrace();
++        }
++    }
++
++    // ── Emergency ────────────────────────────────────────────────────────────────
+ 
+     @FXML
+     void activateEmergency(ActionEvent e) {
+         try {
+             FXMLLoader authLoader = new FXMLLoader(getClass().getResource(
+-                    "/com/example/csit228capstone/emergency/EmergencyAuth.fxml"
+-            ));
++                    "/com/example/csit228capstone/emergency/EmergencyAuth.fxml"));
+             Parent authRoot = authLoader.load();
+-
+             EmergencyAuthController authController = authLoader.getController();
+ 
+             Stage authStage = new Stage();
+             authStage.setTitle("Security Check");
+             authStage.setScene(new Scene(authRoot));
+-
+             authStage.initModality(Modality.APPLICATION_MODAL);
+             authStage.setResizable(false);
+             authStage.initStyle(javafx.stage.StageStyle.UTILITY);
+-
+             authStage.showAndWait();
+ 
+             if (authController.isAuthorized()) {
+                 FXMLLoader mainLoader = new FXMLLoader(getClass().getResource(
+-                        "/com/example/csit228capstone/emergency/Emergency.fxml"
+-                ));
++                        "/com/example/csit228capstone/emergency/Emergency.fxml"));
+                 Parent mainRoot = mainLoader.load();
+ 
+                 Stage mainStage = new Stage();
+@@ -138,25 +170,22 @@
+         }
+     }
+ 
++    // ── Logout ───────────────────────────────────────────────────────────────────
++
+     public void handleLogout(ActionEvent actionEvent) throws Exception {
+         FXMLLoader loader = new FXMLLoader(
+-                getClass().getResource("/com/example/csit228capstone/login/Login.fxml")
+-        );
++                getClass().getResource("/com/example/csit228capstone/login/Login.fxml"));
+         Parent root = loader.load();
+ 
+         Scene scene = new Scene(root, 1440, 900);
+         scene.getStylesheets().add(
+-                getClass().getResource("/css/application.css").toExternalForm()
+-        );
++                getClass().getResource("/css/application.css").toExternalForm());
+ 
+         Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+-
+         stage.setScene(scene);
+         stage.centerOnScreen();
+         stage.setMinWidth(1200);
+         stage.setMinHeight(800);
+         stage.show();
+     }
+-
+-
+ }
+\ No newline at end of file
+Index: src/main/java/com/example/csit228capstone/controller/evacuation/EvacuationController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.csit228capstone.controller.evacuation;\n\nimport com.example.csit228capstone.model.EvacuationCenter;\nimport com.example.csit228capstone.service.EvacuationService;\nimport javafx.application.Platform;\nimport javafx.collections.FXCollections;\nimport javafx.collections.ObservableList;\nimport javafx.collections.transformation.FilteredList;\nimport javafx.collections.transformation.SortedList;\nimport javafx.concurrent.Worker;\nimport javafx.scene.control.ButtonBar;\nimport javafx.scene.control.Dialog;\nimport javafx.scene.control.Spinner;\nimport javafx.event.ActionEvent;\nimport javafx.fxml.FXML;\nimport javafx.fxml.FXMLLoader;\nimport javafx.scene.Parent;\nimport javafx.scene.Scene;\nimport javafx.scene.control.*;\nimport javafx.scene.control.cell.PropertyValueFactory;\nimport javafx.scene.layout.HBox;\nimport javafx.scene.layout.VBox;\nimport javafx.scene.web.WebEngine;\nimport javafx.scene.web.WebView;\nimport javafx.stage.Modality;\nimport javafx.stage.Stage;\nimport javafx.util.Callback;\n\nimport java.io.IOException;\nimport java.util.Comparator;\nimport java.util.List;\n\npublic class EvacuationController {\n\n    @FXML private Label lblTotalEvacuees;\n    @FXML private Label lblCentersActive;\n\n    @FXML private TableColumn colAddress;\n    @FXML private WebView mapWebView;\n    @FXML private TableView centersTable;\n    @FXML private TableColumn<EvacuationCenter, String>  colName;\n    @FXML private TableColumn<EvacuationCenter, String>  colCapacity;\n    @FXML private TableColumn<EvacuationCenter, Integer> colOccupancy;\n    @FXML private TableColumn<EvacuationCenter, Integer> colStatus;\n    @FXML private TableColumn<EvacuationCenter, String>  colManager;\n    @FXML private TableColumn<EvacuationCenter, String>  colContact;\n    @FXML private TableColumn<EvacuationCenter, Void>    colActions;\n    @FXML private ListView<EvacuationCenter> centersList;\n\n    @FXML private ComboBox<String> filterStatus;\n    @FXML private ComboBox<String> filterAscOrDesc;\n    @FXML private TextField tfSearch;\n\n    private FilteredList<EvacuationCenter> filteredData;\n    private SortedList<EvacuationCenter>   sortedData;\n\n    private final ObservableList<EvacuationCenter> centersData =\n            FXCollections.observableArrayList();\n\n    private WebEngine webEngine;\n\n    private final EvacuationService service = EvacuationService.getInstance();\n\n    // -------------------------------------------------------------------------\n    // Initialization\n    // -------------------------------------------------------------------------\n\n    @FXML\n    public void initialize() {\n        setUpMap();\n        setupFiltersAndSearch();\n        setupCentersList();\n        setUpTables();\n    }\n\n    // -------------------------------------------------------------------------\n    // Add / Activate\n    // -------------------------------------------------------------------------\n\n    @FXML\n    private void addCenter(ActionEvent event) {\n        try {\n            FXMLLoader loader = new FXMLLoader(\n                    getClass().getResource(\"/com/example/csit228capstone/evacuation/EvacuationForm.fxml\"));\n            Parent root = loader.load();\n            Stage stage = new Stage();\n            stage.initModality(Modality.APPLICATION_MODAL);\n            stage.setTitle(\"Add Center\");\n            stage.setScene(new Scene(root));\n            stage.setFullScreen(false);\n            stage.showAndWait();\n            loadCentersData();\n        } catch (IOException e) {\n            e.printStackTrace();\n        }\n    }\n\n    @FXML\n    public void activateEvacuation(ActionEvent actionEvent) {\n        System.out.println(\"Evacuation activated\");\n    }\n\n    // -------------------------------------------------------------------------\n    // Table setup\n    // -------------------------------------------------------------------------\n\n    private void setUpTables() {\n        formatTables();;\n        colName.setCellValueFactory(new PropertyValueFactory<>(\"name\"));\n        colCapacity.setCellValueFactory(new PropertyValueFactory<>(\"maxCapacity\"));\n        colOccupancy.setCellValueFactory(new PropertyValueFactory<>(\"currentOccupancy\"));\n        colStatus.setCellValueFactory(new PropertyValueFactory<>(\"status\"));\n        colManager.setCellValueFactory(new PropertyValueFactory<>(\"managerName\"));\n        colAddress.setCellValueFactory(new PropertyValueFactory<>(\"address\"));\n        colContact.setCellValueFactory(new PropertyValueFactory<>(\"contactNumber\"));\n\n        colName.setResizable(false);\n        setupActionButtons();\n        loadCentersData();\n        centersTable.setEditable(false);\n    }\n\n    // -------------------------------------------------------------------------\n    // Map\n    // -------------------------------------------------------------------------\n\n    private void setUpMap() {\n        if (mapWebView == null) return;\n        webEngine = mapWebView.getEngine();\n\n        webEngine.setOnAlert(event ->\n                System.out.println(\"JS Alert: \" + event.getData())\n        );\n\n        try {\n            String mapUrl = getClass()\n                    .getResource(\"/map/map.html\")\n                    .toExternalForm();\n            webEngine.load(mapUrl);\n        } catch (Exception e) {\n            System.err.println(\"Failed to load map.html\");\n            e.printStackTrace();\n        }\n\n        webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {\n            if (newState == Worker.State.SUCCEEDED) {\n                Platform.runLater(() -> {\n                    webEngine.executeScript(\"fixMapSize()\");\n                    refreshMapMarkers();\n                });\n            }\n        });\n\n        mapWebView.widthProperty().addListener((obs, oldVal, newVal) -> {\n            if (webEngine.getLoadWorker().getState() == Worker.State.SUCCEEDED) {\n                webEngine.executeScript(\"fixMapSize()\");\n            }\n        });\n\n        mapWebView.heightProperty().addListener((obs, oldVal, newVal) -> {\n            if (webEngine.getLoadWorker().getState() == Worker.State.SUCCEEDED) {\n                webEngine.executeScript(\"fixMapSize()\");\n            }\n        });\n    }\n\n    private void refreshMapMarkers() {\n        if (webEngine == null) return;\n        if (webEngine.getLoadWorker().getState() != Worker.State.SUCCEEDED) return;\n\n        try {\n            webEngine.executeScript(\"clearMarkers()\");\n\n            Iterable<EvacuationCenter> source =\n                    (filteredData != null) ? filteredData : centersData;\n\n            for (EvacuationCenter center : source) {\n                if (center.getLatitude() != null && center.getLongitude() != null) {\n                    String safeName = center.getName().replace(\"'\", \"\\\\'\");\n                    String script = String.format(\n                            \"addCenterMarker('%s', %f, %f, '%s', %d, %d, %s, '%s')\",\n                            center.getId(),\n                            center.getLatitude(),\n                            center.getLongitude(),\n                            safeName,\n                            center.getCurrentOccupancy(),\n                            center.getMaxCapacity(),\n                            center.isActive(),\n                            center.getStatus()\n                    );\n                    webEngine.executeScript(script);\n                }\n            }\n        } catch (Exception e) {\n            e.printStackTrace();\n        }\n    }\n\n    // -------------------------------------------------------------------------\n    // Centers list (sidebar)\n    // -------------------------------------------------------------------------\n\n    private void setupCentersList() {\n        centersList.setCellFactory(lv -> new ListCell<>() {\n            @Override\n            protected void updateItem(EvacuationCenter center, boolean empty) {\n                super.updateItem(center, empty);\n                if (empty || center == null) {\n                    setGraphic(null);\n                    setText(null);\n                    setStyle(\"-fx-background-color: transparent;\");\n                    return;\n                }\n\n                javafx.scene.shape.Circle indicator = new javafx.scene.shape.Circle(6);\n                String status = center.getStatus();\n                if (status.equalsIgnoreCase(\"inactive\")) {\n                    indicator.setFill(javafx.scene.paint.Color.web(\"#6b7280\"));\n                } else if (status.equalsIgnoreCase(\"full\")) {\n                    indicator.setFill(javafx.scene.paint.Color.web(\"#ef4444\"));\n                } else {\n                    indicator.setFill(javafx.scene.paint.Color.web(\"#22c55e\"));\n                }\n\n                Label lblName = new Label(center.getName());\n                lblName.setStyle(\"-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1a1a1a;\");\n\n                String rawAddress = center.getAddress() != null ? center.getAddress() : \"No address\";\n                String shortAddress = rawAddress.length() > 28\n                        ? rawAddress.substring(0, 28) + \"…\"\n                        : rawAddress;\n                Label lblAddress = new Label(shortAddress);\n                lblAddress.setStyle(\"-fx-text-fill: #6b7280; -fx-font-size: 11px;\");\n\n                HBox nameRow = new HBox(8, indicator, lblName);\n                nameRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);\n\n                VBox leftBox = new VBox(2, nameRow, lblAddress);\n                leftBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);\n                HBox.setHgrow(leftBox, javafx.scene.layout.Priority.ALWAYS);\n\n                int available = center.getMaxCapacity() - center.getCurrentOccupancy();\n                Label lblAvailable = new Label(available + \" slots\");\n                lblAvailable.setStyle(\"-fx-font-size: 11px; -fx-text-fill: #374151;\");\n\n                Label lblEvacuees = new Label(center.getCurrentOccupancy() + \" evacuees\");\n                lblEvacuees.setStyle(\"-fx-font-size: 11px; -fx-text-fill: #6b7280;\");\n\n                VBox rightBox = new VBox(2, lblAvailable, lblEvacuees);\n                rightBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);\n\n                HBox card = new HBox(leftBox, rightBox);\n                card.setAlignment(javafx.geometry.Pos.CENTER_LEFT);\n                card.setPadding(new javafx.geometry.Insets(8, 12, 8, 12));\n\n                selectedProperty().addListener((obs, wasSelected, isSelected) ->\n                        applyCardStyle(card, lblName, lblAddress, lblAvailable, lblEvacuees, isSelected));\n                applyCardStyle(card, lblName, lblAddress, lblAvailable, lblEvacuees, isSelected());\n\n                setGraphic(card);\n                setText(null);\n                setStyle(\"-fx-padding: 4 0 4 0; -fx-background-color: transparent !important;\");\n            }\n        });\n\n        centersList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, selected) -> {\n            if (selected != null && selected.getLatitude() != null && selected.getLongitude() != null) {\n                if (webEngine != null && webEngine.getLoadWorker().getState() == Worker.State.SUCCEEDED) {\n                    webEngine.executeScript(String.format(\n                            \"map.setView([%f, %f], 16)\",\n                            selected.getLatitude(),\n                            selected.getLongitude()\n                    ));\n                }\n            }\n        });\n    }\n\n    // -------------------------------------------------------------------------\n    // Edit / Delete / Manage dialogs\n    // -------------------------------------------------------------------------\n\n    private void openEditForm(EvacuationCenter center) {\n        try {\n            FXMLLoader loader = new FXMLLoader(\n                    getClass().getResource(\"/com/example/csit228capstone/evacuation/EvacuationForm.fxml\"));\n            Parent root = loader.load();\n\n            EvacuationFormController formController = loader.getController();\n            formController.populateForEdit(center);\n\n            Stage stage = new Stage();\n            stage.initModality(Modality.APPLICATION_MODAL);\n            stage.setTitle(\"Edit Center\");\n            stage.setScene(new Scene(root));\n            stage.setFullScreen(false);\n            stage.showAndWait();\n\n            loadCentersData();\n        } catch (IOException e) {\n            e.printStackTrace();\n        }\n    }\n\n    private void confirmAndDelete(EvacuationCenter center) {\n        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);\n        confirm.setTitle(\"Delete Center\");\n        confirm.setHeaderText(\"Delete \\\"\" + center.getName() + \"\\\"?\");\n        confirm.setContentText(\"This action cannot be undone.\");\n\n        confirm.showAndWait().ifPresent(response -> {\n            if (response == ButtonType.OK) {\n                try {\n                    service.deleteCenter(center.getId());\n                    loadCentersData();\n                } catch (Exception e) {\n                    e.printStackTrace();\n                }\n            }\n        });\n    }\n\n    private void openManageEvacueesDialog(EvacuationCenter center) {\n        Dialog<Integer> dialog = new Dialog<>();\n        dialog.setTitle(\"Manage Evacuees\");\n        dialog.setHeaderText(\"Update occupancy for:\\n\" + center.getName());\n\n        ButtonType saveBtn = new ButtonType(\"Save\", ButtonBar.ButtonData.OK_DONE);\n        dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);\n\n        Spinner<Integer> spinner = new Spinner<>(0, center.getMaxCapacity(), center.getCurrentOccupancy());\n        spinner.setEditable(true);\n        spinner.setPrefWidth(120);\n\n        int available = center.getMaxCapacity() - center.getCurrentOccupancy();\n        Label lblInfo = new Label(String.format(\n                \"Current: %d / %d  (%d slots remaining)\",\n                center.getCurrentOccupancy(), center.getMaxCapacity(), available));\n        lblInfo.setStyle(\"-fx-text-fill: #6b7280; -fx-font-size: 11px;\");\n\n        VBox content = new VBox(10,\n                lblInfo,\n                new Label(\"New occupancy count:\"),\n                spinner);\n        content.setPadding(new javafx.geometry.Insets(16));\n        dialog.getDialogPane().setContent(content);\n\n        dialog.setResultConverter(btn -> btn == saveBtn ? spinner.getValue() : null);\n\n        dialog.showAndWait().ifPresent(newOccupancy -> {\n            try {\n                service.updateOccupancy(center.getId(), newOccupancy);\n                loadCentersData();\n            } catch (Exception e) {\n                e.printStackTrace();\n            }\n        });\n    }\n\n    // -------------------------------------------------------------------------\n    // Filters & sort\n    // -------------------------------------------------------------------------\n\n    private void setupFiltersAndSearch() {\n        filterStatus.getItems().setAll(\"All\", \"Available\", \"Full\", \"Inactive\");\n        filterStatus.setValue(\"All\");\n\n        filterAscOrDesc.getItems().setAll(\n                \"Name A→Z\", \"Name Z→A\",\n                \"Occupancy ↑\", \"Occupancy ↓\",\n                \"Capacity ↑\",  \"Capacity ↓\");\n        filterAscOrDesc.setValue(\"Name A→Z\");\n\n        filteredData = new FilteredList<>(centersData, p -> true);\n        sortedData   = new SortedList<>(filteredData);\n\n        centersTable.setItems(sortedData);\n        centersList.setItems(sortedData);\n\n        tfSearch.textProperty().addListener((obs, oldVal, newVal) -> applyFilters());\n        filterStatus.valueProperty().addListener((obs, oldVal, newVal) -> applyFilters());\n        filterAscOrDesc.valueProperty().addListener((obs, oldVal, newVal) -> applySort());\n\n        applySort();\n    }\n\n    private void applyFilters() {\n        if (filteredData == null) return;\n\n        String search = tfSearch.getText() == null ? \"\" : tfSearch.getText().toLowerCase().trim();\n        String status = filterStatus.getValue();\n\n        filteredData.setPredicate(center -> {\n            boolean statusMatch = switch (status) {\n                case \"Available\" -> center.getStatus().equalsIgnoreCase(\"available\");\n                case \"Full\"      -> center.getStatus().equalsIgnoreCase(\"full\");\n                case \"Inactive\"  -> !center.isActive();\n                default          -> true;\n            };\n\n            boolean searchMatch = search.isEmpty()\n                    || center.getName().toLowerCase().contains(search)\n                    || (center.getAddress() != null && center.getAddress().toLowerCase().contains(search))\n                    || (center.getManagerName() != null && center.getManagerName().toLowerCase().contains(search));\n\n            return statusMatch && searchMatch;\n        });\n\n        refreshMapMarkers();\n        updateStats();\n    }\n\n    private void applySort() {\n        if (sortedData == null) return;\n        String sort = filterAscOrDesc.getValue();\n        if (sort == null) return;\n\n        Comparator<EvacuationCenter> comparator = switch (sort) {\n            case \"Name Z→A\"    -> Comparator.comparing(EvacuationCenter::getName, String.CASE_INSENSITIVE_ORDER).reversed();\n            case \"Occupancy ↑\" -> Comparator.comparingInt(EvacuationCenter::getCurrentOccupancy);\n            case \"Occupancy ↓\" -> Comparator.comparingInt(EvacuationCenter::getCurrentOccupancy).reversed();\n            case \"Capacity ↑\"  -> Comparator.comparingInt(EvacuationCenter::getMaxCapacity);\n            case \"Capacity ↓\"  -> Comparator.comparingInt(EvacuationCenter::getMaxCapacity).reversed();\n            default            -> Comparator.comparing(EvacuationCenter::getName, String.CASE_INSENSITIVE_ORDER);\n        };\n\n        sortedData.setComparator(comparator);\n    }\n\n    // -------------------------------------------------------------------------\n    // Action buttons (table column)\n    // -------------------------------------------------------------------------\n\n    private void setupActionButtons() {\n        colActions.setCellFactory(new Callback<>() {\n            @Override\n            public TableCell<EvacuationCenter, Void> call(TableColumn<EvacuationCenter, Void> param) {\n                return new TableCell<>() {\n                    private final Button btnEdit   = new Button(\"Edit\");\n                    private final Button btnDelete = new Button(\"Delete\");\n                    private final Button btnManage = new Button(\"Manage\");\n\n                    {\n                        btnManage.setStyle(\"\"\"\n                                -fx-background-color: #bbf7d0;\n                                -fx-text-fill: #166534;\n                                -fx-font-size: 10px;\n                                -fx-padding: 3 8 3 8;\n                                -fx-background-radius: 4;\n                                -fx-cursor: hand;\n                                \"\"\");\n                        btnEdit.setStyle(\"\"\"\n                                -fx-background-color: #bfdbfe;\n                                -fx-text-fill: #1e40af;\n                                -fx-font-size: 10px;\n                                -fx-padding: 3 8 3 8;\n                                -fx-background-radius: 4;\n                                -fx-cursor: hand;\n                                \"\"\");\n                        btnDelete.setStyle(\"\"\"\n                                -fx-background-color: #fecaca;\n                                -fx-text-fill: #991b1b;\n                                -fx-font-size: 10px;\n                                -fx-padding: 3 8 3 8;\n                                -fx-background-radius: 4;\n                                -fx-cursor: hand;\n                                \"\"\");\n\n                        btnEdit.setOnAction(e -> {\n                            EvacuationCenter center = getTableView().getItems().get(getIndex());\n                            openEditForm(center);\n                        });\n                        btnDelete.setOnAction(e -> {\n                            EvacuationCenter center = getTableView().getItems().get(getIndex());\n                            confirmAndDelete(center);\n                        });\n                        btnManage.setOnAction(e -> {\n                            EvacuationCenter center = getTableView().getItems().get(getIndex());\n                            openManageEvacueesDialog(center);\n                        });\n                    }\n\n                    @Override\n                    protected void updateItem(Void item, boolean empty) {\n                        super.updateItem(item, empty);\n                        if (empty) {\n                            setGraphic(null);\n                        } else {\n                            btnManage.setTextFill(javafx.scene.paint.Color.WHITE);\n                            btnEdit.setTextFill(javafx.scene.paint.Color.WHITE);\n                            btnDelete.setTextFill(javafx.scene.paint.Color.WHITE);\n\n                            HBox box = new HBox(4, btnManage, btnEdit, btnDelete);\n                            box.setAlignment(javafx.geometry.Pos.CENTER);\n                            setGraphic(box);\n                        }\n                    }\n                };\n            }\n        });\n    }\n\n    // -------------------------------------------------------------------------\n    // Data loading & stats\n    // -------------------------------------------------------------------------\n\n    private void loadCentersData() {\n        centersData.clear();\n        try {\n            List<EvacuationCenter> loaded = service.fetchAllCenters();\n            centersData.addAll(loaded);\n            refreshMapMarkers();\n            updateStats();\n            applyFilters();\n        } catch (Exception e) {\n            System.err.println(\"Database Error: \" + e.getMessage());\n            e.printStackTrace();\n        }\n    }\n\n    private void updateStats() {\n        try {\n            lblTotalEvacuees.setText(String.valueOf(service.getTotalEvacuees()));\n        } catch (Exception e) { e.printStackTrace(); }\n\n        lblCentersActive.setText(String.valueOf(service.getTotalActiveCenters(centersData)));\n    }\n\n    // -------------------------------------------------------------------------\n    // Public accessors for the Dashboard\n    // -------------------------------------------------------------------------\n\n\n    public int getTotalEvacuees() {\n        try { return service.getTotalEvacuees(); } catch (Exception e) { e.printStackTrace(); return 0; }\n    }\n\n\n    public long getTotalActiveCenters() {\n        return service.getTotalActiveCenters(centersData);\n    }\n\n    // -------------------------------------------------------------------------\n    // UI helpers\n    // -------------------------------------------------------------------------\n\n    private void applyCardStyle(HBox card, Label lblName, Label lblAddress,\n                                Label lblAvailable, Label lblEvacuees, boolean selected) {\n        if (selected) {\n            card.setStyle(\"\"\"\n                    -fx-background-color: #fefce8;\n                    -fx-border-color: #eab308;\n                    -fx-border-width: 2;\n                    -fx-border-radius: 8;\n                    -fx-background-radius: 8;\n                    \"\"\");\n        } else {\n            card.setStyle(\"\"\"\n                    -fx-background-color: white;\n                    -fx-border-color: #e5e7eb;\n                    -fx-border-width: 1;\n                    -fx-border-radius: 8;\n                    -fx-background-radius: 8;\n                    \"\"\");\n        }\n        lblName.setStyle(\"-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1a1a1a;\");\n        lblAddress.setStyle(\"-fx-text-fill: #6b7280; -fx-font-size: 11px;\");\n        lblAvailable.setStyle(\"-fx-font-size: 11px; -fx-text-fill: #374151;\");\n        lblEvacuees.setStyle(\"-fx-font-size: 11px; -fx-text-fill: #6b7280;\");\n    }\n\n    private void formatTables() {\n        // 1. Bind widths to percentages of the table width (Total: 1.0)\n        colName.setMinWidth(200);\n        colAddress.setMinWidth(300);    // Give address plenty of space\n        colCapacity.setMinWidth(100);\n        colOccupancy.setMinWidth(120);\n        colStatus.setMinWidth(120);\n        colManager.setMinWidth(150);\n        colContact.setMinWidth(150);\n        colActions.setMinWidth(250);\n\n        // 2. Disable Resizing for all columns\n        colName.setResizable(false);\n        colCapacity.setResizable(false);\n        colOccupancy.setResizable(false);\n        colStatus.setResizable(false);\n        colManager.setResizable(false);\n        colAddress.setResizable(false);\n        colContact.setResizable(false);\n        colActions.setResizable(false);\n\n        // 3. Disable Reordering (prevents users from dragging columns around)\n        colName.setReorderable(false);\n        colCapacity.setReorderable(false);\n        colOccupancy.setReorderable(false);\n        colStatus.setReorderable(false);\n        colManager.setReorderable(false);\n        colAddress.setReorderable(false);\n        colContact.setReorderable(false);\n        colActions.setReorderable(false);\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/example/csit228capstone/controller/evacuation/EvacuationController.java b/src/main/java/com/example/csit228capstone/controller/evacuation/EvacuationController.java
+--- a/src/main/java/com/example/csit228capstone/controller/evacuation/EvacuationController.java	(revision 80475a7ef34330c0284bb4c14d1f8c714ef3a406)
++++ b/src/main/java/com/example/csit228capstone/controller/evacuation/EvacuationController.java	(date 1778517879522)
+@@ -35,9 +35,9 @@
+     @FXML private Label lblTotalEvacuees;
+     @FXML private Label lblCentersActive;
+ 
+-    @FXML private TableColumn colAddress;
++    @FXML private TableColumn<EvacuationCenter, String> colAddress;
+     @FXML private WebView mapWebView;
+-    @FXML private TableView centersTable;
++    @FXML private TableView<EvacuationCenter> centersTable;
+     @FXML private TableColumn<EvacuationCenter, String>  colName;
+     @FXML private TableColumn<EvacuationCenter, String>  colCapacity;
+     @FXML private TableColumn<EvacuationCenter, Integer> colOccupancy;
+@@ -73,6 +73,21 @@
+         setUpTables();
+     }
+ 
++    // -------------------------------------------------------------------------
++    // Refresh Logic
++    // -------------------------------------------------------------------------
++
++    @FXML
++    private void handleRefresh(ActionEvent event) {
++        // Reset Filter UI
++        tfSearch.clear();
++        filterStatus.setValue("All");
++        filterAscOrDesc.setValue("Name A→Z");
++
++        // Reload fresh data from database/service
++        loadCentersData();
++    }
++
+     // -------------------------------------------------------------------------
+     // Add / Activate
+     // -------------------------------------------------------------------------
+@@ -105,7 +120,7 @@
+     // -------------------------------------------------------------------------
+ 
+     private void setUpTables() {
+-        formatTables();;
++        formatTables();
+         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
+         colCapacity.setCellValueFactory(new PropertyValueFactory<>("maxCapacity"));
+         colOccupancy.setCellValueFactory(new PropertyValueFactory<>("currentOccupancy"));
+@@ -114,7 +129,6 @@
+         colAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
+         colContact.setCellValueFactory(new PropertyValueFactory<>("contactNumber"));
+ 
+-        colName.setResizable(false);
+         setupActionButtons();
+         loadCentersData();
+         centersTable.setEditable(false);
+@@ -570,9 +584,8 @@
+     }
+ 
+     private void formatTables() {
+-        // 1. Bind widths to percentages of the table width (Total: 1.0)
+         colName.setMinWidth(200);
+-        colAddress.setMinWidth(300);    // Give address plenty of space
++        colAddress.setMinWidth(300);
+         colCapacity.setMinWidth(100);
+         colOccupancy.setMinWidth(120);
+         colStatus.setMinWidth(120);
+@@ -580,7 +593,6 @@
+         colContact.setMinWidth(150);
+         colActions.setMinWidth(250);
+ 
+-        // 2. Disable Resizing for all columns
+         colName.setResizable(false);
+         colCapacity.setResizable(false);
+         colOccupancy.setResizable(false);
+@@ -590,7 +602,6 @@
+         colContact.setResizable(false);
+         colActions.setResizable(false);
+ 
+-        // 3. Disable Reordering (prevents users from dragging columns around)
+         colName.setReorderable(false);
+         colCapacity.setReorderable(false);
+         colOccupancy.setReorderable(false);
+Index: src/main/java/com/example/csit228capstone/controller/resident/ResidentsController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.csit228capstone.controller.resident;\n\nimport com.example.csit228capstone.model.Resident;\nimport com.example.csit228capstone.model.vulnerability.VulnerabilityTag;\nimport com.example.csit228capstone.repository.ResidentRepository;\nimport javafx.beans.property.ReadOnlyObjectWrapper;\nimport javafx.beans.property.ReadOnlyStringWrapper;\nimport javafx.collections.FXCollections;\nimport javafx.collections.ObservableList;\nimport javafx.collections.transformation.FilteredList;\nimport javafx.collections.transformation.SortedList;\nimport javafx.event.ActionEvent;\nimport javafx.fxml.FXML;\nimport javafx.fxml.FXMLLoader;\nimport javafx.scene.Node;\nimport javafx.scene.Parent;\nimport javafx.scene.Scene;\nimport javafx.scene.control.*;\nimport javafx.scene.control.cell.PropertyValueFactory;\nimport javafx.scene.layout.HBox;\nimport javafx.stage.FileChooser;\nimport javafx.stage.Modality;\nimport javafx.stage.Stage;\n\nimport java.io.*;\nimport java.time.LocalDate;\nimport java.time.format.DateTimeFormatter;\nimport java.util.Comparator;\nimport java.util.List;\nimport java.util.stream.Collectors;\n\npublic class ResidentsController {\n\n\n    @FXML private TableView<Resident> residentsTable;\n    @FXML private TableColumn<Resident, String> colId;\n    @FXML private TableColumn<Resident, String> colName;\n    @FXML private TableColumn<Resident, Integer> colAge;\n    @FXML private TableColumn<Resident, String> colCategory;\n    @FXML private TableColumn<Resident, String> colStatus;\n    @FXML private TableColumn<Resident, String> colPhoneNumber;\n    @FXML private TableColumn<Resident, String> colRegisteredDate;\n    @FXML private TableColumn<Resident, Void> colActions;\n    @FXML private TableColumn<Resident, String> colAddress;\n\n    @FXML private Label lblTotalResidents;\n    @FXML private Label lblRegisteredToday;\n    @FXML private Label lblVulnerable;\n    @FXML private Label lblMissing;\n\n    @FXML private ComboBox<String> filterStatus;\n    @FXML private ComboBox<String> filterCategory;\n    @FXML private ComboBox<String> filterAscOrDesc;\n\n    @FXML private TextField tfSearch;\n\n    private final ResidentRepository repository = new ResidentRepository();\n    private final ObservableList<Resident> masterData = FXCollections.observableArrayList();\n    private FilteredList<Resident> filteredData;\n\n    private SortedList<Resident> sortedData;\n\n    @FXML\n    public void initialize() {\n\n        setupTableColumns();\n        setupFiltering();\n        loadData();\n    }\n\n    public void exportData(ActionEvent event) {\n        FileChooser fileChooser = new FileChooser();\n        fileChooser.setTitle(\"Export Resident Data\");\n        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(\"CSV Files\", \"*.csv\"));\n        fileChooser.setInitialFileName(\"residents_\" + LocalDate.now() + \".csv\");\n\n        File file = fileChooser.showSaveDialog(((Node) event.getSource()).getScene().getWindow());\n\n        if (file != null) {\n            ResidentRepository repo = new ResidentRepository();\n            List<Resident> residents = repo.findAll();\n\n            residents.sort((r1, r2) -> r2.getCreatedAt().compareTo(r1.getCreatedAt()));\n\n            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(\"yyyy-MM-dd HH:mm\");\n\n            try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(file)))) {\n                writer.println(\"Date Created,ID,First Name,Last Name,Sex,Birth Date,Address,Vulnerabilities,Household Head\");\n\n                for (Resident r : residents) {\n                    StringBuilder row = new StringBuilder();\n\n                    // Add the Created At date first\n                    row.append(r.getCreatedAt().format(formatter)).append(\",\");\n\n                    row.append(r.getId()).append(\",\");\n                    row.append(escape(r.getFirstName())).append(\",\");\n                    row.append(escape(r.getLastName())).append(\",\");\n                    row.append(r.getSex()).append(\",\");\n                    row.append(r.getDateOfBirth()).append(\",\");\n                    row.append(escape(r.getAddress())).append(\",\");\n\n                    String tags = r.getVulnerabilities().stream()\n                            .map(Enum::name)\n                            .collect(Collectors.joining(\"; \"));\n                    row.append(escape(tags)).append(\",\");\n\n                    row.append(r.isHouseholdHead());\n\n                    writer.println(row.toString());\n                }\n            } catch (IOException e) {\n                e.printStackTrace();\n            }\n        }\n    }\n\n    @FXML\n    public void openRegistration(ActionEvent actionEvent) {\n        openForm(null);\n    }\n\n\n\n    //HELPERS BELOW\n    private void setupFiltering() {\n        filteredData = new FilteredList<>(masterData, p -> true);\n\n        filterStatus.setItems(FXCollections.observableArrayList(\"All\", \"Single\", \"Married\", \"Widowed\", \"Separated\"));\n        filterCategory.setItems(FXCollections.observableArrayList(\"All\", \"General\", \"Senior Citizen\", \"PWD\", \"Solo Parent\", \"Indigenous\" , \"Child\"));\n        filterStatus.setValue(\"All\");\n        filterCategory.setValue(\"All\");\n\n        filterAscOrDesc.setItems(FXCollections.observableArrayList(\n                \"Newest\", \"Oldest\", \"Name A→Z\", \"Name Z→A\", \"Age ↑\", \"Age ↓\"\n        ));\n        filterAscOrDesc.setValue(\"Newest\");\n\n\n        sortedData = new SortedList<>(filteredData);\n        filterAscOrDesc.valueProperty().addListener((obs, oldVal, newVal) -> updateSort());\n        tfSearch.textProperty().addListener((obs, old, newValue) -> updateFilter());\n        filterStatus.valueProperty().addListener((obs, old, newValue) -> updateFilter());\n        filterCategory.valueProperty().addListener((obs, old, newValue) -> updateFilter());\n\n        residentsTable.setItems(sortedData);\n    }\n\n    private void updateFilter() {\n        String search   = tfSearch.getText() == null ? \"\" : tfSearch.getText().toLowerCase().trim();\n        String status   = filterStatus.getValue() == null ? \"All\" : filterStatus.getValue();\n        String category = filterCategory.getValue() == null ? \"All\" : filterCategory.getValue();\n\n        filteredData.setPredicate(resident -> {\n            // Search — matches name, address, phone, or ID\n            boolean matchesSearch = search.isEmpty()\n                    || resident.getFullName().toLowerCase().contains(search)\n                    || (resident.getAddress() != null && resident.getAddress().toLowerCase().contains(search))\n                    || (resident.getContactNumber() != null && resident.getContactNumber().toLowerCase().contains(search))\n                    || resident.getId().toString().toLowerCase().contains(search);\n\n            // Status filter\n            boolean matchesStatus = status.equals(\"All\")\n                    || resident.getCivilStatus().equalsIgnoreCase(status);\n\n            // Category filter\n            boolean matchesCategory;\n            if (category.equals(\"All\")) {\n                matchesCategory = true;\n            } else if (category.equals(\"General\")) {\n                matchesCategory = resident.getVulnerabilities().isEmpty();\n            } else {\n                matchesCategory = resident.getVulnerabilities().stream()\n                        .anyMatch(tag -> tag.getDisplayName().equalsIgnoreCase(category));\n            }\n\n            return matchesSearch && matchesStatus && matchesCategory;\n        });\n\n        updateLabels();\n    }\n\n    public void loadData() {\n        try {\n            masterData.setAll(repository.findAll());\n            updateLabels();\n            updateSort();\n        } catch (Exception e) {\n            e.printStackTrace();\n            showAlert(\"Database Error\", \"Could not fetch data from server.\");\n        }\n    }\n\n    private void setupTableColumns() {\n\n        //FORMAT TABLE\n        formatTable();\n\n        colId.setCellValueFactory(cellData -> {\n            String fullId = cellData.getValue().getId().toString();\n            String shortId = (fullId.length() > 8) ? fullId.substring(0, 8) : fullId;\n\n            return new javafx.beans.property.ReadOnlyStringWrapper(shortId.toUpperCase());\n        });\n\n\n        colName.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getFullName()));\n        colAge.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getAge()));\n        colPhoneNumber.setCellValueFactory(new PropertyValueFactory<>(\"contactNumber\"));\n        colStatus.setCellValueFactory(new PropertyValueFactory<>(\"civilStatus\"));\n\n        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(\"MMM dd, yyyy\");\n        colRegisteredDate.setCellValueFactory(cellData ->\n                new ReadOnlyStringWrapper(cellData.getValue().getCreatedAt().format(formatter)));\n\n        colAddress.setCellValueFactory(new PropertyValueFactory<>(\"address\"));\n\n        colCategory.setCellValueFactory(cellData -> {\n            Resident r = cellData.getValue();\n            List<VulnerabilityTag> tags = r.getVulnerabilities();\n            if (tags == null || tags.isEmpty()) return new ReadOnlyStringWrapper(\"General\");\n\n            String formattedTags = tags.stream()\n                    .map(VulnerabilityTag::getDisplayName)\n                    .collect(Collectors.joining(\", \"));\n            return new ReadOnlyStringWrapper(formattedTags);\n        });\n\n        setupActionButtons();\n    }\n\n    private void setupActionButtons() {\n        colActions.setCellFactory(param -> new TableCell<>() {\n            private final Button btnEdit = new Button(\"Edit\");\n            private final Button btnDelete = new Button(\"Delete\");\n            private final HBox container = new HBox(10, btnEdit, btnDelete);\n            {\n                btnEdit.setStyle(\"\"\"\n                            -fx-background-color: #fef08a;\n                            -fx-text-fill: #854d0e;\n                            -fx-font-size: 10px;\n                            -fx-padding: 3 8 3 8;\n                            -fx-background-radius: 4;\n                            -fx-cursor: hand;\n                            \"\"\");\n\n                btnDelete.setStyle(\"\"\"\n                            -fx-background-color: #fecaca;\n                            -fx-text-fill: #991b1b;\n                            -fx-font-size: 10px;\n                            -fx-padding: 3 8 3 8;\n                            -fx-background-radius: 4;\n                            -fx-cursor: hand;\n                            \"\"\");\n\n                container.setStyle(\"-fx-alignment: CENTER;\");\n\n                btnDelete.setOnAction(event -> handleDeleteResident(getTableView().getItems().get(getIndex())));\n                btnEdit.setOnAction(event -> handleEditResident(getTableView().getItems().get(getIndex())));\n            }\n\n            @Override\n            protected void updateItem(Void item, boolean empty) {\n                super.updateItem(item, empty);\n                setGraphic(empty ? null : container);\n            }\n        });\n    }\n\n\n    private void handleEditResident(Resident resident) {\n        openForm(resident);\n    }\n\n    private void openForm(Resident resident) {\n        try {\n            FXMLLoader loader = new FXMLLoader(getClass().getResource(\"/com/example/csit228capstone/resident/ResidentForm.fxml\"));\n            Parent root = loader.load();\n            ResidentFormController controller = loader.getController();\n            controller.setParentController(this);\n            if (resident != null) controller.setResidentData(resident);\n\n            Stage stage = new Stage();\n            stage.initModality(Modality.APPLICATION_MODAL);\n            stage.setTitle(resident == null ? \"Register New Resident\" : \"Edit Resident\");\n            stage.setScene(new Scene(root));\n            stage.setFullScreen(false);\n            stage.show();\n        } catch (IOException e) {\n            e.printStackTrace();\n            showAlert(\"Error\", \"Could not open form.\");\n        }\n    }\n\n    private void handleDeleteResident(Resident resident) {\n        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, \"Delete \" + resident.getFullName() + \"?\", ButtonType.YES, ButtonType.NO);\n        if (alert.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {\n            repository.delete(resident.getId());\n            loadData();\n        }\n    }\n\n    private void showAlert(String title, String content) {\n        Alert alert = new Alert(Alert.AlertType.ERROR);\n        alert.setTitle(title);\n        alert.setContentText(content);\n        alert.showAndWait();\n    }\n\n\n    private void updateSort() {\n        String sort = filterAscOrDesc.getValue();\n        if (sort == null) return;\n\n        Comparator<Resident> comparator = switch (sort) {\n            case \"Oldest\"   -> Comparator.comparing(Resident::getCreatedAt);\n            case \"Name A→Z\" -> Comparator.comparing(Resident::getFullName, String.CASE_INSENSITIVE_ORDER);\n            case \"Name Z→A\" -> Comparator.comparing(Resident::getFullName, String.CASE_INSENSITIVE_ORDER).reversed();\n            case \"Age ↑\"    -> Comparator.comparingInt(Resident::getAge);\n            case \"Age ↓\"    -> Comparator.comparingInt(Resident::getAge).reversed();\n            default         -> Comparator.comparing(Resident::getCreatedAt).reversed(); // \"Newest\"\n        };\n\n        sortedData.setComparator(comparator);\n    }\n\n    private String escape(String data) {\n        if (data == null) return \"\";\n        if (data.contains(\",\") || data.contains(\"\\\"\")) {\n            return \"\\\"\" + data.replace(\"\\\"\", \"\\\"\\\"\") + \"\\\"\";\n        }\n        return data;\n    }\n\n\n    private void formatTable(){\n        colId.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.10));\n        colName.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.20));\n        colAge.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.05));\n        colCategory.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.15));\n        colStatus.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.10));\n        colPhoneNumber.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.12));\n        colRegisteredDate.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.10));\n        colActions.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.15));\n        colAddress.prefWidthProperty().bind(residentsTable.widthProperty().multiply(0.20));\n\n        colId.setResizable(false);\n        colAddress.setResizable(false);\n        colName.setResizable(false);\n        colAge.setResizable(false);\n        colCategory.setResizable(false);\n        colStatus.setResizable(false);\n        colPhoneNumber.setResizable(false);\n        colRegisteredDate.setResizable(false);\n        colActions.setResizable(false);\n\n        colId.setReorderable(false);\n        colAddress.setReorderable(false);\n        colName.setReorderable(false);\n        colAge.setReorderable(false);\n        colCategory.setReorderable(false);\n        colStatus.setReorderable(false);\n        colPhoneNumber.setReorderable(false);\n        colRegisteredDate.setReorderable(false);\n        colActions.setReorderable(false);\n    }\n\n    private void updateLabels() {\n        // Total shown (respects current filter)\n        lblTotalResidents.setText(String.valueOf(filteredData.size()));\n\n        // These always reflect full dataset\n        java.time.LocalDate today = java.time.LocalDate.now();\n\n        long todayCount = masterData.stream()\n                .filter(r -> r.getCreatedAt().toLocalDate().isEqual(today))\n                .count();\n        lblRegisteredToday.setText(String.valueOf(todayCount));\n\n        long vulnerableCount = masterData.stream()\n                .filter(r -> !r.getVulnerabilities().isEmpty())\n                .count();\n        lblVulnerable.setText(String.valueOf(vulnerableCount));\n\n        // lblMissing — residents with no contact number and no address (unverified/incomplete)\n        long missingCount = masterData.stream()\n                .filter(r -> (r.getContactNumber() == null || r.getContactNumber().isBlank())\n                        && (r.getAddress() == null || r.getAddress().isBlank()))\n                .count();\n        lblMissing.setText(String.valueOf(missingCount));\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/example/csit228capstone/controller/resident/ResidentsController.java b/src/main/java/com/example/csit228capstone/controller/resident/ResidentsController.java
+--- a/src/main/java/com/example/csit228capstone/controller/resident/ResidentsController.java	(revision 80475a7ef34330c0284bb4c14d1f8c714ef3a406)
++++ b/src/main/java/com/example/csit228capstone/controller/resident/ResidentsController.java	(date 1778512777094)
+@@ -127,7 +127,7 @@
+         filteredData = new FilteredList<>(masterData, p -> true);
+ 
+         filterStatus.setItems(FXCollections.observableArrayList("All", "Single", "Married", "Widowed", "Separated"));
+-        filterCategory.setItems(FXCollections.observableArrayList("All", "General", "Senior Citizen", "PWD", "Solo Parent", "Indigenous" , "Child"));
++        filterCategory.setItems(FXCollections.observableArrayList("All", "General", "Senior Citizen", "PWD", "Solo Parent", "Indigenous" , "Child", "Pregnant"));
+         filterStatus.setValue("All");
+         filterCategory.setValue("All");
+ 
+Index: src/main/resources/com/example/csit228capstone/dashboard/Dashboard.fxml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<?import javafx.geometry.*?>\n<?import javafx.scene.control.*?>\n<?import javafx.scene.layout.*?>\n\n<ScrollPane fx:id=\"mainContent\" fitToWidth=\"true\" prefHeight=\"800.0\" prefWidth=\"1000.0\" styleClass=\"dashboard-scroll\" stylesheets=\"@../../../../css/application.css\" xmlns=\"http://javafx.com/javafx/17.0.12\" xmlns:fx=\"http://javafx.com/fxml/1\" fx:controller=\"com.example.csit228capstone.controller.dashboard.DashboardController\">\n\n    <VBox alignment=\"TOP_CENTER\" spacing=\"24\">\n        <padding><Insets topRightBottomLeft=\"16\" /></padding>\n\n        <!-- KPI Cards Row -->\n        <HBox fx:id=\"kpiRow\" spacing=\"16\">\n            <VBox styleClass=\"kpi-card\" HBox.hgrow=\"ALWAYS\">\n                <Label styleClass=\"kpi-label\" text=\"Total Residents\" />\n                <Label fx:id=\"lblTotalResidents\" styleClass=\"kpi-value\" text=\"0\" />\n                <Label styleClass=\"kpi-sub\" text=\"Registered in system\" />\n            </VBox>\n            <VBox styleClass=\"kpi-card, kpi-danger\" HBox.hgrow=\"ALWAYS\">\n                <Label styleClass=\"kpi-label\" text=\"Active Incidents\" />\n                <Label fx:id=\"lblActiveIncidents\" styleClass=\"kpi-value\" text=\"0\" />\n                <Label styleClass=\"kpi-sub\" text=\"Require attention\" />\n            </VBox>\n            <VBox styleClass=\"kpi-card, kpi-warning\" HBox.hgrow=\"ALWAYS\">\n                <Label styleClass=\"kpi-label\" text=\"Pending Documents\" />\n                <Label fx:id=\"lblPendingDocs\" styleClass=\"kpi-value\" text=\"0\" />\n                <Label styleClass=\"kpi-sub\" text=\"Awaiting processing\" />\n            </VBox>\n            <VBox styleClass=\"kpi-card, kpi-info\" HBox.hgrow=\"ALWAYS\">\n                <Label styleClass=\"kpi-label\" text=\"Evacuees\" />\n                <Label fx:id=\"lblEvacuees\" styleClass=\"kpi-value\" text=\"0\" />\n                <Label styleClass=\"kpi-sub\" text=\"Currently sheltered\" />\n            </VBox>\n        </HBox>\n\n        <!-- Middle Row: Incident Monitor + Quick Actions -->\n        <HBox spacing=\"16\">\n            <!-- Live Incident Monitor -->\n            <VBox styleClass=\"panel-card\" HBox.hgrow=\"ALWAYS\">\n                <HBox alignment=\"CENTER_LEFT\" spacing=\"8\">\n                    <Label styleClass=\"panel-title\" text=\"Live Incident Monitor\" />\n                    <Region HBox.hgrow=\"ALWAYS\" />\n                    <Hyperlink onAction=\"#viewAllIncidents\" styleClass=\"panel-link\" text=\"View all →\" />\n                </HBox>\n                <TableView fx:id=\"incidentTable\" prefHeight=\"250\" styleClass=\"incident-table\" VBox.vgrow=\"ALWAYS\">\n                    <columns>\n                        <TableColumn fx:id=\"colSeverity\" prefWidth=\"30\" text=\"\" />\n                        <TableColumn fx:id=\"colType\" prefWidth=\"140\" text=\"Incident\" />\n                        <TableColumn fx:id=\"colLocation\" prefWidth=\"130\" text=\"Location\" />\n                        <TableColumn fx:id=\"colTime\" prefWidth=\"80\" text=\"Time\" />\n                        <TableColumn fx:id=\"colStatus\" prefWidth=\"100\" text=\"Status\" />\n                    </columns>\n               <columnResizePolicy>\n                  <TableView fx:constant=\"CONSTRAINED_RESIZE_POLICY\" />\n               </columnResizePolicy>\n                </TableView>\n            </VBox>\n\n            <!-- Quick Actions -->\n            <VBox prefWidth=\"200\" spacing=\"12\" styleClass=\"panel-card\">\n                <Label styleClass=\"panel-title\" text=\"Quick Actions\" />\n                <Button maxWidth=\"Infinity\" onAction=\"#reportIncident\" styleClass=\"quick-action-btn, qa-danger\" text=\"Report Incident\" />\n                <Button maxWidth=\"Infinity\" onAction=\"#evacuationCenter\" styleClass=\"quick-action-btn, qa-warning\" text=\"Evacution Center\" />\n                <Button maxWidth=\"Infinity\" onAction=\"#addResident\" styleClass=\"quick-action-btn\" text=\"Add Resident\" />\n            </VBox>\n        </HBox>\n\n        <!-- Bottom Row: Resources + Vulnerable + Weather -->\n        <HBox spacing=\"16\">\n            <!-- Resource Status -->\n            <VBox spacing=\"12\" styleClass=\"panel-card\" HBox.hgrow=\"ALWAYS\">\n                <Label styleClass=\"panel-title\" text=\"Resource Status\" />\n                <VBox spacing=\"8\">\n                    <HBox alignment=\"CENTER_LEFT\"><Label styleClass=\"resource-label\" text=\"Relief Goods\" /><Region HBox.hgrow=\"ALWAYS\" /><Label fx:id=\"lblRelief\" styleClass=\"resource-pct\" text=\"68%\" /></HBox>\n                    <ProgressBar fx:id=\"pbRelief\" maxWidth=\"Infinity\" progress=\"0.68\" styleClass=\"progress-green\" />\n                    <HBox alignment=\"CENTER_LEFT\"><Label styleClass=\"resource-label\" text=\"Med Supplies\" /><Region HBox.hgrow=\"ALWAYS\" /><Label fx:id=\"lblMed\" styleClass=\"resource-pct\" text=\"45%\" /></HBox>\n                    <ProgressBar fx:id=\"pbMed\" maxWidth=\"Infinity\" progress=\"0.45\" styleClass=\"progress-amber\" />\n                    <HBox alignment=\"CENTER_LEFT\"><Label styleClass=\"resource-label\" text=\"Emergency Fund\" /><Region HBox.hgrow=\"ALWAYS\" /><Label fx:id=\"lblFund\" styleClass=\"resource-pct\" text=\"22%\" /></HBox>\n                    <ProgressBar fx:id=\"pbFund\" maxWidth=\"Infinity\" progress=\"0.22\" styleClass=\"progress-red\" />\n                    <HBox alignment=\"CENTER_LEFT\"><Label styleClass=\"resource-label\" text=\"Evac Center Cap.\" /><Region HBox.hgrow=\"ALWAYS\" /><Label fx:id=\"lblEvac\" styleClass=\"resource-pct\" text=\"80%\" /></HBox>\n                    <ProgressBar fx:id=\"pbEvac\" maxWidth=\"Infinity\" progress=\"0.80\" styleClass=\"progress-blue\" />\n                </VBox>\n            </VBox>\n\n            <!-- Vulnerable Residents -->\n            <VBox spacing=\"12\" styleClass=\"panel-card\" HBox.hgrow=\"ALWAYS\">\n                <Label styleClass=\"panel-title\" text=\"Vulnerable Residents\" />\n                <HBox alignment=\"CENTER_LEFT\" spacing=\"16\">\n                    <VBox alignment=\"CENTER_LEFT\" prefHeight=\"59.0\" prefWidth=\"149.0\" spacing=\"4\">\n                        <Label fx:id=\"lblSenior\" styleClass=\"vuln-count\" text=\"312\" textFill=\"#bf5d5d\" />\n                        <Label styleClass=\"vuln-label\" text=\"Senior Citizens\" />\n                  <HBox.margin>\n                     <Insets />\n                  </HBox.margin>\n                    </VBox>\n                    <VBox alignment=\"CENTER_LEFT\" spacing=\"4\">\n                        <Label fx:id=\"lblPwd\" styleClass=\"vuln-count\" text=\"87\" />\n                        <Label styleClass=\"vuln-label\" text=\"PWD\" />\n                    </VBox>\n               <VBox.margin>\n                  <Insets />\n               </VBox.margin>\n               <padding>\n                  <Insets left=\"15.0\" />\n               </padding>\n                </HBox>\n                <HBox alignment=\"CENTER_LEFT\" spacing=\"16\">\n                    <VBox alignment=\"CENTER_LEFT\" prefHeight=\"52.0\" prefWidth=\"149.0\" spacing=\"4\">\n                        <Label fx:id=\"lblPregnant\" prefHeight=\"34.0\" prefWidth=\"80.0\" styleClass=\"vuln-count\" text=\"24\" />\n                        <Label styleClass=\"vuln-label\" text=\"Pregnant\" />\n                    </VBox>\n                    <VBox alignment=\"CENTER_LEFT\" spacing=\"4\">\n                        <Label fx:id=\"lblChildren\" styleClass=\"vuln-count\" text=\"441\" />\n                        <Label styleClass=\"vuln-label\" text=\"Children (0-5)\" />\n                    </VBox>\n               <padding>\n                  <Insets left=\"15.0\" top=\"15.0\" />\n               </padding>\n                </HBox>\n            </VBox>\n\n            <!-- Weather Widget -->\n            <VBox prefWidth=\"220\" spacing=\"4\" styleClass=\"panel-card, weather-card\">\n                <Label styleClass=\"weather-temp\" text=\"29°C\" />\n                <HBox spacing=\"16\">\n                    <VBox><Label styleClass=\"weather-stat\" text=\"78%\" /><Label styleClass=\"weather-stat-label\" text=\"Humidity\" /></VBox>\n                    <VBox><Label styleClass=\"weather-stat\" text=\"18 kph\" /><Label styleClass=\"weather-stat-label\" text=\"Wind\" /></VBox>\n                </HBox>\n                <Label styleClass=\"weather-desc\" text=\"Partly cloudy · Bacolod City\" />\n            </VBox>\n        </HBox>\n    </VBox>\n</ScrollPane>\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/com/example/csit228capstone/dashboard/Dashboard.fxml b/src/main/resources/com/example/csit228capstone/dashboard/Dashboard.fxml
+--- a/src/main/resources/com/example/csit228capstone/dashboard/Dashboard.fxml	(revision 80475a7ef34330c0284bb4c14d1f8c714ef3a406)
++++ b/src/main/resources/com/example/csit228capstone/dashboard/Dashboard.fxml	(date 1778515245974)
+@@ -9,7 +9,7 @@
+     <VBox alignment="TOP_CENTER" spacing="24">
+         <padding><Insets topRightBottomLeft="16" /></padding>
+ 
+-        <!-- KPI Cards Row -->
++        <!-- ── KPI Cards Row ─────────────────────────────────────────────────── -->
+         <HBox fx:id="kpiRow" spacing="16">
+             <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                 <Label styleClass="kpi-label" text="Total Residents" />
+@@ -20,11 +20,6 @@
+                 <Label styleClass="kpi-label" text="Active Incidents" />
+                 <Label fx:id="lblActiveIncidents" styleClass="kpi-value" text="0" />
+                 <Label styleClass="kpi-sub" text="Require attention" />
+-            </VBox>
+-            <VBox styleClass="kpi-card, kpi-warning" HBox.hgrow="ALWAYS">
+-                <Label styleClass="kpi-label" text="Pending Documents" />
+-                <Label fx:id="lblPendingDocs" styleClass="kpi-value" text="0" />
+-                <Label styleClass="kpi-sub" text="Awaiting processing" />
+             </VBox>
+             <VBox styleClass="kpi-card, kpi-info" HBox.hgrow="ALWAYS">
+                 <Label styleClass="kpi-label" text="Evacuees" />
+@@ -33,8 +28,9 @@
+             </VBox>
+         </HBox>
+ 
+-        <!-- Middle Row: Incident Monitor + Quick Actions -->
++        <!-- ── Middle Row: Incident Monitor + Quick Actions ─────────────────── -->
+         <HBox spacing="16">
++
+             <!-- Live Incident Monitor -->
+             <VBox styleClass="panel-card" HBox.hgrow="ALWAYS">
+                 <HBox alignment="CENTER_LEFT" spacing="8">
+@@ -50,9 +46,9 @@
+                         <TableColumn fx:id="colTime" prefWidth="80" text="Time" />
+                         <TableColumn fx:id="colStatus" prefWidth="100" text="Status" />
+                     </columns>
+-               <columnResizePolicy>
+-                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+-               </columnResizePolicy>
++                    <columnResizePolicy>
++                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
++                    </columnResizePolicy>
+                 </TableView>
+             </VBox>
+ 
+@@ -60,74 +56,110 @@
+             <VBox prefWidth="200" spacing="12" styleClass="panel-card">
+                 <Label styleClass="panel-title" text="Quick Actions" />
+                 <Button maxWidth="Infinity" onAction="#reportIncident" styleClass="quick-action-btn, qa-danger" text="Report Incident" />
+-                <Button maxWidth="Infinity" onAction="#evacuationCenter" styleClass="quick-action-btn, qa-warning" text="Evacution Center" />
++                <Button maxWidth="Infinity" onAction="#evacuationCenter" styleClass="quick-action-btn, qa-warning" text="Evacuation Center" />
+                 <Button maxWidth="Infinity" onAction="#addResident" styleClass="quick-action-btn" text="Add Resident" />
+             </VBox>
+         </HBox>
+ 
+-        <!-- Bottom Row: Resources + Vulnerable + Weather -->
++        <!-- ── Bottom Row: Resources + Vulnerable + Weather ─────────────────── -->
+         <HBox spacing="16">
+-            <!-- Resource Status -->
++
++            <!-- Resource Status — driven by ResourceRepository -->
+             <VBox spacing="12" styleClass="panel-card" HBox.hgrow="ALWAYS">
+                 <Label styleClass="panel-title" text="Resource Status" />
+                 <VBox spacing="8">
+-                    <HBox alignment="CENTER_LEFT"><Label styleClass="resource-label" text="Relief Goods" /><Region HBox.hgrow="ALWAYS" /><Label fx:id="lblRelief" styleClass="resource-pct" text="68%" /></HBox>
+-                    <ProgressBar fx:id="pbRelief" maxWidth="Infinity" progress="0.68" styleClass="progress-green" />
+-                    <HBox alignment="CENTER_LEFT"><Label styleClass="resource-label" text="Med Supplies" /><Region HBox.hgrow="ALWAYS" /><Label fx:id="lblMed" styleClass="resource-pct" text="45%" /></HBox>
+-                    <ProgressBar fx:id="pbMed" maxWidth="Infinity" progress="0.45" styleClass="progress-amber" />
+-                    <HBox alignment="CENTER_LEFT"><Label styleClass="resource-label" text="Emergency Fund" /><Region HBox.hgrow="ALWAYS" /><Label fx:id="lblFund" styleClass="resource-pct" text="22%" /></HBox>
+-                    <ProgressBar fx:id="pbFund" maxWidth="Infinity" progress="0.22" styleClass="progress-red" />
+-                    <HBox alignment="CENTER_LEFT"><Label styleClass="resource-label" text="Evac Center Cap." /><Region HBox.hgrow="ALWAYS" /><Label fx:id="lblEvac" styleClass="resource-pct" text="80%" /></HBox>
+-                    <ProgressBar fx:id="pbEvac" maxWidth="Infinity" progress="0.80" styleClass="progress-blue" />
++                    <!-- Relief Goods -->
++                    <HBox alignment="CENTER_LEFT">
++                        <Label styleClass="resource-label" text="Relief Goods" />
++                        <Region HBox.hgrow="ALWAYS" />
++                        <Label fx:id="lblRelief" styleClass="resource-pct" text="–%" />
++                    </HBox>
++                    <ProgressBar fx:id="pbRelief" maxWidth="Infinity" progress="0" styleClass="progress-green" />
++
++                    <!-- Medical -->
++                    <HBox alignment="CENTER_LEFT">
++                        <Label styleClass="resource-label" text="Medical" />
++                        <Region HBox.hgrow="ALWAYS" />
++                        <Label fx:id="lblMed" styleClass="resource-pct" text="–%" />
++                    </HBox>
++                    <ProgressBar fx:id="pbMed" maxWidth="Infinity" progress="0" styleClass="progress-amber" />
++
++                    <!-- Emergency Fund -->
++                    <HBox alignment="CENTER_LEFT">
++                        <Label styleClass="resource-label" text="Emergency Fund" />
++                        <Region HBox.hgrow="ALWAYS" />
++                        <Label fx:id="lblFund" styleClass="resource-pct" text="–%" />
++                    </HBox>
++                    <ProgressBar fx:id="pbFund" maxWidth="Infinity" progress="0" styleClass="progress-red" />
++
++                    <!-- Evacuation -->
++                    <HBox alignment="CENTER_LEFT">
++                        <Label styleClass="resource-label" text="Evacuation" />
++                        <Region HBox.hgrow="ALWAYS" />
++                        <Label fx:id="lblEvac" styleClass="resource-pct" text="–%" />
++                    </HBox>
++                    <ProgressBar fx:id="pbEvac" maxWidth="Infinity" progress="0" styleClass="progress-blue" />
+                 </VBox>
+             </VBox>
+ 
+             <!-- Vulnerable Residents -->
+             <VBox spacing="12" styleClass="panel-card" HBox.hgrow="ALWAYS">
+                 <Label styleClass="panel-title" text="Vulnerable Residents" />
+-                <HBox alignment="CENTER_LEFT" spacing="16">
+-                    <VBox alignment="CENTER_LEFT" prefHeight="59.0" prefWidth="149.0" spacing="4">
+-                        <Label fx:id="lblSenior" styleClass="vuln-count" text="312" textFill="#bf5d5d" />
++                <HBox alignment="CENTER_LEFT" spacing="90.0">
++                    <VBox alignment="CENTER_LEFT" prefHeight="52.0" prefWidth="72.0">
++                        <Label fx:id="lblSenior" styleClass="vuln-count" text="–" textFill="#bf5d5d" />
+                         <Label styleClass="vuln-label" text="Senior Citizens" />
++                    </VBox>
++                    <VBox alignment="CENTER_LEFT" prefHeight="52.0" prefWidth="44.0" spacing="4">
++                        <Label fx:id="lblPwd" styleClass="vuln-count" text="–">
++                     <VBox.margin>
++                        <Insets />
++                     </VBox.margin></Label>
++                        <Label styleClass="vuln-label" text="PWD" />
+                   <HBox.margin>
+-                     <Insets />
++                     <Insets left="-23.0" />
+                   </HBox.margin>
+                     </VBox>
+                     <VBox alignment="CENTER_LEFT" spacing="4">
+-                        <Label fx:id="lblPwd" styleClass="vuln-count" text="87" />
+-                        <Label styleClass="vuln-label" text="PWD" />
++                        <Label fx:id="lblIndigenous" styleClass="vuln-count" text="–" />
++                        <Label styleClass="vuln-label" text="Indigenous" />
+                     </VBox>
+-               <VBox.margin>
+-                  <Insets />
+-               </VBox.margin>
+-               <padding>
+-                  <Insets left="15.0" />
+-               </padding>
++                    <VBox.margin><Insets /></VBox.margin>
++                    <padding><Insets left="15.0" /></padding>
+                 </HBox>
+-                <HBox alignment="CENTER_LEFT" spacing="16">
+-                    <VBox alignment="CENTER_LEFT" prefHeight="52.0" prefWidth="149.0" spacing="4">
+-                        <Label fx:id="lblPregnant" prefHeight="34.0" prefWidth="80.0" styleClass="vuln-count" text="24" />
++                <HBox alignment="CENTER_LEFT" spacing="73.0">
++                    <VBox alignment="CENTER_LEFT" prefWidth="66.0" spacing="4">
++                        <Label fx:id="lblPregnant" styleClass="vuln-count" text="–" />
+                         <Label styleClass="vuln-label" text="Pregnant" />
+                     </VBox>
+                     <VBox alignment="CENTER_LEFT" spacing="4">
+-                        <Label fx:id="lblChildren" styleClass="vuln-count" text="441" />
++                        <Label fx:id="lblChildren" styleClass="vuln-count" text="–" />
+                         <Label styleClass="vuln-label" text="Children (0-5)" />
+                     </VBox>
+-               <padding>
+-                  <Insets left="15.0" top="15.0" />
+-               </padding>
++                    <VBox alignment="CENTER_LEFT" spacing="4">
++                        <Label fx:id="lblSoloParent" styleClass="vuln-count" text="–" />
++                        <Label styleClass="vuln-label" text="Solo Parent" />
++                    </VBox>
++                    <padding><Insets left="15.0" top="15.0" /></padding>
+                 </HBox>
+             </VBox>
+ 
+-            <!-- Weather Widget -->
++            <!-- Weather Widget — populated by OpenWeatherMap API -->
+             <VBox prefWidth="220" spacing="4" styleClass="panel-card, weather-card">
+-                <Label styleClass="weather-temp" text="29°C" />
++                <Label fx:id="lblWeatherTemp" styleClass="weather-temp" text="--°C" />
+                 <HBox spacing="16">
+-                    <VBox><Label styleClass="weather-stat" text="78%" /><Label styleClass="weather-stat-label" text="Humidity" /></VBox>
+-                    <VBox><Label styleClass="weather-stat" text="18 kph" /><Label styleClass="weather-stat-label" text="Wind" /></VBox>
++                    <VBox>
++                        <Label fx:id="lblHumidity" styleClass="weather-stat" text="--%" />
++                        <Label styleClass="weather-stat-label" text="Humidity" />
++                    </VBox>
++                    <VBox>
++                        <Label fx:id="lblWind" styleClass="weather-stat" text="-- kph" />
++                        <Label styleClass="weather-stat-label" text="Wind" />
++                    </VBox>
+                 </HBox>
+-                <Label styleClass="weather-desc" text="Partly cloudy · Bacolod City" />
++                <Label fx:id="lblWeatherDesc" styleClass="weather-desc" text="Loading… · Bacolod City" />
+             </VBox>
++
+         </HBox>
+     </VBox>
+ </ScrollPane>

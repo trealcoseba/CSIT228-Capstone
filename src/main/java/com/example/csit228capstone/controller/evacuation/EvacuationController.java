@@ -35,9 +35,9 @@ public class EvacuationController {
     @FXML private Label lblTotalEvacuees;
     @FXML private Label lblCentersActive;
 
-    @FXML private TableColumn colAddress;
+    @FXML private TableColumn<EvacuationCenter, String> colAddress;
     @FXML private WebView mapWebView;
-    @FXML private TableView centersTable;
+    @FXML private TableView<EvacuationCenter> centersTable;
     @FXML private TableColumn<EvacuationCenter, String>  colName;
     @FXML private TableColumn<EvacuationCenter, String>  colCapacity;
     @FXML private TableColumn<EvacuationCenter, Integer> colOccupancy;
@@ -74,6 +74,21 @@ public class EvacuationController {
     }
 
     // -------------------------------------------------------------------------
+    // Refresh Logic
+    // -------------------------------------------------------------------------
+
+    @FXML
+    private void handleRefresh(ActionEvent event) {
+        // Reset Filter UI
+        tfSearch.clear();
+        filterStatus.setValue("All");
+        filterAscOrDesc.setValue("Name A→Z");
+
+        // Reload fresh data from database/service
+        loadCentersData();
+    }
+
+    // -------------------------------------------------------------------------
     // Add / Activate
     // -------------------------------------------------------------------------
 
@@ -84,9 +99,20 @@ public class EvacuationController {
                     getClass().getResource("/com/example/csit228capstone/evacuation/EvacuationForm.fxml"));
             Parent root = loader.load();
             Stage stage = new Stage();
+
+            // FIX: Set Owner to prevent the dialog from inheriting full-screen state
+            if (centersTable.getScene() != null) {
+                stage.initOwner(centersTable.getScene().getWindow());
+            }
+
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("Add Center");
             stage.setScene(new Scene(root));
+
+            // FIX: Disable resizing and force full-screen off
+            stage.setResizable(false);
+            stage.setFullScreen(false);
+
             stage.showAndWait();
             loadCentersData();
         } catch (IOException e) {
@@ -104,12 +130,15 @@ public class EvacuationController {
     // -------------------------------------------------------------------------
 
     private void setUpTables() {
+        formatTables();
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colCapacity.setCellValueFactory(new PropertyValueFactory<>("maxCapacity"));
         colOccupancy.setCellValueFactory(new PropertyValueFactory<>("currentOccupancy"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colManager.setCellValueFactory(new PropertyValueFactory<>("managerName"));
         colAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
+        colContact.setCellValueFactory(new PropertyValueFactory<>("contactNumber"));
+
         setupActionButtons();
         loadCentersData();
         centersTable.setEditable(false);
@@ -285,11 +314,21 @@ public class EvacuationController {
             formController.populateForEdit(center);
 
             Stage stage = new Stage();
+
+            // FIX: Set Owner
+            if (centersTable.getScene() != null) {
+                stage.initOwner(centersTable.getScene().getWindow());
+            }
+
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("Edit Center");
             stage.setScene(new Scene(root));
-            stage.showAndWait();
 
+            // FIX: Disable resizing and force full-screen off
+            stage.setResizable(false);
+            stage.setFullScreen(false);
+
+            stage.showAndWait();
             loadCentersData();
         } catch (IOException e) {
             e.printStackTrace();
@@ -298,6 +337,12 @@ public class EvacuationController {
 
     private void confirmAndDelete(EvacuationCenter center) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+
+        // FIX: Set the owner so the alert stays on top in full-screen mode
+        if (centersTable.getScene() != null && centersTable.getScene().getWindow() != null) {
+            confirm.initOwner(centersTable.getScene().getWindow());
+        }
+
         confirm.setTitle("Delete Center");
         confirm.setHeaderText("Delete \"" + center.getName() + "\"?");
         confirm.setContentText("This action cannot be undone.");
@@ -308,6 +353,10 @@ public class EvacuationController {
                     service.deleteCenter(center.getId());
                     loadCentersData();
                 } catch (Exception e) {
+                    // If deletion fails, show an error alert (also with an owner)
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR, "Delete failed: " + e.getMessage());
+                    if (centersTable.getScene() != null) errorAlert.initOwner(centersTable.getScene().getWindow());
+                    errorAlert.show();
                     e.printStackTrace();
                 }
             }
@@ -316,6 +365,11 @@ public class EvacuationController {
 
     private void openManageEvacueesDialog(EvacuationCenter center) {
         Dialog<Integer> dialog = new Dialog<>();
+
+        if (centersTable.getScene() != null) {
+            dialog.initOwner(centersTable.getScene().getWindow());
+        }
+
         dialog.setTitle("Manage Evacuees");
         dialog.setHeaderText("Update occupancy for:\n" + center.getName());
 
@@ -436,29 +490,31 @@ public class EvacuationController {
 
                     {
                         btnManage.setStyle("""
-                                -fx-background-color: #bbf7d0;
-                                -fx-text-fill: #166534;
-                                -fx-font-size: 10px;
-                                -fx-padding: 3 8 3 8;
-                                -fx-background-radius: 4;
-                                -fx-cursor: hand;
-                                """);
+                    -fx-background-color: #3aab8a;
+                    -fx-text-fill: white;
+                    -fx-font-size: 11px;
+                    -fx-padding: 5 12 5 12;
+                    -fx-background-radius: 8;
+                    -fx-cursor: hand;
+                    """);
+
                         btnEdit.setStyle("""
-                                -fx-background-color: #bfdbfe;
-                                -fx-text-fill: #1e40af;
-                                -fx-font-size: 10px;
-                                -fx-padding: 3 8 3 8;
-                                -fx-background-radius: 4;
-                                -fx-cursor: hand;
-                                """);
+                    -fx-background-color: #d4a017;
+                    -fx-text-fill: white;
+                    -fx-font-size: 11px;
+                    -fx-padding: 5 12 5 12;
+                    -fx-background-radius: 8;
+                    -fx-cursor: hand;
+                    """);
+
                         btnDelete.setStyle("""
-                                -fx-background-color: #fecaca;
-                                -fx-text-fill: #991b1b;
-                                -fx-font-size: 10px;
-                                -fx-padding: 3 8 3 8;
-                                -fx-background-radius: 4;
-                                -fx-cursor: hand;
-                                """);
+                    -fx-background-color: #c0392b;
+                    -fx-text-fill: white;
+                    -fx-font-size: 11px;
+                    -fx-padding: 5 12 5 12;
+                    -fx-background-radius: 8;
+                    -fx-cursor: hand;
+                    """);
 
                         btnEdit.setOnAction(e -> {
                             EvacuationCenter center = getTableView().getItems().get(getIndex());
@@ -561,5 +617,30 @@ public class EvacuationController {
         lblAddress.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 11px;");
         lblAvailable.setStyle("-fx-font-size: 11px; -fx-text-fill: #374151;");
         lblEvacuees.setStyle("-fx-font-size: 11px; -fx-text-fill: #6b7280;");
+    }
+
+    private void formatTables() {
+        // Total should add up to 1.0 (100%)
+        // Adjust these percentages if you want specific columns to be wider/narrower
+        colName.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.15));      // 15%
+        colAddress.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.20));   // 20%
+        colManager.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.12));   // 12%
+        colContact.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.12));   // 12%
+        colCapacity.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.08));  // 8%
+        colOccupancy.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.08)); // 8%
+        colStatus.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.10));    // 10%
+        colActions.prefWidthProperty().bind(centersTable.widthProperty().multiply(0.25));   // 15%
+
+        // Apply constraints and alignment to all columns
+        for (TableColumn<EvacuationCenter, ?> col : List.of(
+                colName, colAddress, colCapacity, colOccupancy,
+                colStatus, colManager, colContact, colActions)) {
+
+            col.setResizable(false);
+            col.setReorderable(false);
+
+            // This ensures text is centered within the column
+            col.setStyle("-fx-alignment: CENTER;");
+        }
     }
 }

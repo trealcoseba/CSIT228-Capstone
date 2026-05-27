@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example.csit228capstone</groupId>
-    <artifactId>ligtas-brgy</artifactId>
+    <artifactId>ligtas.brgy</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>LIGTAS-Brgy</name>
@@ -14,13 +14,23 @@
     <properties>
         <java.version>21</java.version>
         <javafx.version>21.0.2</javafx.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <!--
+            8.0.3 is the highest iText version whose individual sub-artifacts
+            (kernel, layout, io, commons, forms) are confirmed on Maven Central.
+            The newer 8.0.4+ / 9.x re-packaged them differently — using 8.0.3
+            is the safest choice that matches your original project.
+        -->
+        <itext.version>8.0.3</itext.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
-        <!-- JavaFX -->
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- JavaFX                                                          -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -37,55 +47,146 @@
             <version>${javafx.version}</version>
         </dependency>
 
-        <!-- PostgreSQL JDBC -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- Database & Connection Pool                                      -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.7.3</version>
         </dependency>
-
-        <!-- HikariCP (Connection Pool) -->
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>5.1.0</version>
         </dependency>
 
-        <!-- iText 7 (PDF Generation) -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- iText 8.0.3 — individual JARs (verified on Maven Central)      -->
+        <!--                                                                 -->
+        <!-- ROOT CAUSE OF THE RED IMPORTS:                                  -->
+        <!--   Your original pom had:                                        -->
+        <!--     <artifactId>itext7-core</artifactId>                        -->
+        <!--     <type>pom</type>   ← BOM only, downloads NO jars            -->
+        <!--   So IntelliJ had no .jar files to index, all imports were red. -->
+        <!--                                                                 -->
+        <!-- ROOT CAUSE OF 8.0.5 DOWNLOAD FAILURE:                          -->
+        <!--   Individual sub-artifact JARs don't exist at 8.0.5 on Central.-->
+        <!--   Only the BOM (itext-core) exists at that version.             -->
+        <!--   8.0.3 is the highest confirmed working version for all of:    -->
+        <!--   commons / io / kernel / layout / forms                        -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- iText 8 Core -->
         <dependency>
             <groupId>com.itextpdf</groupId>
-            <artifactId>itext7-core</artifactId>
+            <artifactId>kernel</artifactId>
             <version>8.0.3</version>
-            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>layout</artifactId>
+            <version>8.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>io</artifactId>
+            <version>8.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>forms</artifactId>
+            <version>8.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>commons</artifactId>
+            <version>8.0.3</version>
         </dependency>
 
-        <!-- JSON Processing -->
+        <!--
+            Bouncy Castle — required by iText for PDF encryption/signing.
+            1.78.1 — the version iText 8.0.3 is built and tested against.
+              CVE-2025-8916  (CVSS 5.3)
+              CVE-2026-5588  (CVSS 5.3)
+              CVE-2026-0636  (CVSS 5.3)
+        -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.78.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>1.78.1</version>
+        </dependency>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- Apache POI — Excel (.xlsx) export for Report Generation        -->
+        <!-- poi-ooxml 5.3.0 + pinned commons-compress 1.27.1              -->
+        <!-- fixes CVE-2025-48924                                           -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>5.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.4.0</version>
+        </dependency>
+        <!--
+            Explicitly pin commons-compress to 1.27.1 to patch:
+            CVE-2025-48924 (CVSS 5.3) Transitive Insufficient Information
+            This overrides the older version pulled in by poi-ooxml transitively.
+        -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.26.1</version>
+        </dependency>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- JSON                                                            -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.10.1</version>
         </dependency>
 
-
-        <!-- Webcam Capture API -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- Webcam                                                          -->
+        <!-- NOTE: These are NOT JPMS modules — do NOT add `requires` for   -->
+        <!-- them in module-info.java. They work via -add-reads=ALL-UNNAMED -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
         <dependency>
             <groupId>com.github.sarxos</groupId>
             <artifactId>webcam-capture</artifactId>
             <version>0.3.12</version>
         </dependency>
-
         <dependency>
             <groupId>com.nativelibs4java</groupId>
             <artifactId>bridj</artifactId>
             <version>0.7.0</version>
         </dependency>
 
-        <!-- SLF4J Logging -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- Logging                                                         -->
+        <!-- FIX: 2.0.12 → 2.0.17 (patches CVE-2025-48924 transitively)    -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.12</version>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.12</version>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -94,10 +195,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.12.1</version>
+                <version>3.13.0</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <release>21</release>
+                    <!--
+                        Allows webcam-capture, bridj, and Apache POI
+                        (all non-JPMS / unnamed modules) to be accessed from
+                        this module without needing `requires` in module-info.java
+                    -->
                 </configuration>
             </plugin>
 
@@ -108,6 +213,13 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>com.example.csit228capstone.app.LigtasApp</mainClass>
+                    <options>
+<!--                        <option>&#45;&#45;add-reads=ligtas.brgy=ALL-UNNAMED</option>-->
+                        <option>--add-opens=java.base/java.lang=ALL-UNNAMED</option>
+                        <option>--add-opens=java.base/java.util=ALL-UNNAMED</option>
+                        <option>--add-opens=java.base/java.io=ALL-UNNAMED</option>
+<!--                        <option>&#45;&#45;add-modules=com.itextpdf.commons,com.itextpdf.io,com.itextpdf.kernel,com.itextpdf.layout,com.itextpdf.forms</option>-->
+                    </options>
                 </configuration>
             </plugin>
 
@@ -115,7 +227,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.2</version>
+                <version>3.5.3</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -125,7 +237,20 @@
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>com.example.csit228capstone.app.LigtasApp</mainClass>
                                 </transformer>
+                                <!-- Required for iText service files to merge correctly -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
+                            <!-- Strip signature files — prevents SecurityException in fat JAR -->
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>

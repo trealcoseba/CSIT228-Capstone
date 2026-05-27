@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane prefHeight="800.0" prefWidth="1000.0" style="-fx-background-color: #F0F2FF;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.login.LoginController"> <!-- Force white background -->
+<StackPane prefHeight="1200.0" prefWidth="1500.0" style="-fx-background-color: #F0F2FF;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.login.LoginController"> <!-- Force white background -->
 
     <stylesheets>
       <URL value="@../../../../css/application.css" />
@@ -40,18 +40,18 @@
             <!-- Labels styled with white text to pop against Navy -->
             <VBox spacing="5">
                 <Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Username" />
-                <TextField fx:id="tfUsername" promptText="Tre" styleClass="search-field" />
+                <TextField fx:id="tfUsername" onAction="#handleFirstTF" promptText="Tre" styleClass="search-field" />
             </VBox>
 
             <VBox spacing="5">
                 <Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Password" />
-                <PasswordField fx:id="tfPassword" promptText="iloveyou143" styleClass="search-field" />
+                <PasswordField fx:id="tfPassword" onAction="#handleSecondTF" promptText="iloveyou143" styleClass="search-field" />
             </VBox>
         </VBox>
 
         <!-- Login Button using your Gold/Warning variant -->
         <VBox alignment="CENTER" spacing="10">
-            <Button maxWidth="Infinity" onAction="#handleLogin" prefHeight="45" styleClass="quick-action-btn, qa-warning" text="SIGN IN" />
+            <Button fx:id="btnLogin" maxWidth="Infinity" onAction="#handleLogin" prefHeight="45" styleClass="quick-action-btn, qa-warning" text="SIGN IN" />
 
             <Label fx:id="lblError" style="-fx-text-fill: #E74C3C; -fx-font-weight: bold;" text="Invalid Credentials" visible="false" />
         </VBox>

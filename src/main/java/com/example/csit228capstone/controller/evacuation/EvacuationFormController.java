@@ -45,6 +45,11 @@ public class EvacuationFormController {
             MapPickerController mapController = loader.getController();
 
             Stage stage = new Stage();
+
+            if (txtName.getScene() != null) {
+                stage.initOwner(txtName.getScene().getWindow());
+            }
+
             stage.setTitle("Pin Evacuation Center Location");
             stage.setScene(new Scene(root));
             stage.showAndWait();
@@ -151,6 +156,11 @@ public class EvacuationFormController {
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+
+        if (txtName.getScene() != null && txtName.getScene().getWindow() != null) {
+            alert.initOwner(txtName.getScene().getWindow());
+        }
+
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);

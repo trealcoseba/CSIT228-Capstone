@@ -13,6 +13,8 @@ module ligtas.brgy {
     requires webcam.capture;
     requires java.desktop;
     requires jdk.jsobject;
+    requires org.apache.poi.poi;
+    requires org.apache.poi.ooxml;
 
     opens com.example.csit228capstone.app to javafx.fxml;
     opens com.example.csit228capstone.model to javafx.base;
@@ -23,7 +25,6 @@ module ligtas.brgy {
     exports com.example.csit228capstone.service;
     exports com.example.csit228capstone.repository;
     exports com.example.csit228capstone.util;
-    exports com.example.csit228capstone.ai;
     exports com.example.csit228capstone.controller.resident;
     opens com.example.csit228capstone.controller.resident to javafx.fxml;
     exports com.example.csit228capstone.controller.login;
@@ -32,16 +33,14 @@ module ligtas.brgy {
     opens com.example.csit228capstone.controller.mainlayout to javafx.fxml;
     exports com.example.csit228capstone.controller.dashboard;
     opens com.example.csit228capstone.controller.dashboard to javafx.fxml;
-    exports com.example.csit228capstone.controller.documents;
-    opens com.example.csit228capstone.controller.documents to javafx.fxml;
     exports com.example.csit228capstone.controller.reports;
     opens com.example.csit228capstone.controller.reports to javafx.fxml;
     exports com.example.csit228capstone.controller.settings;
     opens com.example.csit228capstone.controller.settings to javafx.fxml;
     exports com.example.csit228capstone.controller.incidents;
+    opens com.example.csit228capstone.controller.responder to javafx.fxml;
+    exports com.example.csit228capstone.controller.responder;
     opens com.example.csit228capstone.controller.incidents to javafx.fxml;
-    exports com.example.csit228capstone.controller.chatbot;
-    opens com.example.csit228capstone.controller.chatbot to javafx.fxml;
     exports com.example.csit228capstone.controller.resources;
     opens com.example.csit228capstone.controller.resources to javafx.fxml;
     exports com.example.csit228capstone.controller.alerts;
@@ -53,16 +52,16 @@ module ligtas.brgy {
     exports com.example.csit228capstone.controller.map;
     opens com.example.csit228capstone.controller.map to javafx.fxml;
     exports com.example.csit228capstone.model.incident;
+    opens com.example.csit228capstone.controller.emergency to javafx.fxml;
+    exports com.example.csit228capstone.controller.emergency;
     opens com.example.csit228capstone.model.incident to javafx.base;
-    exports com.example.csit228capstone.model.chatbot;
-    opens com.example.csit228capstone.model.chatbot to javafx.base;
     exports com.example.csit228capstone.model.vulnerability;
     opens com.example.csit228capstone.model.vulnerability to javafx.base;
-    exports com.example.csit228capstone.model.document;
-    opens com.example.csit228capstone.model.document to javafx.base;
     exports com.example.csit228capstone.model.alert;
     opens com.example.csit228capstone.model.alert to javafx.base;
     opens com.example.csit228capstone.model.report to javafx.base, javafx.fxml;
+    exports com.example.csit228capstone.model.responder;
+    opens com.example.csit228capstone.model.responder to javafx.base;
 
 
 }

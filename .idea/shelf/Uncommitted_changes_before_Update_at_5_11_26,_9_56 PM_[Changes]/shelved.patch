@@ -1,0 +1,109 @@
+Index: src/main/resources/com/example/csit228capstone/emergency/EmergencyAuth.fxml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n<?import javafx.scene.control.*?>\n<?import javafx.scene.layout.*?>\n\n<VBox alignment=\"CENTER\" prefHeight=\"200\" prefWidth=\"350\" spacing=\"20\" style=\"-fx-background-color: #0d1117; -fx-border-color: #ff4757; -fx-border-width: 2; -fx-padding: 30;\" stylesheets=\"@../../../../css/application.css\" xmlns=\"http://javafx.com/javafx/17.0.12\" xmlns:fx=\"http://javafx.com/fxml/1\" fx:controller=\"com.example.csit228capstone.controller.emergency.EmergencyAuthController\">\n\n    <VBox alignment=\"CENTER\" spacing=\"8\">\n        <Label style=\"-fx-text-fill: #ff4757; -fx-font-weight: bold; -fx-font-size: 14px;\" text=\"高 SECURITY CLEARANCE REQUIRED\" />\n        <Label style=\"-fx-text-fill: #9ca3af; -fx-font-size: 11px;\" text=\"Enter Admin Passkey to activate EOC\" />\n    </VBox>\n\n    <PasswordField fx:id=\"txtPasskey\" promptText=\"Enter Passkey\" style=\"-fx-background-color: #161b22; -fx-text-fill: white; -fx-border-color: #374151; -fx-background-radius: 5; -fx-border-radius: 5;\" />\n\n    <HBox alignment=\"CENTER\" spacing=\"10\">\n        <Button onAction=\"#handleCancel\" style=\"-fx-cursor: hand;\" styleClass=\"btn-outline\" text=\"Cancel\" />\n        <Button defaultButton=\"true\" onAction=\"#handleAuthorize\" prefHeight=\"34.0\" prefWidth=\"70.0\" style=\"-fx-background-color: #ff4757; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;\" text=\"Authorize\" />\n    </HBox>\n</VBox>\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/resources/com/example/csit228capstone/emergency/EmergencyAuth.fxml b/src/main/resources/com/example/csit228capstone/emergency/EmergencyAuth.fxml
+--- a/src/main/resources/com/example/csit228capstone/emergency/EmergencyAuth.fxml	(revision 3079f185c2f059e6a5d29386d3f34b1b3dd31711)
++++ b/src/main/resources/com/example/csit228capstone/emergency/EmergencyAuth.fxml	(date 1778477420803)
+@@ -6,7 +6,7 @@
+ <VBox alignment="CENTER" prefHeight="200" prefWidth="350" spacing="20" style="-fx-background-color: #0d1117; -fx-border-color: #ff4757; -fx-border-width: 2; -fx-padding: 30;" stylesheets="@../../../../css/application.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.csit228capstone.controller.emergency.EmergencyAuthController">
+ 
+     <VBox alignment="CENTER" spacing="8">
+-        <Label style="-fx-text-fill: #ff4757; -fx-font-weight: bold; -fx-font-size: 14px;" text="高 SECURITY CLEARANCE REQUIRED" />
++        <Label style="-fx-text-fill: #ff4757; -fx-font-weight: bold; -fx-font-size: 14px;" text=" SECURITY CLEARANCE REQUIRED" textAlignment="CENTER" />
+         <Label style="-fx-text-fill: #9ca3af; -fx-font-size: 11px;" text="Enter Admin Passkey to activate EOC" />
+     </VBox>
+ 
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"7f9927eb-169f-486c-98fc-cd8fa020e882\" name=\"Changes\" comment=\"fixed evacuation bug\">\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/example/csit228capstone/controller/responder/ResponderController.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/example/csit228capstone/controller/responder/ResponderController.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/example/csit228capstone/model/Responder.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/example/csit228capstone/model/responder/Responder.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/com/example/csit228capstone/repository/ResponderRepository.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/com/example/csit228capstone/repository/ResponderRepository.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/module-info.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/module-info.java\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/responder/Responder.fxml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/responder/Responder.fxml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/src/main/resources/css/application.css\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/resources/css/application.css\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"CopilotPersistence\">\n    <persistenceIdMap>\n      <entry key=\"_/Users/jacyerlsangre/CSIT228-Capstone\" value=\"3DGTyvLvckC2cpUrfXKhuN1coQa\" />\n    </persistenceIdMap>\n  </component>\n  <component name=\"FileTemplateManagerImpl\">\n    <option name=\"RECENT_TEMPLATES\">\n      <list>\n        <option value=\"HTML File\" />\n        <option value=\"FxmlFile\" />\n        <option value=\"Class\" />\n      </list>\n    </option>\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"GitHubPullRequestSearchHistory\">{\n  &quot;lastFilter&quot;: {\n    &quot;state&quot;: &quot;OPEN&quot;,\n    &quot;assignee&quot;: &quot;jacy-sangre&quot;\n  }\n}</component>\n  <component name=\"GithubPullRequestsUISettings\">{\n  &quot;selectedUrlAndAccountId&quot;: {\n    &quot;url&quot;: &quot;https://github.com/trealcoseba/CSIT228-Capstone.git&quot;,\n    &quot;accountId&quot;: &quot;6154ff64-34fc-4318-9084-c2f39e161e61&quot;\n  }\n}</component>\n  <component name=\"McpProjectServerCommands\">\n    <commands />\n    <urls />\n  </component>\n  <component name=\"ProblemsViewState\">\n    <option name=\"selectedTabId\" value=\"CurrentFile\" />\n  </component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 8,\n  &quot;fromUser&quot;: false\n}</component>\n  <component name=\"ProjectId\" id=\"3DGTyvLvckC2cpUrfXKhuN1coQa\" />\n  <component name=\"ProjectLevelVcsManager\">\n    <ConfirmationsSetting value=\"1\" id=\"Add\" />\n  </component>\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n    <option name=\"sortKey\" value=\"BY_TIME_ASCENDING\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"Application.DBtest.executor\": \"Run\",\n    \"Application.LigtasApp.executor\": \"Run\",\n    \"Application.residentTest.executor\": \"Run\",\n    \"DefaultHtmlFileTemplate\": \"HTML File\",\n    \"RunOnceActivity.MCP Project settings loaded\": \"true\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252\": \"true\",\n    \"RunOnceActivity.git.unshallow\": \"true\",\n    \"RunOnceActivity.typescript.service.memoryLimit.init\": \"true\",\n    \"codeWithMe.voiceChat.enabledByDefault\": \"false\",\n    \"git-widget-placeholder\": \"thisisitpancit\",\n    \"kotlin-language-version-configured\": \"true\",\n    \"last_opened_file_path\": \"/Users/jacyerlsangre/CSIT228-Capstone/src/main/resources/com/example/csit228capstone/responder\",\n    \"node.js.detected.package.eslint\": \"true\",\n    \"node.js.detected.package.tslint\": \"true\",\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\n    \"nodejs_package_manager_path\": \"npm\",\n    \"project.structure.last.edited\": \"Libraries\",\n    \"project.structure.proportion\": \"0.0\",\n    \"project.structure.side.proportion\": \"0.0\",\n    \"settings.editor.selected.configurable\": \"preferences.pluginManager\"\n  },\n  \"keyToStringList\": {\n    \"DatabaseDriversLRU\": [\n      \"postgresql\"\n    ]\n  }\n}]]></component>\n  <component name=\"RecentsManager\">\n    <key name=\"CopyFile.RECENT_KEYS\">\n      <recent name=\"$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/responder\" />\n      <recent name=\"$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/emergency\" />\n      <recent name=\"$PROJECT_DIR$/src/main/resources/com/example/csit228capstone\" />\n      <recent name=\"$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/analytics\" />\n      <recent name=\"$PROJECT_DIR$/src/main/resources/images\" />\n    </key>\n    <key name=\"MoveFile.RECENT_KEYS\">\n      <recent name=\"$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/emergency\" />\n      <recent name=\"$PROJECT_DIR$/src/main/resources/images\" />\n      <recent name=\"$PROJECT_DIR$/src/main/resources/map\" />\n      <recent name=\"$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/evacuation\" />\n      <recent name=\"$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/settings\" />\n    </key>\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"7f9927eb-169f-486c-98fc-cd8fa020e882\" name=\"Changes\" comment=\"\" />\n      <created>1777907667020</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1777907667020</updated>\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"Seperated Analytics and Reports FXML&#10;Fixed edit resident logic\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1778245487563</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1778245487563</updated>\n    </task>\n    <task id=\"LOCAL-00002\" summary=\"Seperated Analytics and Reports FXML&#10;Fixed edit resident logic\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1778245562773</created>\n      <option name=\"number\" value=\"00002\" />\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1778245562773</updated>\n    </task>\n    <task id=\"LOCAL-00003\" summary=\"added responders\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1778250438002</created>\n      <option name=\"number\" value=\"00003\" />\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1778250438002</updated>\n    </task>\n    <task id=\"LOCAL-00004\" summary=\"added responders\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1778250445701</created>\n      <option name=\"number\" value=\"00004\" />\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1778250445701</updated>\n    </task>\n    <task id=\"LOCAL-00005\" summary=\"fixed evacuation bug\">\n      <option name=\"closed\" value=\"true\" />\n      <created>1778252842854</created>\n      <option name=\"number\" value=\"00005\" />\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1778252842854</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"6\" />\n    <servers />\n  </component>\n  <component name=\"TypeScriptGeneratedFilesManager\">\n    <option name=\"version\" value=\"3\" />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State />\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"Seperated Analytics and Reports FXML&#10;Fixed edit resident logic\" />\n    <MESSAGE value=\"Merge remote-tracking branch 'origin/thisisitpancit' into thisisitpancit&#10;&#10;# Conflicts:&#10;#&#9;src/main/java/com/example/csit228capstone/model/alert/AlertPriority.java\" />\n    <MESSAGE value=\"added responders\" />\n    <MESSAGE value=\"fixed evacuation bug\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"fixed evacuation bug\" />\n  </component>\n  <component name=\"github-copilot-workspace\">\n    <instructionFileLocations>\n      <option value=\".github/instructions\" />\n    </instructionFileLocations>\n    <promptFileLocations>\n      <option value=\".github/prompts\" />\n    </promptFileLocations>\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 3079f185c2f059e6a5d29386d3f34b1b3dd31711)
++++ b/.idea/workspace.xml	(date 1778477611083)
+@@ -6,12 +6,7 @@
+   <component name="ChangeListManager">
+     <list default="true" id="7f9927eb-169f-486c-98fc-cd8fa020e882" name="Changes" comment="fixed evacuation bug">
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/controller/responder/ResponderController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/controller/responder/ResponderController.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/model/Responder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/model/responder/Responder.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/repository/ResponderRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/csit228capstone/repository/ResponderRepository.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/responder/Responder.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/responder/Responder.fxml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/resources/css/application.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/css/application.css" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/emergency/EmergencyAuth.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/emergency/EmergencyAuth.fxml" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -67,37 +62,37 @@
+     <option name="showLibraryContents" value="true" />
+     <option name="sortKey" value="BY_TIME_ASCENDING" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "Application.DBtest.executor": "Run",
+-    "Application.LigtasApp.executor": "Run",
+-    "Application.residentTest.executor": "Run",
+-    "DefaultHtmlFileTemplate": "HTML File",
+-    "RunOnceActivity.MCP Project settings loaded": "true",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+-    "RunOnceActivity.git.unshallow": "true",
+-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+-    "codeWithMe.voiceChat.enabledByDefault": "false",
+-    "git-widget-placeholder": "thisisitpancit",
+-    "kotlin-language-version-configured": "true",
+-    "last_opened_file_path": "/Users/jacyerlsangre/CSIT228-Capstone/src/main/resources/com/example/csit228capstone/responder",
+-    "node.js.detected.package.eslint": "true",
+-    "node.js.detected.package.tslint": "true",
+-    "node.js.selected.package.eslint": "(autodetect)",
+-    "node.js.selected.package.tslint": "(autodetect)",
+-    "nodejs_package_manager_path": "npm",
+-    "project.structure.last.edited": "Libraries",
+-    "project.structure.proportion": "0.0",
+-    "project.structure.side.proportion": "0.0",
+-    "settings.editor.selected.configurable": "preferences.pluginManager"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;Application.DBtest.executor&quot;: &quot;Run&quot;,
++    &quot;Application.LigtasApp.executor&quot;: &quot;Run&quot;,
++    &quot;Application.residentTest.executor&quot;: &quot;Run&quot;,
++    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
++    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
++    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
++    &quot;git-widget-placeholder&quot;: &quot;thisisitpancit&quot;,
++    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
++    &quot;last_opened_file_path&quot;: &quot;/Users/jacyerlsangre/CSIT228-Capstone/src/main/resources/com/example/csit228capstone/responder&quot;,
++    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
++    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
++    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
++    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
++    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
++    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
++    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
++    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
++    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+   },
+-  "keyToStringList": {
+-    "DatabaseDriversLRU": [
+-      "postgresql"
++  &quot;keyToStringList&quot;: {
++    &quot;DatabaseDriversLRU&quot;: [
++      &quot;postgresql&quot;
+     ]
+   }
+-}]]></component>
++}</component>
+   <component name="RecentsManager">
+     <key name="CopyFile.RECENT_KEYS">
+       <recent name="$PROJECT_DIR$/src/main/resources/com/example/csit228capstone/responder" />
