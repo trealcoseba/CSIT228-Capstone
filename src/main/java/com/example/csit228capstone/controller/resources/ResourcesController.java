@@ -111,7 +111,7 @@ public class ResourcesController {
 
 
     private void setupLogSort() {
-        if (cbLogSort == null) return; // guard for older FXML without the field
+        if (cbLogSort == null) return;
 
         cbLogSort.setItems(FXCollections.observableArrayList(
                 SORT_DATE_DESC, SORT_DATE_ASC, SORT_RESOURCE, SORT_QTY_DESC
@@ -342,7 +342,6 @@ public class ResourcesController {
         resourcesTabPane.getSelectionModel().select(logTab);
     }
 
-    /** Called by the Reset Filter button in the Log tab. */
     public void resetLogFilter(ActionEvent actionEvent) {
         highlightedResourceId = null;
         applyLogView();
@@ -448,7 +447,6 @@ public class ResourcesController {
         return "OK";
     }
 
-    // ── Edit dialog ───────────────────────────────────────────────────────────
 
     private void openEditDialog(Resource resource) {
         Dialog<ButtonType> dialog = new Dialog<>();
@@ -529,7 +527,6 @@ public class ResourcesController {
         }
     }
 
-    // ── Misc helpers ──────────────────────────────────────────────────────────
 
     private void confirmAndDelete(Resource resource) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);

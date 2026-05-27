@@ -229,5 +229,5 @@ src/main/resources/
 ## UML Diagrams
 
 The `diagrams/` folder contains:
-- **`use-case-diagram.png`** — models interactions between the Barangay Admin and all system modules
+- **`use-case-diagram.svg`** — models interactions between the Barangay Admin and all system modules
 - **`class-diagram.png`** — illustrates relationships between core model classes, repositories, services, and controllers
